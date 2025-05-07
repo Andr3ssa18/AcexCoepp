@@ -15,4 +15,7 @@ GitHub: [Andr3ssa18](https://github.com/Andr3ssa18)
 * Yasmin Menezes Santana
 
 ## Professor Orientador
-* 
+*
+
+## Visual do Site
+
