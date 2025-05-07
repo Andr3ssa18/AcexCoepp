@@ -1,4 +1,7 @@
-# Projeto AcexCoepp
+<div align="center"> 
+<h1>Projeto AcexCoepp</h1> 
+</div>
+
 ## Ideia Principal
 Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de psicologia. Nele, dá pra marcar consultas e encontrar vagas de estágio na clínica de forma rápida e organizada. Isso ajuda na formação dos alunos e ainda melhora o acesso ao cuidado com a saúde mental.
 
