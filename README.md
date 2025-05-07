@@ -14,10 +14,15 @@ Alan dos Anjos Cabral
   
 Andressa Rosa Cruz
 * GitHub: [Andr3ssa18](https://github.com/Andr3ssa18)
+  
 Guilherme Cordeiro da Silva
+
 Júlia Abrantes Silva
+
 Thiago da Silva Azevedo
+
 Wesley Kenzo Ito
+
 Yasmin Menezes Santana
 
 ## Professor Orientador
