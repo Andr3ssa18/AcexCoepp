@@ -16,7 +16,7 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 #### Andressa Rosa Cruz
 * [GitHub](https://github.com/Andr3ssa18)
   
-Guilherme Cordeiro da Silva
+#### Guilherme Cordeiro da Silva
 
 #### Júlia Abrantes Silva
 
