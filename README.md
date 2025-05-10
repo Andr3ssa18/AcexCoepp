@@ -31,7 +31,7 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 
 ## Professor Orientador
 
-#### Manoel Moraes
+#### Manoel Guilherme de Faria Moraes
 * [GitHub](https://github.com/profmanoel)
 
 ## Visual do Site
