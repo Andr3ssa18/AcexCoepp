@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .welcome-section {
+            background-color: #4285F4;
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+            text-align: center;
+        }
+        
+        .welcome-content {
+            max-width: 350px;
+        }
+        
+        .welcome-title {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+        
+        .welcome-text {
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .register-now {
+            color: white;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .register-now:hover {
+            background-color: white;
+            color: #4285F4;
+        }
+        
+        .login-container {
+            background-color: white;
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .language-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        
+        .language-btn {
+            background: none;
+            border: none;
+            color: #4285F4;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .language-btn:hover {
+            text-decoration: underline;
+        }
+        
+        h1 {
+            text-align: left;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+            font-size: 24px;
+        }
+        
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .social-btn {
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .social-btn:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .social-btn.google {
+            border-color: #4285F4;
+            color: #4285F4;
+        }
+        
+        .social-btn.facebook {
+            border-color: #4267B2;
+            color: #4267B2;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .divider::before {
+            margin-right: 10px;
+        }
+        
+        .divider::after {
+            margin-left: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            justify-content: flex-start;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .login-btn:hover {
+            background-color: #3367D6;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .footer-links a {
+            color: #4285F4;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Welcome back!</h1>
+            <p class="welcome-text">To keep connected with us please login with your personal info</p>
+            <a href="#" class="register-now">REGISTER NOW</a>
+        </div>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-form">
+            <div class="language-toggle">
+                <button class="language-btn" id="toggleLanguage">Português</button>
+            </div>
+            
+            <h1 id="loginTitle">Login</h1>
+            
+            <div class="social-login">
+                <button class="social-btn google" id="googleBtn">
+                    Sign up with Google
+                </button>
+                <button class="social-btn facebook" id="facebookBtn">
+                    Sign up with Facebook
+                </button>
+            </div>
+            
+            <div class="divider" id="dividerText">OR</div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email" id="emailLabel">Email Address or Username</label>
+                    <input type="text" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" id="passwordLabel">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember">
+                    <label for="remember" id="rememberLabel">Keep me logged in</label>
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">Log in</button>
+            </form>
+            
+            <div class="footer-links">
+                <a href="#" id="forgotPasswordLink">Forgot your Password?</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                loginTitle: "Login",
+                googleBtn: "Sign up with Google",
+                facebookBtn: "Sign up with Facebook",
+                dividerText: "OR",
+                emailLabel: "Email Address or Username",
+                passwordLabel: "Password",
+                rememberLabel: "Keep me logged in",
+                loginBtn: "Log in",
+                forgotPasswordLink: "Forgot your Password?",
+                toggleLanguage: "Português",
+                welcomeTitle: "Welcome back!",
+                welcomeText: "New here?",
+                registerNow: "REGISTER NOW"
+            },
+            pt: {
+                loginTitle: "Entrar",
+                googleBtn: "Cadastre-se com Google",
+                facebookBtn: "Cadastre-se com Facebook",
+                dividerText: "OU",
+                emailLabel: "E-mail ou Nome de Usuário",
+                passwordLabel: "Senha",
+                rememberLabel: "Manter-me conectado",
+                loginBtn: "Entrar",
+                forgotPasswordLink: "Esqueceu sua Senha?",
+                toggleLanguage: "English",
+                welcomeTitle: "Bem-vindo de volta!",
+                welcomeText: "Novo aqui?",
+                registerNow: "CADASTRE-SE AGORA"
+            }
+        };
+
+        let currentLanguage = 'en';
+        const toggleBtn = document.getElementById('toggleLanguage');
+
+        function updateTexts() {
+            const elements = translations[currentLanguage];
+            for (const [key, value] of Object.entries(elements)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.tagName === 'INPUT' && element.type === 'submit') {
+                        element.value = value;
+                    } else if (element.tagName === 'BUTTON' && element.id !== 'toggleLanguage') {
+                        element.textContent = value;
+                    } else if (element.tagName === 'LABEL') {
+                        element.textContent = value;
+                    } else if (element.tagName === 'SPAN') {
+                        element.textContent = value;
+                    } else if (element.tagName === 'A') {
+                        element.textContent = value;
+                    } else if (element.tagName === 'DIV' && element.classList.contains('divider')) {
+                        element.textContent = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+            
+            // Update welcome section texts
+            document.querySelector('.welcome-title').textContent = translations[currentLanguage].welcomeTitle;
+            document.querySelector('.welcome-text').textContent = translations[currentLanguage].welcomeText;
+            document.querySelector('.register-now').textContent = translations[currentLanguage].registerNow;
+            
+            toggleBtn.textContent = translations[currentLanguage].toggleLanguage;
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'en' ? 'pt' : 'en';
+            updateTexts();
+        });
+
+        // Initialize with English
+        updateTexts();
+    </script>
+</body>
+</html>
