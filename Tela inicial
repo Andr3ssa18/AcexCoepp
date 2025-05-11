@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>COEPP - Início</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+      background-color: #f8f8f8;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      background: url('https://source.unsplash.com/1600x500/?education,school') no-repeat center center/cover;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-shadow: 1px 1px 4px black;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .hero h2 {
+      font-size: 48px;
+    }
+
+    section {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .info-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .info-box h3 {
+      color: #003366;
+    }
+
+    .cta {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .cta a {
+      padding: 12px 30px;
+      background-color: #003366;
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .cta a:hover {
+      background-color: #00509e;
+    }
+
+    footer {
+      background-color: #003366;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h2 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>COEPP</h1>
+    <nav>
+      <a href="#sobre">Sobre</a>
+      <a href="#valores">Missão e Visão</a>
+      <a href="#login">Login</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h2>Centro de Oportunidades Educacionais e Profissionais</h2>
+      <p>Transformando vidas por meio da educação de qualidade</p>
+    </div>
+  </div>
+
+  <section id="sobre">
+    <h2>Sobre o COEPP</h2>
+    <p>
+      O COEPP é uma instituição comprometida com a formação educacional e profissional de qualidade, oferecendo cursos e programas que preparam alunos para os desafios do mercado de trabalho e da vida.
+    </p>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <h3>Cursos Técnicos</h3>
+        <p>Capacitação profissional com foco no mercado de trabalho atual.</p>
+      </div>
+      <div class="info-box">
+        <h3>Formação Humana</h3>
+        <p>Desenvolvimento pessoal e valores para uma sociedade melhor.</p>
+      </div>
+      <div class="info-box">
+        <h3>Inclusão Social</h3>
+        <p>Projetos e ações voltadas para comunidades vulneráveis.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="valores">
+    <h2>Missão, Visão e Valores</h2>
+    <div class="info-grid">
+      <div class="info-box">
+        <h3>Missão</h3>
+        <p>Promover educação acessível e transformadora para todos.</p>
+      </div>
+      <div class="info-box">
+        <h3>Visão</h3>
+        <p>Ser referência nacional em educação profissional e humana.</p>
+      </div>
+      <div class="info-box">
+        <h3>Valores</h3>
+        <p>Ética, respeito, compromisso social, qualidade e inovação.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta" id="login">
+    <a href="login.html">Acessar Login</a>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 COEPP - Todos os direitos reservados</p>
+  </footer>
+</body>
