@@ -26,7 +26,7 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 #### Thiago da Silva Azevedo
 
 #### Wesley Kenzo Ito
-* [GitHub](https://github.com/Wesley-Ito))
+* [GitHub](https://github.com/Wesley-Ito)
 
 #### Yasmin Menezes Santana
 * [GitHub](https://github.com/YasminMenezes06)
