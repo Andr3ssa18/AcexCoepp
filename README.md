@@ -20,6 +20,7 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 * [GitHub](https://github.com/Andr3ssa18)
   
 #### Guilherme Cordeiro da Silva
+* [GitHub](https://github.com/GuilhermeSilvaGit)
 
 #### Júlia Abrantes Silva
 
