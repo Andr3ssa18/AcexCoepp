@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Senha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to top, #074276, #64a1d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .cartao {
+            background: white;
+            border-radius: 20px;
+            width: 380px;
+            padding: 40px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            position: relative;
+        }
+
+        .cartao h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            color: black;
+        }
+
+        .cartao label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .cartao input[type="password"] {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .password-strength-container {
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+        .password-strength {
+            height: 6px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 20%;
+            background-color: #f44336;
+            border-radius: 4px;
+        }
+
+        .password-strength-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .botoes-navegacao {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .botao-navegacao {
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .botao-navegacao:hover {
+            background-color: #053052;
+        }
+
+        .indicador-etapa {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .logo-img {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 100px;
+            height: auto;
+        }
+
+        .botao-criar-conta {
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 15px;
+        }
+
+        .botao-criar-conta:hover {
+            background-color: #053052;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cartao">
+        <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="Logo FSA" class="logo-img">
+
+        <h2>Senha</h2>
+
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" minlength="8" maxlength="20" required>
+        <p class="error-message" id="password-length-error" style="display:none;">A senha deve ter entre 8 e 20 caracteres.</p>
+
+        <label for="confirm_password">Confirmar sua senha</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+        <p class="error-message" id="password-match-error" style="display:none;">As senhas não são a mesma.</p>
+
+        <div class="password-strength-container">
+            <div class="password-strength">
+                <div class="password-strength-bar" style="width: 20%; background-color: #f44336;"></div>
+            </div>
+            <span class="password-strength-text">Muito fraca</span>
+        </div>
+
+        <button class="botao-criar-conta" type="submit" onclick="validatePasswords()">Criar Conta</button>
+
+        <div class="botoes-navegacao" style="margin-top: 25px;">
+            <button class="botao-navegacao" onclick="window.history.back()">&#8592;</button>
+            <div style="flex-grow: 1;"></div>
+        </div>
+    </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const strengthBar = document.querySelector('.password-strength-bar');
+        const strengthText = document.querySelector('.password-strength-text');
+        const passwordLengthError = document.getElementById('password-length-error');
+        const passwordMatchError = document.getElementById('password-match-error');
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            let width = '20%';
+            let color = '#f44336';
+            let text = 'Muito fraca';
+
+            if (strength === 1) {
+                width = '40%';
+                color = '#ff9800';
+                text = 'Fraca';
+            } else if (strength === 2) {
+                width = '60%';
+                color = '#ffc107';
+                text = 'Razoável';
+            } else if (strength === 3) {
+                width = '80%';
+                color = '#4caf50';
+                text = 'Forte';
+            } else if (strength === 4) {
+                width = '100%';
+                color = '#4caf50';
+                text = 'Muito forte';
+            }
+
+            strengthBar.style.width = width;
+            strengthBar.style.backgroundColor = color;
+            strengthText.textContent = text;
+
+            if (password.length < 8 || password.length > 20) {
+                passwordLengthError.style.display = 'block';
+            } else {
+                passwordLengthError.style.display = 'none';
+            }
+        });
+
+        function validatePasswords() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (password.length < 8 || password.length > 20) {
+                passwordLengthError.style.display = 'block';
+                return;
+            } else {
+                passwordLengthError.style.display = 'none';
+            }
+
+            if (password !== confirmPassword) {
+                passwordMatchError.style.display = 'block';
+                return;
+            } else {
+                passwordMatchError.style.display = 'none';
+                alert('Senhas coincidem e são válidas! (Simulação de criação de conta)');
+            }
+        }
+    </script>
+</body>
+</html>
