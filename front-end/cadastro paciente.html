@@ -98,7 +98,7 @@
     <input type="text" id="nome" placeholder="Nome completo">
 
     <div class="linha-inputs">
-      <input type="date" id="nascimento" placeholder="Data de nascimento">
+        <input type="date" id="nascimento" placeholder="Data de nascimento" max="2020-12-31">
       <select id="genero">
         <option value="">Selecione o gênero</option>
         <option value="Feminino">Feminino</option>
@@ -124,12 +124,11 @@
       <button class="botao-navegacao" onclick="verificarIdade()">&#8594;</button>
     </div>
 
-    <div class="indicador-etapa">1/3</div>
   </div>
 
   <script>
     function voltar() {
-      alert("Voltando para a tela anterior...");
+      window.history.back();
     }
 
     function calcularIdade(dataNascimento) {
@@ -189,6 +188,7 @@
   </script>
 </body>
 </html>
+
 
 
 
