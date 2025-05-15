@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamentos - Psicologia</title>
+  <style>
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: linear-gradient(to bottom, #d6eaff, #ffffff);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      border-bottom: 2px solid #004a91;
+      position: relative;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .logo span {
+      background-color: #004a91;
+      color: white;
+      font-weight: bold;
+      font-size: 26px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #004a91;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      color: #444;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .profile span {
+      background-color: #004a91;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: linear-gradient(to bottom, #ffffff, #86b9e8);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      z-index: 10;
+      min-width: 180px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #004a91;
+      font-weight: bold;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
+    .dropdown a:last-child {
+      margin-bottom: 0;
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #004a91;
+      margin: 20px 0;
+    }
+
+    .card-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      background-color: white;
+      border: 1px solid #004a91;
+      border-radius: 5px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-info {
+      color: #004a91;
+    }
+
+    .card-info h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .card-info p {
+      margin: 5px 0 0;
+      font-size: 16px;
+    }
+
+    .card button {
+      background-color: #004a91;
+      color: white;
+      font-weight: bold;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .card button:hover {
+      background-color: #003366;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span>F</span>
+      <span>S</span>
+      <span>A</span>
+    </div>
+    <div class="title">Agendamentos - Psicologia</div>
+    <div class="profile" onclick="toggleDropdown()">
+      <div>Olá, Paciente</div>
+      <span>P</span>
+      <div class="dropdown" id="dropdownMenu">
+        <a href="#"><span>📅</span>Minhas Consultas</a>
+        <a href="#"><span>👤</span>Minha Conta</a>
+        <a href="#"><span>❓</span>Ajuda</a>
+        <a href="#"><span>↩️</span>Sair da Conta</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-title">Estagiários Disponíveis</div>
+
+  <div class="card-container">
+    <div class="card">
+      <div class="card-info">
+        <h3>Ana Souza</h3>
+        <p>Estudante de Psicologia no 1º semestre</p>
+      </div>
+      <button onclick="alert('Horários de Ana Souza')">Visualizar Horários</button>
+    </div>
+
+    <div class="card">
+      <div class="card-info">
+        <h3>Lucas Melo</h3>
+        <p>Estudante de Psicologia no 1º semestre</p>
+      </div>
+      <button onclick="alert('Horários de Lucas Melo')">Visualizar Horários</button>
+    </div>
+
+    <div class="card">
+      <div class="card-info">
+        <h3>Mariana Lima</h3>
+        <p>Estudante de Psicologia no 1º semestre</p>
+      </div>
+      <button onclick="alert('Horários de Mariana Lima')">Visualizar Horários</button>
+    </div>
+
+    <div class="card">
+      <div class="card-info">
+        <h3>Vinicius Oliveira</h3>
+        <p>Estudante de Psicologia no 1º semestre</p>
+      </div>
+      <button onclick="alert('Horários de Vinicius Oliveira')">Visualizar Horários</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    window.onclick = function(event) {
+      const dropdown = document.getElementById('dropdownMenu');
+      const profile = document.querySelector('.profile');
+      if (!profile.contains(event.target)) {
+        dropdown.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
