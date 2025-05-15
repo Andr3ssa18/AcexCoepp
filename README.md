@@ -41,6 +41,5 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 
 ## Paleta de cores
 
-![](img/paleta.png)
 
 
