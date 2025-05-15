@@ -1,182 +1,258 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>COEPP - Início</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      color: #333;
-      background-color: #f8f8f8;
-    }
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <cabeça>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="largura=largura-do-dispositivo, escala-inicial=1.0"/>
+          <title>COEPP - Início</title>
+          <estilo>
+            corpo {
+              margem: 0;
+              família de fontes: 'Segoe UI', sem serifa;
+              cor: #333;
+              fundo: gradiente linear (para baixo, #6a90f2, #f8f8f8);
+            }
 
-    header {
-      background-color: #003366;
-      color: white;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+            cabeçalho {
+              cor de fundo: #003366;
+              cor: branco;
+              preenchimento: 20px;
+              exibição: flexível;
+              justificar-conteúdo: espaço-entre;
+              alinhar-itens: centro;
+            }
 
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+            cabeçalho h1 {
+              margem: 0;
+              tamanho da fonte: 24px;
+            }
 
-    nav a {
-      color: white;
-      margin-left: 20px;
-      text-decoration: none;
-      font-weight: 500;
-    }
+            navegar para {
+              cor: branco;
+              margem esquerda: 20px;
+              decoração de texto: nenhuma;
+              espessura da fonte: 500;
+            }
 
-    nav a:hover {
-      text-decoration: underline;
-    }
+            nav a:hover {
+              decoração de texto: sublinhado;
+            }
 
-    .hero {
-      background: url('https://source.unsplash.com/1600x500/?education,school') no-repeat center center/cover;
-      height: 400px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-shadow: 1px 1px 4px black;
-      text-align: center;
-      padding: 20px;
-    }
+            .herói {
+              fundo: url('https://source.unsplash.com/1600x500/?education,school') sem repetição centro centro/capa;
+              altura: 400px;
+              exibição: flexível;
+              alinhar-itens: centro;
+              justificar-conteúdo: centro;
+              cor: branco;
+              sombra do texto: 1px 1px 4px preto;
+              alinhamento de texto: centro;
+              preenchimento: 20px;
+            }
 
-    .hero h2 {
-      font-size: 48px;
-    }
+            .herói h2 {
+              tamanho da fonte: 48px;
+            }
 
-    section {
-      padding: 60px 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
+            .herói p {
+              tamanho da fonte: 24px;
+              espessura da fonte: 500;
+              margem superior: 10px;
+            }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 30px;
-      margin-top: 40px;
-    }
+            seção {
+              preenchimento: 60px 20px;
+              largura máxima: 1000px;
+              margem: auto;
+            }
 
-    .info-box {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+            .info-grade {
+              exibição: grade;
+              colunas-de-modelo-de-grade: 1fr 1fr 1fr;
+              lacuna: 30px;
+              margem superior: 40px;
+            }
 
-    .info-box h3 {
-      color: #003366;
-    }
+            .caixa de informações {
+              fundo: branco;
+              preenchimento: 20px;
+              raio da borda: 8px;
+              caixa-sombra: 0 2px 6px rgba(0,0,0,0.1);
+            }
 
-    .cta {
-      text-align: center;
-      margin-top: 40px;
-    }
+            .caixa de informações h3 {
+              cor: #003366;
+            }
 
-    .cta a {
-      padding: 12px 30px;
-      background-color: #003366;
-      color: white;
-      text-decoration: none;
-      font-size: 18px;
-      border-radius: 4px;
-      transition: background 0.3s;
-    }
+            .cta {
+              alinhamento de texto: centro;
+              margem superior: 40px;
+            }
 
-    .cta a:hover {
-      background-color: #00509e;
-    }
+            .botao-login {
+              preenchimento: 14px 40px;
+              cor de fundo: #00509e;
+              cor: branco;
+              tamanho da fonte: 18px;
+              espessura da fonte: negrito;
+              raio da borda: 6px;
+              decoração de texto: nenhuma;
+              caixa-sombra: 0 3px 8px rgba(0,0,0,0.2);
+              transição: fundo 0,3s, transformação 0,2s;
+            }
 
-    footer {
-      background-color: #003366;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin-top: 60px;
-    }
+            .botao-login:hover {
+              cor de fundo: #0071ce;
+              transformar: escala(1,03);
+            }
 
-    @media (max-width: 768px) {
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
+            .galeria {
+              exibição: flexível;
+              justificar-conteúdo: centro;
+              margem superior: 30px;
+            }
 
-      .hero h2 {
-        font-size: 32px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>COEPP</h1>
-    <nav>
-      <a href="#sobre">Sobre</a>
-      <a href="#valores">Missão e Visão</a>
-      <a href="#login">Login</a>
-    </nav>
-  </header>
+            .galeria img {
+              largura: 400px;
+              largura máxima: 100%;
+              raio da borda: 8px;
+              transição: transformação 0,3s, sombra de caixa 0,3s;
+            }
 
-  <div class="hero">
-    <div>
-      <h2>Centro de Oportunidades Educacionais e Profissionais</h2>
-      <p>Transformando vidas por meio da educação de qualidade</p>
-    </div>
-  </div>
+            .galeria img:hover {
+              transformar: escala(1,05);
+              caixa-sombra: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
 
-  <section id="sobre">
-    <h2>Sobre o COEPP</h2>
-    <p>
-      O COEPP é uma instituição comprometida com a formação educacional e profissional de qualidade, oferecendo cursos e programas que preparam alunos para os desafios do mercado de trabalho e da vida.
-    </p>
+            .vídeo {
+              alinhamento de texto: centro;
+              margem superior: 50px;
+            }
 
-    <div class="info-grid">
-      <div class="info-box">
-        <h3>Cursos Técnicos</h3>
-        <p>Capacitação profissional com foco no mercado de trabalho atual.</p>
-      </div>
-      <div class="info-box">
-        <h3>Formação Humana</h3>
-        <p>Desenvolvimento pessoal e valores para uma sociedade melhor.</p>
-      </div>
-      <div class="info-box">
-        <h3>Inclusão Social</h3>
-        <p>Projetos e ações voltadas para comunidades vulneráveis.</p>
-      </div>
-    </div>
-  </section>
+            .iframe de vídeo {
+              largura máxima: 100%;
+              raio da borda: 8px;
+            }
 
-  <section id="valores">
-    <h2>Missão, Visão e Valores</h2>
-    <div class="info-grid">
-      <div class="info-box">
-        <h3>Missão</h3>
-        <p>Promover educação acessível e transformadora para todos.</p>
-      </div>
-      <div class="info-box">
-        <h3>Visão</h3>
-        <p>Ser referência nacional em educação profissional e humana.</p>
-      </div>
-      <div class="info-box">
-        <h3>Valores</h3>
-        <p>Ética, respeito, compromisso social, qualidade e inovação.</p>
-      </div>
-    </div>
-  </section>
+            rodapé {
+              cor de fundo: #003366;
+              cor: branco;
+              alinhamento de texto: centro;
+              preenchimento: 20px;
+              margem superior: 60px;
+            }
 
-  <div class="cta" id="login">
-    <a href="login.html">Acessar Login</a>
-  </div>
+            .contato {
+              margem superior: 40px;
+              alinhamento de texto: centro;
+            }
 
-  <footer>
-    <p>&copy; 2025 COEPP - Todos os direitos reservados</p>
-  </footer>
-</body>
+            .contato img {
+              largura: 150px;
+              margem superior: 20px;
+            }
+
+            @media (largura máxima: 768px) {
+              .info-grade {
+                colunas de modelo de grade: 1fr;
+              }
+
+              .herói h2 {
+                tamanho da fonte: 32px;
+              }
+
+              .galeria img {
+                largura: 100%;
+                largura máxima: 400px;
+              }
+            }
+          </estilo>
+        </cabeçalho>
+        <corpo>
+          <cabeçalho>
+            <h1>COEPP</h1>
+            <navegação>
+              <a href="#sobre">Sobre</a>
+              <a href="#valores">Missão e Visão</a>
+              <a href="login.html" class="botao-login">Entrar</a>
+            </navegação>
+          </cabeçalho>
+
+          <div class="herói">
+            <div>
+              <h2>Centro de Oportunidades Educacionais e Profissionais</h2>
+              <p>Transformando vidas por meio da educação de qualidade</p>
+            </div>
+          </div>
+
+          <section id="sobre">
+            <h2>Sobre o COEPP</h2>
+            <p>
+              O COEPP é uma instituição comprometida com a formação educacional e profissional de qualidade, oferecendo cursos e programas que preparam alunos para os desafios do mercado de trabalho e da vida.
+            </p>
+
+            <div class="info-grid">
+              <div class="caixa de informações">
+                <h3>Cursos Técnicos</h3>
+                <p>Capacitação profissional com foco no mercado de trabalho atual.</p>
+              </div>
+              <div class="caixa de informações">
+                <h3>Formação Humana</h3>
+                <p>Desenvolvimento pessoal e valores para uma sociedade melhor.</p>
+              </div>
+              <div class="caixa de informações">
+                <h3>Inclusão Social</h3>
+                <p>Projetos e ações externas para comunidades vulneráveis.</p>
+              </div>
+            </div>
+          </seção>
+
+          <section id="valores">
+            <h2>Missão, Visão e Valores</h2>
+            <div class="info-grid">
+              <div class="caixa de informações">
+                <h3>Missão</h3>
+                <p>Promover educação acessível e transformadora para todos.</p>
+              </div>
+              <div class="caixa de informações">
+                <h3>Visão</h3>
+                <p>Ser referência nacional em educação profissional e humana.</p>
+              </div>
+              <div class="caixa de informações">
+                <h3>Valores</h3>
+                <p>Ética, respeito, compromisso social, qualidade e inovação.</p>
+              </div>
+            </div>
+          </seção>
+
+          <section id="mídia">
+            <h2 style="text-align:center;">Conheça Mais Sobre o COEPP</h2>
+
+            <div class="galeria">
+              <img src="https://www.fsa.br/wp-content/uploads/2019/10/coepp.jpg" alt="Imagem do COEPP">
+            </div>
+
+            <div class="vídeo">
+              <h3>Vídeo Institucional</h3>
+              <iframe width="560" height="315" src="https://youtu.be/ys1V0rE7gAY"
+                title="O que é a COEPP" frameborder="0"allowfullscreen></iframe>
+            </div>
+          </seção>
+
+          <div class="cta" id="login">
+            <a href="login.html" class="botao-login">Ir para Login</a>
+          </div>
+
+          <section class="contato">
+            <h2>Contato</h2>
+            <p>Endereço: Rua Adib AB de Souza, nº 567, Centro, Santo André - SP</p>
+            <p>Telefone: (11) 4002-8922</p>
+            <p>WhatsApp: (11) 98765-4321</p>
+            <h3>Escaneie o QR Code para mais informações:</h3>
+            <img src="https://www.fsa.br/wp-content/uploads/2024/05/qr-coepp-2.png" alt="Código QR">
+          </seção>
+
+          <rodapé>
+            <p>© 2025 COEPP - Todos os direitos reservados</p>
+          </rodapé>
+        </corpo>
+        </html>
