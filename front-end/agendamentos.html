@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agendamentos - Psicologia</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <style>
-
     body {
       font-family: 'Times New Roman', Times, serif;
       background: linear-gradient(to bottom, #d6eaff, #ffffff);
@@ -34,9 +33,9 @@
       background-color: #004a91;
       color: white;
       font-weight: bold;
-      font-size: 26px;
-      width: 40px;
-      height: 40px;
+      font-size: 30px;
+      width: 45px;
+      height: 45px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -160,21 +159,76 @@
     .card button:hover {
       background-color: #003366;
     }
+
+    .consultas {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px auto;
+      max-width: 800px;
+    }
+
+    .consultas.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .consultas h2 {
+      text-align: center;
+      color: #004a91;
+    }
+
+    .consultas .periodo {
+      background-color: #004a91;
+      color: white;
+      padding: 5px 10px;
+      font-weight: bold;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .consultas .consulta {
+      background-color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #004a91;
+      border-top: none;
+    }
+
+    .consultas .consulta button {
+      background-color: #004a91;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background-color: white;
+      border: 1px solid #004a91;
+      color: #004a91;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-weight: bold;
+      float: right;
+      margin: 0 10px 10px 0;
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="logo">
-      <span>F</span>
-      <span>S</span>
-      <span>A</span>
+      <span>F</span><span>S</span><span>A</span>
     </div>
     <div class="title">Agendamentos - Psicologia</div>
     <div class="profile" onclick="toggleDropdown()">
       <div>Olá, Paciente</div>
       <span>P</span>
       <div class="dropdown" id="dropdownMenu">
-        <a href="#"><span>📅</span>Minhas Consultas</a>
+        <a href="#" onclick="mostrarConsultas()"><span>📅</span>Minhas Consultas</a>
         <a href="#"><span>👤</span>Minha Conta</a>
         <a href="#"><span>❓</span>Ajuda</a>
         <a href="#"><span>↩️</span>Sair da Conta</a>
@@ -184,37 +238,57 @@
 
   <div class="main-title">Estagiários Disponíveis</div>
 
-  <div class="card-container">
+  <div class="card-container" id="estagiariosContainer">
     <div class="card">
       <div class="card-info">
         <h3>Ana Souza</h3>
-        <p>Estudante de Psicologia no 1º semestre</p>
+        <p>Estudante de Psicologia no 6º semestre</p>
       </div>
       <button onclick="alert('Horários de Ana Souza')">Visualizar Horários</button>
     </div>
-
     <div class="card">
       <div class="card-info">
         <h3>Lucas Melo</h3>
-        <p>Estudante de Psicologia no 1º semestre</p>
+        <p>Estudante de Psicologia no 6º semestre</p>
       </div>
       <button onclick="alert('Horários de Lucas Melo')">Visualizar Horários</button>
     </div>
-
     <div class="card">
       <div class="card-info">
         <h3>Mariana Lima</h3>
-        <p>Estudante de Psicologia no 1º semestre</p>
+        <p>Estudante de Psicologia no 8º semestre</p>
       </div>
       <button onclick="alert('Horários de Mariana Lima')">Visualizar Horários</button>
     </div>
-
     <div class="card">
       <div class="card-info">
         <h3>Vinicius Oliveira</h3>
-        <p>Estudante de Psicologia no 1º semestre</p>
+        <p>Estudante de Psicologia no 7º semestre</p>
       </div>
       <button onclick="alert('Horários de Vinicius Oliveira')">Visualizar Horários</button>
+    </div>
+  </div>
+
+  <div class="consultas" id="consultasContainer">
+    <h2>Minhas Consultas</h2>
+    <button class="edit-btn">Editar consultas</button>
+
+    <div class="periodo"> Manhã <span style="float:right">13/05/2025</span></div>
+    <div class="consulta">
+      <span>12:00 - Ana Souza</span>
+      <button>Detalhes</button>
+    </div>
+
+    <div class="periodo"> Tarde <span style="float:right">20/07/2025</span></div>
+    <div class="consulta">
+      <span>16:00 - Lucas Melo</span>
+      <button>Detalhes</button>
+    </div>
+
+    <div class="periodo"> Noite <span style="float:right">31/08/2025</span></div>
+    <div class="consulta">
+      <span>20:00 - Lucas Melo</span>
+      <button>Detalhes</button>
     </div>
   </div>
 
@@ -230,6 +304,11 @@
       if (!profile.contains(event.target)) {
         dropdown.style.display = 'none';
       }
+    }
+
+    function mostrarConsultas() {
+      document.getElementById('estagiariosContainer').style.display = 'none';
+      document.getElementById('consultasContainer').classList.add('active');
     }
   </script>
 </body>
