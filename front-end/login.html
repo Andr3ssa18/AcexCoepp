@@ -265,7 +265,7 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value.trim(); // Adicionado .trim()
+            const email = document.getElementById('email').value.trim(); 
             const password = document.getElementById('password').value;
 
             fetch('/login', {
@@ -277,7 +277,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log("Resposta do servidor:", data); // Adicionado console.log
+                console.log("Resposta do servidor:", data); 
                 if (data.success) {
                     if (email.endsWith("@graduacao.fsa.br")) {
                         window.location.href = 'master.html';
@@ -289,4 +289,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
