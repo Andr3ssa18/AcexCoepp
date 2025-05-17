@@ -23,7 +23,7 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 * [GitHub](https://github.com/GuilhermeSilvaGit)
 
 #### Júlia Abrantes Silva
-
+* [GitHub](https://github.com/juliabrantes)
 #### Thiago da Silva Azevedo
 
 #### Wesley Kenzo Ito
