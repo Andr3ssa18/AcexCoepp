@@ -138,41 +138,63 @@
 
         function proximo() {
             const nome = document.getElementById("nome").value.trim();
-            const nascimento = document.getElementById("nascimento").value;
+            const nascimento = dataNascimentoInput.value;
             const ra = raInput.value.trim();
             const cpf = cpfInput.value.trim();
             const telefone = telefoneInput.value.trim();
             const email_institucional = document.getElementById("email_institucional").value.trim();
             const curso_periodo = document.getElementById("curso_periodo").value;
 
+            // Validação de campos vazios
             if (!nome || !nascimento || !ra || !cpf || !telefone || !email_institucional || !curso_periodo) {
                 alert("Por favor, preencha todos os campos.");
                 return;
             }
 
-            if (ra.length !== 6) {
-                alert("Por favor, insira o RA");
+            // Validação de Idade Mínima (16 anos)
+            const dataNasc = new Date(nascimento);
+            const hojeData = new Date(); 
+            let idade = hojeData.getFullYear() - dataNasc.getFullYear();
+            const m = hojeData.getMonth() - dataNasc.getMonth();
+
+            if (m < 0 || (m === 0 && hojeData.getDate() < dataNasc.getDate())) {
+                idade--;
+            }
+
+            const idadeMinima = 16;
+            if (idade < idadeMinima) {
+                alert(`O aluno deve ter no mínimo ${idadeMinima} anos para estagiar. segundo a lei do Estágio (Lei nº 11.788/2008)`);
                 return;
             }
 
+            // Validação de RA
+            if (ra.length !== 6) {
+                alert("Por favor, insira o RA com 6 dígitos.");
+                return;
+            }
+
+            // Validação de CPF
             if (!validarCPF(cpf)) {
                 alert("Por favor, insira um CPF válido.");
                 return;
             }
 
+            // Validação de Telefone
             const telefoneNumerico = telefone.replace(/\D/g, '');
             if (telefoneNumerico.length < 10 || telefoneNumerico.length > 11) {
-                alert("Por favor, insira um telefone válido.");
+                alert("Por favor, insira um telefone válido (DDD + 8 ou 9 dígitos).");
                 return;
             }
 
+            // Validação de E-mail Institucional
             if (!email_institucional.endsWith("@graduacao.fsa.br")) {
-                alert("Por favor, insira o e-mail institucional");
+                alert("Por favor, insira o e-mail institucional (finalizado em @graduacao.fsa.br).");
                 return;
             }
 
             window.location.href = "informacao_add.html";
         }
+
 
         function formatarTelefone(input) {
             let valor = input.value.replace(/\D/g, "");
