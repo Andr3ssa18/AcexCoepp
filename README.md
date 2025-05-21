@@ -14,29 +14,23 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 
 ## Praticipantes
 
-#### Alan dos Anjos Cabral
-* [GitHub](https://github.com/AlanKenji7)
+### [Alan dos Anjos Cabral](https://github.com/AlanKenji7)
+
+### [Andressa Rosa Cruz](https://github.com/Andr3ssa18)
   
-#### Andressa Rosa Cruz
-* [GitHub](https://github.com/Andr3ssa18)
-  
-#### Guilherme Cordeiro da Silva
-* [GitHub](https://github.com/GuilhermeSilvaGit)
+### [Guilherme Cordeiro da Silva](https://github.com/GuilhermeSilvaGit)
 
-#### Júlia Abrantes Silva
-* [GitHub](https://github.com/juliabrantes)
-#### Thiago da Silva Azevedo
+### [Júlia Abrantes Silva](https://github.com/juliabrantes)
 
-#### Wesley Kenzo Ito
-* [GitHub](https://github.com/Wesley-Ito)
+### Thiago da Silva Azevedo
 
-#### Yasmin Menezes Santana
-* [GitHub](https://github.com/YasminMenezes06)
+### [Wesley Kenzo Ito](https://github.com/Wesley-Ito)
+
+### [Yasmin Menezes Santana](https://github.com/YasminMenezes06)
 
 ## Professor Orientador
 
-#### Manoel Guilherme de Faria Moraes
-* [GitHub](https://github.com/profmanoel)
+### [Manoel Guilherme de Faria Moraes](https://github.com/profmanoel)
 
 ## Visual do Site
 
