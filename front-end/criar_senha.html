@@ -262,7 +262,7 @@
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             let strength = 0;
-            if (password.length >= 8) strength++;
+            if (password.length >= 9) strength++;
             if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
             if (password.match(/[0-9]/)) strength++;
             if (password.match(/[^a-zA-Z0-9]/)) strength++;
