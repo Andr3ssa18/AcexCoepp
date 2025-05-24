@@ -36,6 +36,16 @@
             margin-bottom: 15px;
         }
 
+         #responsavel {
+            width: 98%;
+            height: 30px;
+            font-size: 16px;
+            padding: 8px 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+        }
+
         .form-group label {
             display: block;
             font-size: 14px;
@@ -137,12 +147,7 @@
         <h2>Informações Adicionais</h2>
 
         <div class="form-group">
-            <label for="responsavel">Responsável supervisor</label>
-            <select id="responsavel" required>
-                <option value="">Selecione o responsável</option>
-                <option value="supervisor1">Supervisor 1</option>
-                <option value="supervisor2">Supervisor 2</option>
-            </select>
+            <input type="text" id="responsavel" placeholder="Digite o nome formal do responsável supervisor" required>
             <div id="responsavel-erro" class="campo-obrigatorio">Este campo é obrigatório</div>
         </div>
 
