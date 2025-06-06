@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Estagiário - Psicologia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/aba_estagiario.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span style="font-family: 'Times New Roman', Times, serif;">F</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">S</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">A</span>
+        </div>
+        <div class="title" id="page-title">Portal do Estagiário</div>
+        <div class="profile" onclick="toggleDropdown()">
+            <div>Olá, Estagiário</div>
+            <span>E</span>
+            <div class="dropdown" id="dropdownMenu">
+                <a href="#" onclick="mostrarPagina('pagina-meus-dados')"><span>👤</span>Minha Conta</a>
+                <a href="#" onclick="mostrarPagina('pagina-ajuda')"><span>❓</span>Ajuda</a>
+                <a href="#"><span>↩️</span>Sair da Conta</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-user">
+                    <div class="user-avatar">E</div>
+                    <div class="user-info">
+                        <div class="user-name">Estagiário</div>
+                        <div class="user-role">Psicologia</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="mostrarPagina('pagina-minhas-consultas')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM5 5v1h14V5H5z"/>
+                    </svg>
+                    <span>Minhas Consultas</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-meus-horarios')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                    <span>Meus Horários</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-solicitacoes')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/>
+                    </svg>
+                    <span>Solicitações</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-prontuarios')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+                    </svg>
+                    <span>Prontuários</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-comunicados')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    </svg>
+                    <span>Comunicados</span>
+                </a>
+                <a href="#" class="nav-item logout" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                    </svg>
+                    <span>Sair da Conta</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="content">
+            <!-- Página de Meus Horários -->
+            <div id="pagina-meus-horarios" class="page">
+                <div class="page-header">
+                    <h1>Meus Horários</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Informe seus horários disponíveis</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Dias da Semana</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="checkbox-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="dia" value="Segunda">
+                                    <span class="checkmark"></span>
+                                    Segunda
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="dia" value="Terça">
+                                    <span class="checkmark"></span>
+                                    Terça
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="dia" value="Quarta">
+                                    <span class="checkmark"></span>
+                                    Quarta
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="dia" value="Quinta">
+                                    <span class="checkmark"></span>
+                                    Quinta
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="dia" value="Sexta">
+                                    <span class="checkmark"></span>
+                                    Sexta
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="dia" value="Sábado">
+                                    <span class="checkmark"></span>
+                                    Sábado
+                                </label>
+                            </div>
+                            <button class="btn btn-primary btn-block" id="btn-todos-dias">TODOS</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Período do dia</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="checkbox-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="periodo" value="Manhã">
+                                    <span class="checkmark"></span>
+                                    Manhã
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="periodo" value="Tarde" checked>
+                                    <span class="checkmark"></span>
+                                    Tarde
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="periodo" value="Noite">
+                                    <span class="checkmark"></span>
+                                    Noite
+                                </label>
+                            </div>
+                            <button class="btn btn-primary btn-block" id="btn-todos-periodos">TODOS</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Horário específico?</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Ex: 14:00 às 16:00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-message">
+                        <p>Escolha os dias e períodos em que você pode atender pacientes para triagem. Essas informações serão utilizadas pela equipe da COEPP para atribuir atendimentos.</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-lg" id="btn-salvar-disponibilidade">Salvar Disponibilidade</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Solicitações de Triagem -->
+            <div id="pagina-solicitacoes" class="page">
+                <div class="page-header">
+                    <h1>Solicitações de Triagem</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Com base nos seus horários, abaixo estão os pacientes que aguardam ser atendidos por você. Analise os horários disponíveis e confirme se pode atendê-los.</p>
+                    </div>
+                    
+                    <div class="solicitacoes-list">
+                        <div class="solicitacao-item">
+                            <div class="solicitacao-header">
+                                <div class="solicitacao-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="solicitacao-info">
+                                    <h3>Nome do Paciente</h3>
+                                    <div class="solicitacao-details">
+                                        <p><strong>Triagem solicitada em:</strong> 13/05/2025</p>
+                                        <p><strong>Disponibilidade informada:</strong> Tarde e noite \ seg - qua - sex</p>
+                                    </div>
+                                </div>
+                                <div class="solicitacao-time">
+                                    <span>13:00h às 16:00h</span>
+                                </div>
+                            </div>
+                            <div class="solicitacao-status">
+                                <div class="status-badge aguardando">Aguardando</div>
+                                <div class="solicitacao-actions">
+                                    <button class="btn btn-outline">Mais Detalhes</button>
+                                    <button class="btn btn-success" onclick="abrirModalConfirmacaoTriagem('Nome do Paciente', '13/05/2025', '15:00')">Agendar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="solicitacao-item">
+                            <div class="solicitacao-header">
+                                <div class="solicitacao-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="solicitacao-info">
+                                    <h3>Nome do Paciente</h3>
+                                    <div class="solicitacao-details">
+                                        <p><strong>Triagem solicitada em:</strong> 14/05/2025</p>
+                                        <p><strong>Disponibilidade informada:</strong> Manhã \ seg - qua - sex</p>
+                                    </div>
+                                </div>
+                                <div class="solicitacao-time">
+                                    <span>10:00h às 11:00h</span>
+                                </div>
+                            </div>
+                            <div class="solicitacao-status">
+                                <div class="status-badge aguardando">Aguardando</div>
+                                <div class="solicitacao-actions">
+                                    <button class="btn btn-outline">Mais Detalhes</button>
+                                    <button class="btn btn-success" onclick="abrirModalConfirmacaoTriagem('Nome do Paciente', '14/05/2025', '10:00')">Agendar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="solicitacao-item">
+                            <div class="solicitacao-header">
+                                <div class="solicitacao-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="solicitacao-info">
+                                    <h3>Nome do Paciente</h3>
+                                    <div class="solicitacao-details">
+                                        <p><strong>Triagem solicitada em:</strong> 26/05/2025</p>
+                                        <p><strong>Disponibilidade informada:</strong> Manhã e Noite \ seg - qua - sex</p>
+                                    </div>
+                                </div>
+                                <div class="solicitacao-time">
+                                    <span>08:00h às 09:00h</span>
+                                </div>
+                            </div>
+                            <div class="solicitacao-status">
+                                <div class="status-badge aguardando">Aguardando</div>
+                                <div class="solicitacao-actions">
+                                    <button class="btn btn-outline">Mais Detalhes</button>
+                                    <button class="btn btn-success" onclick="abrirModalConfirmacaoTriagem('Nome do Paciente', '26/05/2025', '08:00')">Agendar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="solicitacao-item">
+                            <div class="solicitacao-header">
+                                <div class="solicitacao-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="solicitacao-info">
+                                    <h3>Nome do Paciente</h3>
+                                    <div class="solicitacao-details">
+                                        <p><strong>Triagem solicitada em:</strong> 20/05/2025</p>
+                                        <p><strong>Disponibilidade informada:</strong> Tarde e noite \ seg - qua - sex</p>
+                                    </div>
+                                </div>
+                                <div class="solicitacao-time">
+                                    <span>18:00h às 21:00h</span>
+                                </div>
+                            </div>
+                            <div class="solicitacao-status">
+                                <div class="status-badge aceito">Aceito</div>
+                                <div class="solicitacao-actions">
+                                    <button class="btn btn-outline">Mais Detalhes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Minhas Consultas -->
+            <div id="pagina-minhas-consultas" class="page active">
+                <div class="page-header">
+                    <h1>Minhas Consultas</h1>
+                </div>
+                <div class="page-content">
+                    <div class="calendar-controls">
+                        <div class="calendar-nav">
+                            <button class="btn btn-icon" id="prev-month">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                                </svg>
+                            </button>
+                            <h2 class="calendar-title">Maio de 2025</h2>
+                            <button class="btn btn-icon" id="next-month">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="calendar-view-options">
+                            <button class="btn btn-outline active">Hoje</button>
+                            <button class="btn btn-outline">Semana</button>
+                            <button class="btn btn-outline">Mês</button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <div class="calendar-cell">Seg.</div>
+                            <div class="calendar-cell">Ter.</div>
+                            <div class="calendar-cell">Qua.</div>
+                            <div class="calendar-cell">Qui.</div>
+                            <div class="calendar-cell">Sex.</div>
+                            <div class="calendar-cell">Sáb.</div>
+                        </div>
+                        <div class="calendar-body">
+                            <div class="calendar-row">
+                                <div class="calendar-day empty"></div>
+                                <div class="calendar-day empty"></div>
+                                <div class="calendar-day">
+                                    <div class="day-number">1</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">2</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">3</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">4</div>
+                                </div>
+                            </div>
+                            <div class="calendar-row">
+                                <div class="calendar-day">
+                                    <div class="day-number">5</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">6</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">7</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">8</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">9</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">10</div>
+                                </div>
+                            </div>
+                            <div class="calendar-row">
+                                <div class="calendar-day">
+                                    <div class="day-number">11</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">12</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">13</div>
+                                    <div class="appointment-indicator"></div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">14</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">15</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">16</div>
+                                </div>
+                            </div>
+                            <div class="calendar-row">
+                                <div class="calendar-day">
+                                    <div class="day-number">17</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">18</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">19</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">20</div>
+                                    <div class="appointment-indicator"></div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">21</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">22</div>
+                                </div>
+                            </div>
+                            <div class="calendar-row">
+                                <div class="calendar-day">
+                                    <div class="day-number">23</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">24</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">25</div>
+                                </div>
+                                <div class="calendar-day today">
+                                    <div class="day-number">26</div>
+                                    <div class="appointment-indicator"></div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">27</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">28</div>
+                                </div>
+                            </div>
+                            <div class="calendar-row">
+                                <div class="calendar-day">
+                                    <div class="day-number">29</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">30</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="day-number">31</div>
+                                </div>
+                                <div class="calendar-day empty"></div>
+                                <div class="calendar-day empty"></div>
+                                <div class="calendar-day empty"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="consultas-dia">
+                        <h3>Consultas do dia 26/05/2025</h3>
+                        <div class="consulta-item">
+                            <div class="consulta-time">08:00 - 09:00</div>
+                            <div class="consulta-info">
+                                <h4>Nome do Paciente</h4>
+                                <p>Triagem Inicial</p>
+                            </div>
+                            <div class="consulta-status">
+                                <div class="status-badge confirmado">Confirmado</div>
+                            </div>
+                            <div class="consulta-actions">
+                                <button class="btn btn-outline">Ver Detalhes</button>
+                            </div>
+                        </div>
+                        
+                        <div class="consulta-item">
+                            <div class="consulta-time">10:00 - 11:00</div>
+                            <div class="consulta-info">
+                                <h4>Nome do Paciente</h4>
+                                <p>Sessão de Acompanhamento</p>
+                            </div>
+                            <div class="consulta-status">
+                                <div class="status-badge pendente">Pendente</div>
+                            </div>
+                            <div class="consulta-actions">
+                                <button class="btn btn-outline">Ver Detalhes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Prontuários -->
+            <div id="pagina-prontuarios" class="page">
+                <div class="page-header">
+                    <h1>Prontuários</h1>
+                </div>
+                <div class="page-content">
+                    <div class="search-box">
+                        <input type="text" placeholder="Buscar paciente..." class="search-input">
+                        <button class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="prontuarios-list">
+                        <div class="prontuario-item">
+                            <div class="prontuario-header">
+                                <div class="prontuario-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="prontuario-info">
+                                    <h3>Nome do Paciente</h3>
+                                    <p>Última consulta: 13/05/2025</p>
+                                </div>
+                            </div>
+                            <div class="prontuario-actions">
+                                <button class="btn btn-outline">Ver Prontuário</button>
+                            </div>
+                        </div>
+                        
+                        <div class="prontuario-item">
+                            <div class="prontuario-header">
+                                <div class="prontuario-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="prontuario-info">
+                                    <h3>Nome do Paciente</h3>
+                                    <p>Última consulta: 20/05/2025</p>
+                                </div>
+                            </div>
+                            <div class="prontuario-actions">
+                                <button class="btn btn-outline">Ver Prontuário</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Comunicados -->
+            <div id="pagina-comunicados" class="page">
+                <div class="page-header">
+                    <h1>Comunicados</h1>
+                </div>
+                <div class="page-content">
+                    <div class="comunicados-list">
+                        <div class="comunicado-item">
+                            <div class="comunicado-header">
+                                <div class="comunicado-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
+                                    </svg>
+                                </div>
+                                <div class="comunicado-info">
+                                    <h3>Reunião de Supervisão</h3>
+                                    <p class="comunicado-date">15/05/2025</p>
+                                </div>
+                            </div>
+                            <div class="comunicado-content">
+                                <p>Prezados estagiários, informamos que haverá reunião de supervisão na próxima sexta-feira, às 14h, na sala 12 do COEPP. A presença de todos é obrigatória.</p>
+                            </div>
+                            <div class="comunicado-actions">
+                                <button class="btn btn-outline">Marcar como lido</button>
+                            </div>
+                        </div>
+                        
+                        <div class="comunicado-item read">
+                            <div class="comunicado-header">
+                                <div class="comunicado-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
+                                    </svg>
+                                </div>
+                                <div class="comunicado-info">
+                                    <h3>Atualização do Sistema</h3>
+                                    <p class="comunicado-date">10/05/2025</p>
+                                </div>
+                            </div>
+                            <div class="comunicado-content">
+                                <p>Informamos que o sistema de agendamentos foi atualizado com novas funcionalidades. Agora é possível visualizar o histórico completo de consultas dos pacientes e exportar relatórios em PDF.</p>
+                            </div>
+                            <div class="comunicado-actions">
+                                <button class="btn btn-outline">Arquivar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Agendar Consulta -->
+            <div id="pagina-agendar-consulta" class="page">
+                <div class="page-header">
+                    <h1>Agendar Consulta</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Informe abaixo a data e horário disponível para realizar o atendimento.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Data do Atendimento</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Horário Disponível</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <select class="form-control">
+                                    <option value="">Selecione um horário</option>
+                                    <option value="08:00">08:00 - 09:00</option>
+                                    <option value="09:00">09:00 - 10:00</option>
+                                    <option value="10:00">10:00 - 11:00</option>
+                                    <option value="11:00">11:00 - 12:00</option>
+                                    <option value="13:00">13:00 - 14:00</option>
+                                    <option value="14:00">14:00 - 15:00</option>
+                                    <option value="15:00">15:00 - 16:00</option>
+                                    <option value="16:00">16:00 - 17:00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Tipo de Consulta</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="radio-group">
+                                <label class="radio-container">
+                                    <input type="radio" name="tipo-consulta" value="presencial" checked>
+                                    <span class="radio-mark"></span>
+                                    Presencial
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="tipo-consulta" value="online">
+                                    <span class="radio-mark"></span>
+                                    Online
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Observações</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <textarea class="form-control" rows="4" placeholder="Adicione informações relevantes sobre o atendimento..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-outline btn-lg" onclick="mostrarPagina('pagina-solicitacoes')">Cancelar</button>
+                        <button class="btn btn-primary btn-lg" id="btn-confirmar-agendamento">Avançar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Triagem -->
+    <div id="modal-confirmacao-triagem" class="modal">
+        <div class="modal-content modal-confirmacao">
+            <div class="modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                </svg>
+            </div>
+            <h2 class="modal-title">Confirmar triagem?</h2>
+            <div class="modal-body">
+                <p id="modal-confirmacao-texto">Você está prestes a confirmar uma consulta de triagem para nome paciente no dia 20/05/2025 às 15:00. Deseja Continuar?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-lg" onclick="fecharModalConfirmacaoTriagem()">CANCELAR</button>
+                <button class="btn btn-primary btn-lg" onclick="confirmarTriagem()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso de Disponibilidade -->
+    <div id="modal-sucesso-disponibilidade" class="modal">
+        <div class="modal-content modal-sucesso">
+            <div class="modal-icon success">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <h2 class="modal-title">Sua disponibilidade foi enviada com sucesso!</h2>
+            <div class="modal-body">
+                <p>O paciente confirmará a consulta em breve.</p>
+                <p>Acesse o menu <a href="#" onclick="fecharModalSucessoDisponibilidade(); mostrarPagina('pagina-minhas-consultas');">Minhas Consultas</a> para visualizar os agendamentos.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-lg" onclick="fecharModalSucessoDisponibilidade()">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Agendamento com Sucesso -->
+    <div id="modal-agendamento-sucesso" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                    </svg>
+                </div>
+                <h2>Agendamento Realizado!</h2>
+            </div>
+            <div class="modal-body">
+                <p>O agendamento foi realizado com sucesso. O paciente receberá uma notificação com os detalhes da consulta.</p>
+                <div class="agendamento-details">
+                    <p><strong>Paciente:</strong> <span id="modal-paciente">Nome do Paciente</span></p>
+                    <p><strong>Data:</strong> <span id="modal-data">26/05/2025</span></p>
+                    <p><strong>Horário:</strong> <span id="modal-horario">08:00 - 09:00</span></p>
+                    <p><strong>Tipo:</strong> <span id="modal-tipo">Presencial</span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="fecharModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/aba_estagiario.js') }}"></script>
+</body>
+</html>

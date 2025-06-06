@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Disponibilidade de Atendimento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to top, #074276, #64a1d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .cartao {
+            background: white;
+            border-radius: 20px;
+            width: 560px;
+            padding: 40px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            position: relative;
+        }
+
+        .cartao h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            display: inline-block;
+        }
+
+        .cartao .form-section {
+            margin-bottom: 20px;
+        }
+
+        .cartao .form-section p {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .cartao .checkbox-group,
+        .cartao .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cartao .checkbox-item,
+        .cartao .radio-item {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .cartao .checkbox-item input[type="checkbox"],
+        .cartao .radio-item input[type="radio"] {
+            margin-right: 8px;
+            width: auto;
+            margin-bottom: 0;
+        }
+
+        
+        .cartao input[type="text"],
+        .cartao select { 
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .botoes-navegacao {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .botao-navegacao {
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .logo-img {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 100px;
+            height: auto;
+        }
+
+    
+        .language-dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #074276;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .language-dropdown select {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 15px;
+        }
+
+        .language-dropdown select:focus {
+            outline: none;
+        }
+
+       
+        .modal {
+            display: none;
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 80%; 
+            max-width: 400px;
+            position: relative;
+            text-align: left;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #074276;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin: 8px 0;
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .horario-atendimento-link {
+            display: block; 
+            text-align: left; 
+            margin-top: 15px; 
+            color: #074276;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer; 
+        }
+        .horario-atendimento-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cartao">
+        <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="Logo FSA" class="logo-img">
+
+        <h2>Disponibilidade</h2>
+
+        <div class="form-section">
+            <p>Quais dias da semana você tem disponibilidade para atendimento?*</p>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="segunda" name="dias_semana" value="segunda">
+                    <label for="segunda">Segunda</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="terca" name="dias_semana" value="terca">
+                    <label for="terca">Terça</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="quarta" name="dias_semana" value="quarta">
+                    <label for="quarta">Quarta</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="quinta" name="dias_semana" value="quinta">
+                    <label for="quinta">Quinta</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sexta" name="dias_semana" value="sexta">
+                    <label for="sexta">Sexta</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sabado" name="dias_semana" value="sabado">
+                    <label for="sabado">Sábado</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <p>Qual período do dia é melhor para você?*</p>
+            <div class="radio-group">
+                <div class="radio-item">
+                    <input type="checkbox" id="manha" name="periodo_dia" value="manha">
+                    <label for="manha">Manhã</label>
+                </div>
+                <div class="radio-item">
+                    <input type="checkbox" id="tarde" name="periodo_dia" value="tarde">
+                    <label for="tarde">Tarde</label>
+                </div>
+                <div class="radio-item">
+                    <input type="checkbox" id="noite" name="periodo_dia" value="noite">
+                    <label for="noite">Noite</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-section">
+            <p>Algum horário específico? (opcional)</p>
+            <input type="text" id="horario_especifico" name="horario_especifico" placeholder="Ex: 14:00 - 17:00">
+        </div>
+         <a href="#" class="horario-atendimento-link" id="openHorarioModal">Horário de Atendimento</a>
+        
+        <div class="form-section">
+            <p>Você já passou por triagem na COEPP?*</p>
+            <div class="radio-group">
+                <div class="radio-item">
+                    <input type="radio" id="nao_triagem" name="triagem_coepp" value="nao">
+                    <label for="nao_triagem">Não</label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" id="sim_triagem" name="triagem_coepp" value="sim">
+                    <label for="sim_triagem">Sim</label>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="botoes-navegacao">
+            <button class="botao-navegacao" onclick="voltar()">&#8592;</button>
+            <button class="botao-navegacao" onclick="proximo()">&#8594;</button>
+        </div>
+    </div>
+
+    <div id="horarioModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeHorarioModal">&times;</span>
+            <h3>Horário de Atendimento</h3>
+            <p><strong>Segunda:</strong> 09:30 - 21:00</p>
+            <p><strong>Terça:</strong> 09:30 - 21:00</p>
+            <p><strong>Quarta:</strong> 09:30 - 21:00</p>
+            <p><strong>Quinta:</strong> 09:30 - 21:00</p>
+            <p><strong>Sexta:</strong> 09:30 - 21:00</p>
+            <p><strong>Sábado:</strong> 08:00 - 16:00</p>
+        </div>
+    </div>
+
+    <script>
+       
+        const horarioModal = document.getElementById('horarioModal');
+        const openHorarioModalBtn = document.getElementById('openHorarioModal');
+        const closeHorarioModalBtn = document.getElementById('closeHorarioModal');
+
+       
+        openHorarioModalBtn.onclick = function(event) {
+            event.preventDefault();
+            horarioModal.style.display = 'flex'; 
+        }
+
+        closeHorarioModalBtn.onclick = function() {
+            horarioModal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == horarioModal) {
+                horarioModal.style.display = 'none';
+            }
+        }
+
+        function voltar() {
+            window.history.back()
+        }
+
+        function proximo() {
+            const selectedDays = document.querySelectorAll('input[name="dias_semana"]:checked').length;
+            const selectedPeriod = document.querySelector('input[name="periodo_dia"]:checked');
+            const triagemCoepp = document.querySelector('input[name="triagem_coepp"]:checked');
+
+            if (selectedDays === 0) {
+                alert("Por favor, selecione pelo menos um dia da semana.");
+                return;
+            }
+
+            if (!selectedPeriod) {
+                alert("Por favor, selecione um período do dia.");
+                return;
+            }
+
+            if (!triagemCoepp) {
+                alert("Por favor, responda se já passou por triagem na COEPP.");
+                return;
+            }
+
+            window.location.href = "/criarSenha"; 
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Senha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Seu CSS existente */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to top, #074276, #64a1d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .cartao {
+            background: white;
+            border-radius: 20px;
+            width: 380px;
+            padding: 40px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            position: relative;
+        }
+
+        .cartao h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+            color: black;
+            text-align: center;
+        }
+
+        .cartao label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .cartao input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .password-strength-container {
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+        .password-strength {
+            height: 6px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 20%;
+            background-color: #f44336;
+            border-radius: 4px;
+        }
+
+        .password-strength-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .botoes-navegacao {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .botao-navegacao {
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .botao-navegacao:hover {
+            background-color: #053052;
+        }
+
+        .logo-img {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 100px;
+            height: auto;
+        }
+
+        .botao-criar-conta {
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 15px;
+        }
+
+        .botao-criar-conta:hover {
+            background-color: #053052;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .terms-privacy {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .terms-privacy input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .termos-link {
+            color: #074276;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .termos-link:hover {
+            color: #053052;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .modal-content p {
+            color: #555;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="cartao">
+        <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="Logo FSA" class="logo-img">
+
+        <h2>Senha</h2>
+
+        <form action="/criarSenha_aluno" method="post" id="senhaForm">
+            <label for="password">Senha</label>
+            <input type="password" id="password" name="password" minlength="8" maxlength="20" required>
+            <p class="error-message" id="password-length-error" style="display:none;">A senha deve ter entre 8 e 20 caracteres.</p>
+
+            <label for="confirm_password">Confirmar sua senha</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <p class="error-message" id="password-match-error" style="display:none;">As senhas não são a mesma.</p>
+
+            <div class="password-strength-container">
+                <div class="password-strength">
+                    <div class="password-strength-bar" style="width: 20%; background-color: #f44336;"></div>
+                </div>
+                <span class="password-strength-text">Muito fraca</span>
+            </div>
+
+            <div class="terms-privacy">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">Li e concordo com os <span class="termos-link" onclick="mostrarModal('termosModal')">Termos de Uso</span> e <span class="termos-link" onclick="mostrarModal('politicaModal')">Política de Privacidade</span>.</label>
+            </div>
+            
+            <div id="termosModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="fecharModal('termosModal')">&times;</span>
+                    <h2><span style="color: rgb(68, 68, 68);">1. Termos</span></h2><p><span style="color: rgb(68, 68, 68);">Ao acessar ao site <a href="https://coepp">coepp</a>, concorda em cumprir estes termos de serviço, todas as leis e regulamentos aplicáveis ​​e concorda que é responsável pelo cumprimento de todas as leis locais aplicáveis. Se você não concordar com algum desses termos, está proibido de usar ou acessar este site. Os materiais contidos neste site são protegidos pelas leis de direitos autorais e marcas comerciais aplicáveis.</span></p><h2><span style="color: rgb(68, 68, 68);">2. Uso de Licença</span></h2><p><span style="color: rgb(68, 68, 68);">É concedida permissão para baixar temporariamente uma cópia dos materiais (informações ou software) no site coepp , apenas para visualização transitória pessoal e não comercial. Esta é a concessão de uma licença, não uma transferência de título e, sob esta licença, você não pode:&nbsp;</span></p><ol><li><span style="color: rgb(68, 68, 68);">modificar ou copiar os materiais;&nbsp;</span></li><li><span style="color: rgb(68, 68, 68);">usar os materiais para qualquer finalidade comercial ou para exibição pública (comercial ou não comercial);&nbsp;</span></li><li><span style="color: rgb(68, 68, 68);">tentar descompilar ou fazer engenharia reversa de qualquer software contido no site coepp;&nbsp;</span></li><li><span style="color: rgb(68, 68, 68);">remover quaisquer direitos autorais ou outras notações de propriedade dos materiais; ou&nbsp;</span></li><li><span style="color: rgb(68, 68, 68);">transferir os materiais para outra pessoa ou 'espelhe' os materiais em qualquer outro servidor.</span></li></ol><p><span style="color: rgb(68, 68, 68);">Esta licença será automaticamente rescindida se você violar alguma dessas restrições e poderá ser rescindida por coepp a qualquer momento. Ao encerrar a visualização desses materiais ou após o término desta licença, você deve apagar todos os materiais baixados em sua posse, seja em formato eletrónico ou impresso.</span></p><h2><span style="color: rgb(68, 68, 68);">3. Isenção de responsabilidade</span></h2><ol><li><span style="color: rgb(68, 68, 68);">Os materiais no site da coepp são fornecidos 'como estão'. coepp não oferece garantias, expressas ou implícitas, e, por este meio, isenta e nega todas as outras garantias, incluindo, sem limitação, garantias implícitas ou condições de comercialização, adequação a um fim específico ou não violação de propriedade intelectual ou outra violação de direitos.</span></li><li><span style="color: rgb(68, 68, 68);">Além disso, o coepp não garante ou faz qualquer representação relativa à precisão, aos resultados prováveis ​​ou à confiabilidade do uso dos materiais em seu site ou de outra forma relacionado a esses materiais ou em sites vinculados a este site.</span></li></ol><h2><span style="color: rgb(68, 68, 68);">4. Limitações</span></h2><p><span style="color: rgb(68, 68, 68);">Em nenhum caso o coepp ou seus fornecedores serão responsáveis ​​por quaisquer danos (incluindo, sem limitação, danos por perda de dados ou lucro ou devido a interrupção dos negócios) decorrentes do uso ou da incapacidade de usar os materiais em coepp, mesmo que coepp ou um representante autorizado da coepp tenha sido notificado oralmente ou por escrito da possibilidade de tais danos. Como algumas jurisdições não permitem limitações em garantias implícitas, ou limitações de responsabilidade por danos conseqüentes ou incidentais, essas limitações podem não se aplicar a você.</span></p><h2><span style="color: rgb(68, 68, 68);">5. Precisão dos materiais</span></h2><p><span style="color: rgb(68, 68, 68);">Os materiais exibidos no site da coepp podem incluir erros técnicos, tipográficos ou fotográficos. coepp não garante que qualquer material em seu site seja preciso, completo ou atual. coepp pode fazer alterações nos materiais contidos em seu site a qualquer momento, sem aviso prévio. No entanto, coepp não se compromete a atualizar os materiais.</span></p><h2><span style="color: rgb(68, 68, 68);">6. Links</span></h2><p><span style="color: rgb(68, 68, 68);">O coepp não analisou todos os sites vinculados ao seu site e não é responsável pelo conteúdo de nenhum site vinculado. A inclusão de qualquer link não implica endosso por coepp do site. O uso de qualquer site vinculado é por conta e risco do usuário.</span></p><p><br></p><h3><span style="color: rgb(68, 68, 68);">Modificações</span></h3><p><span style="color: rgb(68, 68, 68);">O coepp pode revisar estes termos de serviço do site a qualquer momento, sem aviso prévio. Ao usar este site, você concorda em ficar vinculado à versão atual desses termos de serviço.</span></p><h3><span style="color: rgb(68, 68, 68);">Lei aplicável</span></h3><p><span style="color: rgb(68, 68, 68);">Estes termos e condições são regidos e interpretados de acordo com as leis do coepp e você se submete irrevogavelmente à jurisdição exclusiva dos tribunais naquele estado ou localidade.</span></p>
+
+                </div>
+            </div>
+            <div id="politicaModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="fecharModal('politicaModal')">&times;</span>
+                    <h2><span style="color: rgb(68, 68, 68);">Política Privacidade</span></h2><p><span style="color: rgb(68, 68, 68);">A sua privacidade é importante para nós. É política do coepp respeitar a sua privacidade em relação a qualquer informação sua que possamos coletar no site <a href="https://coepp">coepp</a>, e outros sites que possuímos e operamos.</span></p><p><span style="color: rgb(68, 68, 68);">Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço. Fazemo-lo por meios justos e legais, com o seu conhecimento e consentimento. Também informamos por que estamos coletando e como será usado.</span></p><p><span style="color: rgb(68, 68, 68);">Apenas retemos as informações coletadas pelo tempo necessário para fornecer o serviço solicitado. Quando armazenamos dados, protegemos dentro de meios comercialmente aceitáveis ​​para evitar perdas e roubos, bem como acesso, divulgação, cópia, uso ou modificação não autorizados.</span></p><p><span style="color: rgb(68, 68, 68);">Não compartilhamos informações de identificação pessoal publicamente ou com terceiros, exceto quando exigido por lei.</span></p><p><span style="color: rgb(68, 68, 68);">O nosso site pode ter links para sites externos que não são operados por nós. Esteja ciente de que não temos controle sobre o conteúdo e práticas desses sites e não podemos aceitar responsabilidade por suas respectivas&nbsp;</span><a href="https://politicaprivacidade.com/" rel="noopener noreferrer" target="_blank" style="background-color: transparent; color: rgb(68, 68, 68);">políticas de privacidade</a><span style="color: rgb(68, 68, 68);">.</span></p><p><span style="color: rgb(68, 68, 68);">Você é livre para recusar a nossa solicitação de informações pessoais, entendendo que talvez não possamos fornecer alguns dos serviços desejados.</span></p><p><span style="color: rgb(68, 68, 68);">O uso continuado de nosso site será considerado como aceitação de nossas práticas em torno de privacidade e informações pessoais. Se você tiver alguma dúvida sobre como lidamos com dados do usuário e informações pessoais, entre em contacto connosco.</span></p><p><span style="color: rgb(68, 68, 68);"><ul><li><span style="color: rgb(68, 68, 68);">O serviço Google AdSense que usamos para veicular publicidade usa um cookie DoubleClick para veicular anúncios mais relevantes em toda a Web e limitar o número de vezes que um determinado anúncio é exibido para você.</span></li><li><span style="color: rgb(68, 68, 68);">Para mais informações sobre o Google AdSense, consulte as FAQs oficiais sobre privacidade do Google AdSense.</span></li><li><span style="color: rgb(68, 68, 68);">Utilizamos anúncios para compensar os custos de funcionamento deste site e fornecer financiamento para futuros desenvolvimentos. Os cookies de publicidade comportamental usados ​​por este site foram projetados para garantir que você forneça os anúncios mais relevantes sempre que possível, rastreando anonimamente seus interesses e apresentando coisas semelhantes que possam ser do seu interesse.</span></li><li><span style="color: rgb(68, 68, 68);">Vários parceiros anunciam em nosso nome e os cookies de rastreamento de afiliados simplesmente nos permitem ver se nossos clientes acessaram o site através de um dos sites de nossos parceiros, para que possamos creditá-los adequadamente e, quando aplicável, permitir que nossos parceiros afiliados ofereçam qualquer promoção que pode fornecê-lo para fazer uma compra.</span></li></ul><p><br></p></span></p><h3><span style="color: rgb(68, 68, 68);">Compromisso do Usuário</span></h3><p><span style="color: rgb(68, 68, 68);">O usuário se compromete a fazer uso adequado dos conteúdos e da informação que o coepp oferece no site e com caráter enunciativo, mas não limitativo:</span></p><ul><li><span style="color: rgb(68, 68, 68);">A) Não se envolver em atividades que sejam ilegais ou contrárias à boa fé a à ordem pública;</span></li><li><span style="color: rgb(68, 68, 68);">B) Não difundir propaganda ou conteúdo de natureza racista, xenofóbica, jogos de sorte ou azar, qualquer tipo de pornografia ilegal, de apologia ao terrorismo ou contra os direitos humanos;</span></li><li><span style="color: rgb(68, 68, 68);">C) Não causar danos aos sistemas físicos (hardwares) e lógicos (softwares) do coepp, de seus fornecedores ou terceiros, para introduzir ou disseminar vírus informáticos ou quaisquer outros sistemas de hardware ou software que sejam capazes de causar danos anteriormente mencionados.</span></li></ul><h3><span style="color: rgb(68, 68, 68);">Mais informações</span></h3><p><span style="color: rgb(68, 68, 68);">Esperemos que esteja esclarecido e, como mencionado anteriormente, se houver algo que você não tem certeza se precisa ou não, geralmente é mais seguro deixar os cookies ativados, caso interaja com um dos recursos que você usa em nosso site.</span></p><p><span style="color: rgb(68, 68, 68);">Esta política é efetiva a partir de&nbsp;15 May 2025 14:21</span></p>
+
+                </div>
+            </div>
+
+            <button class="botao-criar-conta" type="submit" onclick="return validatePasswordsAndTerms()">Criar Conta</button>
+        </form>
+        <div class="botoes-navegacao" style="margin-top: 25px;">
+            <button class="botao-navegacao" onclick="window.history.back()">&#8592;</button>
+            <div style="flex-grow: 1;"></div>
+        </div>
+    </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const strengthBar = document.querySelector('.password-strength-bar');
+        const strengthText = document.querySelector('.password-strength-text');
+        const passwordLengthError = document.getElementById('password-length-error');
+        const passwordMatchError = document.getElementById('password-match-error');
+        const termsCheckbox = document.getElementById('terms');
+        const termosModal = document.getElementById('termosModal');
+        const politicaModal = document.getElementById('politicaModal');
+        const senhaForm = document.getElementById('senhaForm'); // Obter o formulário
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            let width = '20%';
+            let color = '#f44336';
+            let text = 'Muito fraca';
+
+            if (strength === 1) {
+                width = '40%';
+                color = '#ff9800';
+                text = 'Fraca';
+            } else if (strength === 2) {
+                width = '60%';
+                color = '#ffc107';
+                text = 'Razoável';
+            } else if (strength === 3) {
+                width = '80%';
+                color = '#4caf50';
+                text = 'Forte';
+            } else if (strength === 4) {
+                width = '100%';
+                color = '#4caf50';
+                text = 'Muito forte';
+            }
+
+            strengthBar.style.width = width;
+            strengthBar.style.backgroundColor = color;
+            strengthText.textContent = text;
+
+            if (password.length < 8 || password.length > 20) {
+                passwordLengthError.style.display = 'block';
+            } else {
+                passwordLengthError.style.display = 'none';
+            }
+        });
+
+        function mostrarModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == termosModal) {
+                termosModal.style.display = "none";
+            }
+            if (event.target == politicaModal) {
+                politicaModal.style.display = "none";
+            }
+        }
+
+        // A função validatePasswordsAndTerms agora retorna true ou false
+        // para controlar o envio do formulário.
+        function validatePasswordsAndTerms() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            let isValid = true; // Flag para controlar a validade
+
+            if (password.length < 8 || password.length > 20) {
+                passwordLengthError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordLengthError.style.display = 'none';
+            }
+
+            if (password !== confirmPassword) {
+                passwordMatchError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordMatchError.style.display = 'none';
+            }
+
+            if (!termsCheckbox.checked) {
+                alert('Você precisa concordar com os Termos de Uso e Política de Privacidade.');
+                isValid = false;
+            }
+            
+            return isValid; // Retorna true se tudo estiver válido, false caso contrário
+        }
+
+        // Adiciona um listener para o evento submit do formulário
+        senhaForm.addEventListener('submit', function(event) {
+            if (!validatePasswordsAndTerms()) {
+                event.preventDefault(); // Impede o envio do formulário se a validação falhar
+            }
+        });
+    </script>
+</body>
+</html>

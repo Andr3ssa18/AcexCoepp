@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COEPP - Fundação Santo André</title>
+  <style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  font-family: Arial, sans-serif;
+}
+body {
+  background: #ffffff;
+}
+header {
+  position: fixed;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+}
+header nav a {
+  margin: 0 15px;
+  color: #003366;
+  text-decoration: none;
+  font-weight: bold;
+}
+.btn {
+  background: #ffffff;
+  color: #003366;
+  padding: 12px 20px;
+  border: none; /* sem borda */
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #003366;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.section {
+  padding: 100px 30px 60px;
+}
+.hero {
+  background: url('/static/imagem1.jpg') no-repeat center center/cover;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: flex-start;
+  padding: 150px 50px 50px;
+  color: #003366;
+  }
+
+.hero h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+  color: #003366; 
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); 
+}
+
+.hero p {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  color: #ffffff; 
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); 
+}
+.hero .btn {
+  background: #003366;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  width: auto;
+  flex-grow: 0;
+  border: none; 
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.hero .btn:hover {
+  background: #ffffff;
+  color: #003366;
+  cursor: pointer;
+}
+
+.video-section {
+  text-align: center;
+  background: linear-gradient(to bottom, #fff, #dce9f9);
+}
+.video-section iframe {
+  width: 90%;
+  max-width: 560px;
+  height: 315px;
+  margin-top: 20px;
+  border: none;
+}
+.como-funciona {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 30px;
+}
+.como-funciona div {
+  flex: 1 1 300px;
+}
+.profissionais {
+  background: #e3efff;
+  text-align: center;
+}
+.video-section,
+.como-funciona,
+.profissionais,
+footer {
+  font-family: 'Times New Roman', serif;
+  color: #003366;
+  font-size: 1.2em; 
+  line-height: 1.6;
+}
+.professores {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 30px;
+}
+.professor {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  width: 200px;
+  height: 250px;
+}
+.professor img {
+  width: 100%;
+  height: 150px;
+  background-color: #ccc;
+}
+.hero-alt {
+  background: url('/static/imagem3.jpg') no-repeat center center/cover;
+  height: 500px;
+  display: flex;
+  justify-content: center;  
+  align-items: center;      
+  padding: 0 30px;          
+  text-align: center;
+  color: white;
+}
+
+.hero-alt h1 {
+  font-size: 2em;
+  max-width: 700px;  
+  text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8); 
+}
+
+.convite {
+  background-color: #001f4d; 
+  color: white;
+  text-align: center;
+  padding: 80px 20px;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7); 
+  font-family: "Times New Roman", Times, serif;
+}
+
+.convite h2 {
+  font-size: 2em;
+  margin-bottom: 30px;
+}
+
+footer {
+  font-family: "Times New Roman", Times, serif !important;
+  padding: 20px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background: white; 
+  color: #003366; 
+  border-top: 2px solid #003366;
+}
+
+footer.rodape {
+  display: block; 
+  text-align: center; 
+  background: #003366;
+  color: white !important;
+  padding: 15px 0;
+  font-family: "Times New Roman", Times, serif;
+  border-top: 3px solid #001f4d;
+  margin-top: 10px;
+}
+
+footer.rodape * {
+  color: white !important;
+}
+
+footer > div {
+  flex: 1 1 300px;
+  margin-bottom: 20px;
+}
+
+footer h4 {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #003366;
+}
+
+footer p, footer a {
+  font-size: 1em;
+  color: #003366;
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+footer a:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.copy {
+  width: 100%;
+  background: #003366; 
+  color: white !important; 
+  text-align: center;
+  padding: 15px 0;
+  font-size: 1em;
+  font-family: "Times New Roman", Times, serif !important;
+  border-top: 3px solid #001f4d; 
+  margin-top: 10px;
+}
+.popup {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px); 
+  -webkit-backdrop-filter: blur(5px); 
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh; 
+  overflow-y: auto;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.popup-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.popup-content::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.popup-content .close {
+  position: sticky;
+  top: 0;
+  right: 0;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  background-color: #fff;
+  padding: 5px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+}
+.load-more {
+  background-color: #003366;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-family: 'Times New Roman', serif;
+  font-size: 1em;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin-top: 20px;
+}
+
+.load-more:hover {
+  background-color: white;
+  color: #003366;
+}
+
+.extra-professores {
+  display: none;
+}
+.copy {
+  text-align: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+
+#sobre h2, #sobre p,
+.como-funciona h3, .como-funciona p,
+.profissionais h2, .professor h4, .professor p {
+  font-family: "Times New Roman", Times, serif !important;
+  color: #003366 !important;
+  text-shadow: none !important;
+}
+
+
+footer {
+  font-family: "Times New Roman", Times, serif !important;
+  color: #003366 !important;
+}
+footer * {
+  color: #003366 !important;
+}
+footer a {
+  color: #003366 !important;
+}
+
+.info-links {
+  background: white;
+  color: #003366;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px 40px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.info-links > div {
+  flex: 1 1 300px;
+  margin-bottom: 20px;
+}
+
+.info-links h4 {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #003366;
+}
+
+.info-links p, .info-links a {
+  font-size: 1em;
+  color: #003366;
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+.info-links a:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+footer.rodape {
+  background: #003366; 
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+  font-size: 1em;
+  font-family: "Times New Roman", Times, serif;
+  border-top: 3px solid #001f4d;
+  margin-top: 10px;
+}
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='logomenor.png') }}" alt="Logo FSA" width="80" />
+  <nav>
+    <a class="btn" href="#profissionais">PSICÓLOGOS</a>
+    <a class="btn" href="#sobre">SOBRE</a>
+    <a class="btn" href="/registro">ENTRAR</a>
+
+  </nav>
+
+  </header>
+
+  <div class="hero">
+    <h1>Conheça a COEPP, O Centro de Orientação Educacional, Profissional e Psicológico.</h1>
+    <p>Cuidando da sua saúde mental com atenção, escuta e acolhimento.</p>
+    <a href="/login" class="btn">AGENDAR ATENDIMENTO</a>
+  </div>
+
+  <div id="sobre" class="section video-section">
+    <h2>O que é o COEPP?</h2>
+    <p>Acolhimento, escuta e cuidado com você.</p>
+    <iframe src="https://www.youtube.com/embed/ys1V0rE7gAY" width="560" height="315" 
+    frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen></iframe>
+    <p><em>Clique no vídeo e assista!</em></p>
+  </div>
+
+  <div class="section como-funciona">
+    <div>
+      <h3><strong>Como funciona?</strong></h3>
+      <br>
+      <p><strong>💻</strong> Agendamento online, atendimento com estagiários supervisionados, sigilo garantido.</p>
+        <br>
+      <p><strong>🎓</strong> Público-alvo: estudantes, comunidade externa, etc.</p>
+      <br>
+      <p><strong>🎯</strong> Objetivo: promover bem-estar e oferecer suporte psicológico.</p>
+      <br>
+      <p><strong>🌱</strong> Benefícios: apoio emocional, escuta empática, orientação psicológica.</p>
+
+    </div>
+    <img src="{{ url_for('static', filename='imagem2.png') }}" alt="Ilustração" width="300" />
+  </div>
+
+  <div id="profissionais" class="section profissionais">
+    <h2>Conheça nossos profissionais</h2>
+    <div class="professores">
+      <div class="professor">
+        <img src="{{ url_for('static',filename='mulher.png') }}"alt= "Professor 1" />
+        <h4>Prof. Dra. Juliana Aparecida Martini</h4>
+      </div>
+      <div class="professor">
+        <img src="{{ url_for('static', filename='homem.png') }}" alt="Professor 2" />
+        <h4>Prof. Dr. Ednilton José Santa Rosa</h4>
+      </div>
+      <div class="professor">
+        <img src="{{ url_for('static', filename='mulher2.png') }}" alt="Professor 3" />
+        <h4>Prof. Maria dos Santos</h4>
+      </div>
+    </div>
+    <div class="professores extra-professores" id="mais-professores">
+      <div class="professor">
+        <img src="{{ url_for('static', filename='homem2.png') }}" alt="Professor 4" />
+        <h4>Prof. Ricardo Messias</h4>
+      </div>
+      <div class="professor">
+        <img src="{{ url_for('static', filename='mulher3.png') }}" alt="Professor 5" />
+        <h4>Prof. Carla Silva</h4>
+      </div>
+      <div class="professor">
+        <img src="{{ url_for('static', filename='homem3.png') }}" alt="Professor 6" />
+        <h4>Prof. Matheus Souza</h4>
+      </div>
+    </div>
+    <button class="load-more" onclick="document.getElementById('mais-professores').style.display='flex'; this.style.display='none'">MOSTRAR TODOS</button>
+  </div>
+
+  <div class="hero-alt">
+  <h1>Atendimento com estudantes supervisionados por professores especializados.</h1>
+</div>
+<div class="convite">
+  <h2>Quer conversar? A COEPP está de portas abertas!</h2>
+  <a href="/login" class="btn">AGENDAR ATENDIMENTO</a>
+</div>
+
+<div class="info-links">
+  <div class="contato">
+    <h4>INFORMAÇÕES DE CONTATO</h4>
+    <p>📱 (11) 4979-3300<br>
+       ☎ (11) 4979-3458<br>
+       📧 coepp@fsa.br<br>
+       📍 Av. Príncipe de Gales, 821, Santo André - SP CEP: 09060-650</p>
+  </div>
+  <div class="links-uteis">
+    <h4>MAIS INFORMAÇÕES</h4>
+    <p><strong>⚑  </strong><a href="https://www.fsa.br/" target="_blank">https://www.fsa.br/</a></p>
+    <p><strong>⚐  </strong><a href="#" onclick="event.preventDefault(); document.getElementById('popupPriv').style.display='flex'">Política de privacidade</a></p>
+    <p><strong>⚐  </strong><a href="#" onclick="event.preventDefault(); document.getElementById('popupTermos').style.display='flex'">Termos de uso</a></p>
+  </div>
+</div>
+
+  <div class="popup" id="popupPriv">
+    <div class="popup-content">
+      <span class="close" onclick="document.getElementById('popupPriv').style.display='none'">×</span>
+        <h2>Política de Privacidade</h2>
+
+  <p>A proteção dos dados pessoais dos pacientes é prioridade para nós. Esta política explica como tratamos os prontuários eletrônicos e os dados pessoais, em conformidade com as leis brasileiras vigentes, especialmente a <strong>Lei nº 13.787/2018</strong> e a <strong>Lei Geral de Proteção de Dados (LGPD) – Lei nº 13.709/2018</strong>.</p>
+
+  <h3>Sobre os Prontuários Eletrônicos</h3>
+  <p>O prontuário eletrônico de paciente (PEP) é um registro digital que contém informações essenciais sobre a saúde e o histórico clínico do paciente. Ele é utilizado por diversos profissionais da saúde, como médicos, psicólogos, enfermeiros, fisioterapeutas e nutricionistas, para garantir um atendimento eficaz e seguro.</p>
+  <p>O PEP pode ser:</p>
+  <ul>
+    <li><strong>Uniprofissional:</strong> usado por um único profissional.</li>
+    <li><strong>Multiprofissional:</strong> compartilhado em clínicas ou instituições de saúde.</li>
+  </ul>
+  <p>Ele inclui dados pessoais, diagnósticos, tratamentos, resultados de exames, laudos, imagens e outras informações necessárias para o acompanhamento integral do paciente.</p>
+
+  <h3>Normas e Certificações</h3>
+  <p>Nosso sistema de prontuário eletrônico está em conformidade com as normas da Associação Brasileira de Normas Técnicas (ABNT), o Conselho Federal de Medicina (CFM) e os padrões técnicos exigidos para garantir a segurança, integridade, autenticidade e confidencialidade dos dados armazenados.</p>
+  <p>A certificação do sistema, obrigatória desde 2007, assegura que as informações sejam protegidas contra acessos não autorizados, além de garantir que o sistema esteja auditável e cumpra os requisitos legais.</p>
+
+  <h3>Privacidade e Segurança dos Dados</h3>
+  <p>Os dados contidos no PEP são considerados <strong>dados pessoais sensíveis</strong>, pois dizem respeito à saúde do paciente. Por isso, adotamos medidas rigorosas para garantir que esses dados sejam tratados com total confidencialidade e segurança, respeitando:</p>
+  <ul>
+    <li>O consentimento do paciente para o uso e tratamento dos dados;</li>
+    <li>O acesso restrito apenas a profissionais autorizados;</li>
+    <li>A proteção contra divulgação indevida, especialmente em casos que envolvam informações sensíveis, como saúde mental.</li>
+  </ul>
+
+  <h3>Direitos dos Pacientes</h3>
+  <p>Os pacientes têm o direito de acessar seus prontuários, solicitar correções e obter informações sobre o tratamento de seus dados pessoais. Também asseguramos que, quando necessário, o acesso possa ser limitado para proteger a integridade e o cuidado do paciente.</p>
+
+  <h3>Responsabilidades</h3>
+  <p>A instituição e os profissionais responsáveis pelo tratamento dos dados pessoais têm o compromisso de:</p>
+  <ul>
+    <li>Respeitar a privacidade e a dignidade do paciente;</li>
+    <li>Cumprir todas as exigências legais e éticas relacionadas à proteção de dados;</li>
+    <li>Manter os sistemas atualizados e certificados para garantir a segurança das informações.</li>
+  </ul>
+
+  <h3>Finalidade do Uso dos Dados</h3>
+  <p>Além do atendimento clínico, os dados do prontuário eletrônico podem ser utilizados para:</p>
+  <ul>
+    <li>Pesquisa científica e aprimoramento das práticas de saúde;</li>
+    <li>Formulação de políticas públicas de saúde;</li>
+    <li>Melhoria contínua na qualidade dos serviços prestados.</li>
+  </ul>
+
+  <p><strong>Nosso compromisso é assegurar que o tratamento dos dados pessoais seja transparente, seguro e ético, garantindo sempre a proteção dos direitos dos nossos pacientes e a excelência na prestação dos nossos serviços.</strong></p>
+  </div>
+</div>
+
+  <div class="popup" id="popupTermos">
+  <div class="popup-content">
+    <span class="close" onclick="document.getElementById('popupTermos').style.display='none'">×</span>
+    <h3>Termos de Uso</h3>
+
+    <p>Bem-vindo(a) ao nosso sistema! Ao acessar e utilizar este site, você concorda com os seguintes termos de uso. Leia atentamente antes de continuar.</p>
+
+    <h3>1. Aceitação dos Termos</h3>
+    <p>Ao acessar este site, você concorda em cumprir estes termos, bem como todas as leis e regulamentos aplicáveis. Se você não concordar com algum dos termos aqui descritos, é recomendável que não utilize a plataforma.</p>
+
+    <h3>2. Uso da Plataforma</h3>
+    <p>Você se compromete a utilizar este sistema apenas para fins legais, de maneira ética e de acordo com estes termos. É proibido utilizar o site para atividades que possam comprometer sua segurança, integridade ou funcionamento adequado.</p>
+
+    <h3>3. Cadastro e Acesso</h3>
+    <p>Algas funcionalidades podem exigir a criação de uma conta. Você se compromete a fornecer informações verdadeiras, completas e atualizadas durante o processo de registro. O uso da sua conta é de sua total responsabilidade.</p>
+
+    <h3>4. Privacidade e Proteção de Dados</h3>
+    <p>Ao utilizar esta plataforma, você concorda com a coleta e uso dos seus dados de acordo com nossa <a href="#politica-de-privacidade">Política de Privacidade</a>. Comprometemo-nos a proteger suas informações pessoais conforme previsto na Lei Geral de Proteção de Dados (LGPD).</p>
+
+    <h3>5. Propriedade Intelectual</h3>
+    <p>Todo o conteúdo presente no site, incluindo textos, imagens, logos, marcas, códigos e demais materiais, é protegido por direitos autorais e pertence aos seus respectivos proprietários. É proibida a reprodução sem autorização prévia.</p>
+
+    <h3>6. Responsabilidades</h3>
+    <p>Não nos responsabilizamos por eventuais danos decorrentes do uso incorreto da plataforma, indisponibilidades temporárias ou falhas técnicas que possam ocorrer. O uso da plataforma é por sua conta e risco.</p>
+
+    <h3>7. Alterações nos Termos</h3>
+    <p>Estes termos de uso podem ser alterados a qualquer momento, sem aviso prévio. Recomendamos que você os consulte periodicamente. O uso contínuo da plataforma após mudanças indica sua concordância com os novos termos.</p>
+
+    <h3>8. Contato</h3>
+    <p>Em caso de dúvidas, sugestões ou solicitações relacionadas a estes termos, entre em contato conosco pelos canais disponibilizados no site.</p>
+
+  </div>
+</div>
+
+<footer class="rodape">
+  <p>© <span id="ano"></span> | Fundação Santo André</p>
+</footer>
+  <script>
+  document.getElementById('ano').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>

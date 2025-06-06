@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+        }
+
+        .imagem {
+            position: absolute;
+            bottom: 40px;
+            left: 63%;
+            width: 260px;
+            height: auto;
+        }
+
+        .welcome-section {
+            background: linear-gradient(to top, #074276, #64a1d7);
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .welcome-content {
+            max-width: 350px;
+        }
+
+        .welcome-title {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .register-now {
+            color: white;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .register-now:hover {
+            background-color: white;
+            color: #4285F4;
+        }
+
+        .login-container {
+            background-color: white;
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        h1 {
+            text-align: left;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .social-btn:hover {
+            background-color: #f9f9f9;
+        }
+
+        .social-btn.google {
+            border-color: #4285F4;
+            color: #4285F4;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider::before {
+            margin-right: 10px;
+        }
+
+        .divider::after {
+            margin-left: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            justify-content: flex-start;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .login-btn:hover {
+            background-color: #053157;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .footer-links a {
+            color: #074276;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Bem-vindo de volta!</h1>
+            <p class="welcome-text">Novo aqui?</p>
+             <a href="/cadastroPaciente"  class = "register-now">CADASTRE-SE AGORA</a>
+            
+        </div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-form">
+            <h1>Entrar</h1>
+
+            <div class="social-login">
+                <button class="social-btn google">
+                    Cadastre-se com Google
+                </button>
+            </div>
+
+            <div class="divider">OU</div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-mail ou Nome de Usuário</label>
+                    <input type="text" id="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Manter-me conectado</label>
+                </div>
+
+                <button type="submit" class="login-btn">Entrar</button>
+            </form>
+
+            <div class="footer-links">
+                <a href="#">Esqueceu sua Senha?</a>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://www.fsa.br/">
+        <img src="https://www.fsa.br/wp-content/uploads/2018/06/logo-fsa-p.png" class="imagem">
+    </a>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim(); 
+            const password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email, password: password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Resposta do servidor:", data); 
+                if (data.success) {
+                    if (email.endsWith("@graduacao.fsa.br")) {
+                        window.location.href = 'master.html';
+                    } else {
+                        window.location.href = 'agendamentos.html';
+                    }
+                } 
+            });
+        });
+    </script>
+</body>
+</html> 

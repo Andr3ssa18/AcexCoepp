@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Responsável Legal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom, #074276, #64a1d7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .cartao {
+      background: white;
+      border-radius: 20px;
+      width: 560px;
+      padding: 40px 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      text-align: left;
+    }
+
+    .cartao h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .cartao p {
+      color: #777;
+      margin: 8px 0 20px;
+      font-weight: 500;
+    }
+
+    .cartao input,
+    .cartao select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .linha-inputs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .linha-inputs input {
+      flex: 1;
+    }
+
+    .botoes-navegacao {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .botao-navegacao {
+      background-color: #074276;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .indicador-etapa {
+      position: absolute;
+      bottom: 15px;
+      left: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .logo-img {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 100px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="cartao">
+    <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="Logo FSA" class="logo-img">
+
+    <h2>Responsável legal</h2>
+    <p>Preencha os dados do responsável para concluir o cadastro.</p>
+
+    <input type="text" id="nomeResponsavel" placeholder="Nome completo do responsável">
+
+    <select id="parentesco">
+      <option value="">Parentesco</option>
+      <option value="Pai">Pai</option>
+      <option value="Mãe">Mãe</option>
+      <option value="Responsável legal">Responsável legal</option>
+      <option value="Outro">Outro</option>
+    </select>
+
+    <div class="linha-inputs">
+      <input type="text" id="cpfResponsavel" placeholder="CPF do responsável" maxlength="14" oninput="formatarCPF(this)">
+      <input type="text" id="telefoneResponsavel" placeholder="Telefone do responsável" maxlength="15" oninput="formatarTelefone(this)">
+    </div>
+
+    <input type="email" id="emailResponsavel" placeholder="E-mail do responsável">
+
+    <div class="botoes-navegacao">
+      <button class="botao-navegacao" onclick="voltar()">&#8592;</button>
+      <button class="botao-navegacao" onclick="proximo()">&#8594;</button>
+    </div>
+  </div>
+
+  <script>
+    function voltar() {
+      window.history.back(); 
+    }
+
+    function proximo() {
+      
+      const nome = document.getElementById("nomeResponsavel").value.trim();
+      const parentesco = document.getElementById("parentesco").value;
+      const cpf = document.getElementById("cpfResponsavel").value.trim();
+      const telefone = document.getElementById("telefoneResponsavel").value.trim();
+      const email = document.getElementById("emailResponsavel").value.trim();
+
+      if (!nome || !parentesco || !cpf || !telefone || !email) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+      }
+
+      
+      window.location.href = "/plano";
+    }
+
+    function formatarCPF(input) {
+      let valor = input.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+
+      valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+      valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+      valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+      input.value = valor;
+    }
+
+    function formatarTelefone(input) {
+      let valor = input.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+
+      if (valor.length >= 1) {
+        valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+      }
+      if (valor.length > 10) {
+        valor = valor.slice(0, 10) + "-" + valor.slice(10);
+      }
+      input.value = valor;
+    }
+  </script>
+</body>
+</html>

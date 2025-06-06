@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to top, #074276, #64a1d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+            width: 560px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo-fsa {
+            height: 80px;
+            width: auto;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        p {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .user-button {
+            background-color: #074276;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-button:hover {
+            background-color: #053052;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            width: 24px;
+            height: 24px;
+        }
+
+        .next-button-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-button {
+            background-color: #074276;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+
+        .next-button:hover {
+            background-color: #053052;
+        }
+
+        .next-button::after {
+            content: "→";
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="logo-container">
+            <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="FSA Logo" class="logo-fsa">
+        </div>
+
+        <h2>Criar Conta</h2>
+        <p>Escolha o tipo de usuário</p>
+
+        <div class="button-group">
+            <button class="user-button">
+                <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                    </svg></span>
+                <span>Paciente</span>
+            </button>
+            <button class="user-button">
+                <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M12 1H4a1 1 0 0 0-1 1v10.753l6.293-5.243a.5.5 0 0 1 .414 0L13 11.753V2a1 1 0 0 0-1-1z" />
+                        <path
+                            d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z" />
+                        <path fill-rule="evenodd"
+                            d="M8.646 5.146a.5.5 0 0 1 .708 0l2.5 2.5a.5.5 0 0 1 0 .708l-2.5 2.5a.5.5 0 0 1-.708-.708L10.293 8 8.646 6.354a.5.5 0 0 1 0-.708z" />
+                    </svg></span>
+                <span>Aluno</span>
+            </button>
+            <button class="user-button">
+                <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                    </svg></span>
+                <span>Mestre</span>
+            </button>
+        </div>
+
+        <div class="next-button-container">
+            <button class="next-button"></button>
+        </div>
+    </div>
+
+    <script>
+        let selectedUserType = null;
+
+        document.querySelectorAll('.user-button').forEach(button => {
+            button.addEventListener('click', function () {
+
+                document.querySelectorAll('.user-button').forEach(btn => {
+                    btn.style.backgroundColor = '#074276';
+                });
+
+                this.style.backgroundColor = '#053052';
+
+                selectedUserType = this.querySelector('span:last-child').textContent.trim();
+            });
+        });
+
+        document.querySelector('.next-button').addEventListener('click', function () {
+            if (!selectedUserType) {
+                alert('Por favor, selecione um tipo de usuário antes de continuar');
+                return;
+            }
+
+            switch(selectedUserType) {
+                case 'Paciente':
+                    window.location.href = '/cadastroPaciente';
+                    break;
+                case 'Aluno':
+                    window.location.href = 'cadastroAluno';
+                    break;
+                case 'Mestre':
+                    window.location.href = '/cadastroMestre';
+                    break;
+                default:
+                    alert('Tipo de usuário não reconhecido');
+            }
+        });
+    </script>
+</body>
+</html>
