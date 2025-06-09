@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Login</title>
     <style>
+        /* Seu CSS existente, sem alterações */
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -209,6 +210,33 @@
         .footer-links a:hover {
             text-decoration: underline;
         }
+
+        /* Estilos para mensagens flash */
+        .flash-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .flash-message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
     </style>
 </head>
 <body>
@@ -216,7 +244,7 @@
         <div class="welcome-content">
             <h1 class="welcome-title">Bem-vindo de volta!</h1>
             <p class="welcome-text">Novo aqui?</p>
-             <a href="/cadastroPaciente"  class = "register-now">CADASTRE-SE AGORA</a>
+             <a href='registro' class = "register-now">CADASTRE-SE AGORA</a>
             
         </div>
     </div>
@@ -224,6 +252,15 @@
     <div class="login-container">
         <div class="login-form">
             <h1>Entrar</h1>
+
+            {# Adicione este bloco para exibir mensagens flash #}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
             <div class="social-login">
                 <button class="social-btn google">
@@ -233,15 +270,15 @@
 
             <div class="divider">OU</div>
 
-            <form id="loginForm">
+            <form id="loginForm" method="POST" action="{{ url_for('login') }}">
                 <div class="form-group">
-                    <label for="email">E-mail ou Nome de Usuário</label>
-                    <input type="text" id="email" required>
+                    <label for="identificador">E-mail ou RA</label>
+                    <input type="text" id="identificador" name="identificador" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input type="password" id="password" required>
+                    <input type="password" id="password" name="password" required>
                 </div>
 
                 <div class="checkbox-group">
@@ -263,31 +300,8 @@
     </a>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value.trim(); 
-            const password = document.getElementById('password').value;
-
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: email, password: password }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Resposta do servidor:", data); 
-                if (data.success) {
-                    if (email.endsWith("@graduacao.fsa.br")) {
-                        window.location.href = 'master.html';
-                    } else {
-                        window.location.href = 'agendamentos.html';
-                    }
-                } 
-            });
-        });
+        // Removi o fetch API e deixei o formulário submeter de forma tradicional
+        // O Flask agora lida com o redirecionamento e as mensagens flash diretamente.
     </script>
 </body>
-</html> 
+</html>

@@ -33,3 +33,7 @@ class Estagiario(db.Model):
 
     def __repr__(self):
         return f'<Estagiario {self.nome} - RA: {self.RA}>'
+    
+
+
+

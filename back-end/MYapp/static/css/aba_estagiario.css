@@ -2,15 +2,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-color: #004a91;
-    --primary-dark: #003366;
-    --primary-light: #e0f2f7;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --light-color: #f8f9fa;
-    --dark-color: #343a40;
+    --primary-color: #2196F3; /* Um azul mais vibrante para o primary */
+    --primary-dark: #1976D2; /* Um tom mais escuro de azul para hover/ativação */
+    --primary-light: #BBDEFB; /* Um azul bem claro para fundos e realces */
+    --secondary-color: #607D8B; /* Um cinza-azulado para textos secundários */
+    --success-color: #4CAF50; /* Verde para sucesso */
+    --warning-color: #FFC107; /* Amarelo para avisos */
+    --danger-color: #F44336; /* Vermelho para perigo/erros */
+    --light-color: #F5F5F5; /* Cinza bem claro para fundos gerais */
+    --dark-color: #263238; /* Azul escuro quase preto para textos principais */
     --white: #ffffff;
     --sidebar-width: 250px;
     --header-height: 70px;
@@ -27,7 +27,8 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #074276 0%, #0a56a0 100%);
+    /* Alterando o gradiente de fundo para usar tons de azul mais consistentes */
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%); 
     color: var(--dark-color);
     line-height: 1.6;
     min-height: 100vh;
@@ -96,7 +97,7 @@ header {
 }
 
 .profile:hover {
-    background-color: #f0f0f0;
+    background-color: var(--primary-light); /* Usando primary-light para hover */
 }
 
 .profile span {
@@ -128,7 +129,7 @@ header {
 }
 
 .dropdown a {
-    color: var(--primary-color);
+    color: var(--dark-color); /* Mudando para dark-color para contraste */
     padding: 14px 20px;
     text-decoration: none;
     display: flex;
@@ -181,7 +182,7 @@ header {
 
 .sidebar-header {
     padding: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--light-color); /* Usando light-color para a borda */
 }
 
 .sidebar-user {
@@ -237,7 +238,7 @@ header {
 
 .nav-item:hover {
     background-color: var(--primary-light);
-    color: var(--primary-color);
+    color: var(--primary-dark); /* Deixando o texto mais escuro no hover */
     border-left-color: var(--primary-color);
 }
 
@@ -256,12 +257,12 @@ header {
 
 .nav-item.logout {
     margin-top: 20px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--light-color); /* Usando light-color para a borda */
     color: var(--danger-color);
 }
 
 .nav-item.logout:hover {
-    background-color: #ffebee;
+    background-color: #FFEBEE; /* Um vermelho claro para hover de logout */
     border-left-color: var(--danger-color);
 }
 
@@ -270,7 +271,7 @@ header {
     flex: 1;
     margin-left: var(--sidebar-width);
     padding: 30px;
-    background-color: #f5f5f5;
+    background-color: var(--light-color); /* Usando light-color para o fundo do conteúdo */
     min-height: calc(100vh - var(--header-height));
 }
 
@@ -326,7 +327,7 @@ header {
     box-shadow: var(--box-shadow);
     margin-bottom: 30px;
     overflow: hidden;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color para a borda do card */
 }
 
 .card-header {
@@ -353,7 +354,7 @@ header {
 .form-control {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--secondary-color); /* Usando secondary-color para a borda do input */
     border-radius: var(--border-radius);
     font-size: 16px;
     transition: var(--transition);
@@ -362,7 +363,7 @@ header {
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 74, 145, 0.2);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2); /* Usando o novo primary-color */
 }
 
 /* Checkbox and Radio Styles */
@@ -397,9 +398,10 @@ header {
     left: 0;
     height: 24px;
     width: 24px;
-    background-color: #eee;
+    background-color: var(--light-color); /* Usando light-color para o fundo do checkbox/radio */
     border-radius: 4px;
     transition: var(--transition);
+    border: 1px solid var(--secondary-color); /* Adicionando borda */
 }
 
 .radio-mark {
@@ -408,12 +410,13 @@ header {
 
 .checkbox-container:hover input ~ .checkmark,
 .radio-container:hover input ~ .radio-mark {
-    background-color: #ccc;
+    background-color: var(--primary-light); /* Usando primary-light no hover */
 }
 
 .checkbox-container input:checked ~ .checkmark,
 .radio-container input:checked ~ .radio-mark {
     background-color: var(--primary-color);
+    border-color: var(--primary-color); /* Alterando a cor da borda quando checado */
 }
 
 .checkmark:after, .radio-mark:after {
@@ -476,7 +479,7 @@ header {
 }
 
 .btn-success:hover {
-    background-color: #218838;
+    background-color: #388E3C; /* Tom mais escuro para o hover de sucesso */
 }
 
 .btn-danger {
@@ -485,7 +488,7 @@ header {
 }
 
 .btn-danger:hover {
-    background-color: #c82333;
+    background-color: #D32F2F; /* Tom mais escuro para o hover de perigo */
 }
 
 .btn-outline {
@@ -496,6 +499,7 @@ header {
 
 .btn-outline:hover {
     background-color: var(--primary-light);
+    color: var(--primary-dark); /* Mudando a cor do texto no hover para um azul mais escuro */
 }
 
 .btn-block {
@@ -528,8 +532,8 @@ header {
 
 /* Info Message */
 .info-message {
-    background-color: #f8f9fa;
-    border: 1px solid #e0e0e0;
+    background-color: var(--light-color); /* Usando light-color */
+    border: 1px solid #E0E0E0;
     border-radius: var(--border-radius);
     padding: 20px;
     margin: 30px 0;
@@ -550,7 +554,7 @@ header {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     overflow: hidden;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .solicitacao-header {
@@ -558,7 +562,7 @@ header {
     align-items: center;
     padding: 20px;
     gap: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .solicitacao-icon {
@@ -604,7 +608,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: #f8f9fa;
+    background-color: var(--light-color); /* Usando light-color */
 }
 
 .status-badge {
@@ -615,23 +619,23 @@ header {
 }
 
 .status-badge.aguardando {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #FFF9C4; /* Amarelo bem claro para aguardando */
+    color: #FBC02D; /* Amarelo mais escuro para o texto */
 }
 
 .status-badge.aceito {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #C8E6C9; /* Verde bem claro para aceito */
+    color: #388E3C; /* Verde mais escuro para o texto */
 }
 
 .status-badge.confirmado {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #C8E6C9; /* Verde bem claro para confirmado */
+    color: #388E3C; /* Verde mais escuro para o texto */
 }
 
 .status-badge.pendente {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #FFF9C4; /* Amarelo bem claro para pendente */
+    color: #FBC02D; /* Amarelo mais escuro para o texto */
 }
 
 .solicitacao-actions {
@@ -665,7 +669,7 @@ header {
 }
 
 .calendar {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color */
     border-radius: var(--border-radius);
     overflow: hidden;
     margin-bottom: 30px;
@@ -693,22 +697,22 @@ header {
 .calendar-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .calendar-day {
     height: 100px;
     padding: 10px;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid var(--light-color); /* Usando light-color */
     position: relative;
 }
 
 .calendar-day.empty {
-    background-color: #f8f9fa;
+    background-color: var(--light-color); /* Usando light-color */
 }
 
 .calendar-day.today {
-    background-color: #e8f4f8;
+    background-color: var(--primary-light); /* Usando primary-light */
 }
 
 .day-number {
@@ -782,7 +786,7 @@ header {
 .search-input {
     flex: 1;
     padding: 12px 15px;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--secondary-color); /* Usando secondary-color */
     border-radius: var(--border-radius) 0 0 var(--border-radius);
     font-size: 16px;
 }
@@ -805,7 +809,7 @@ header {
     background-color: var(--white);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .prontuario-header {
@@ -853,7 +857,7 @@ header {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     overflow: hidden;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .comunicado-item.read {
@@ -901,7 +905,7 @@ header {
 
 .comunicado-content {
     padding: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .comunicado-actions {
@@ -942,7 +946,7 @@ header {
     text-align: center;
     padding: 30px;
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color */
 }
 
 .modal-icon {
@@ -963,7 +967,7 @@ header {
 }
 
 .modal-icon.success {
-    background-color: #d4edda;
+    background-color: #C8E6C9; /* Verde bem claro para sucesso */
 }
 
 .modal-icon.success svg {
@@ -1008,7 +1012,7 @@ header {
     text-align: center;
     padding: 30px;
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-color); /* Usando light-color */
 }
 
 @keyframes modalFadeIn {
@@ -1018,14 +1022,14 @@ header {
 
 .modal-header {
     padding: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--light-color); /* Usando light-color */
     text-align: center;
 }
 
 .success-icon {
     width: 70px;
     height: 70px;
-    background-color: #d4edda;
+    background-color: #C8E6C9; /* Verde bem claro para sucesso */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1049,7 +1053,7 @@ header {
 }
 
 .agendamento-details {
-    background-color: #f8f9fa;
+    background-color: var(--light-color); /* Usando light-color */
     border-radius: var(--border-radius);
     padding: 15px;
     margin-top: 20px;
@@ -1061,7 +1065,7 @@ header {
 
 .modal-footer {
     padding: 20px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--light-color); /* Usando light-color */
     text-align: center;
 }
 

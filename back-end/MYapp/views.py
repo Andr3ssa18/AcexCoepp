@@ -7,6 +7,92 @@ import datetime # Adicionado para conversão de data
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 
+
+
+@app.route('/')
+def index():
+ return render_template('landingpage.html')
+
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        print("DEBUG: Requisição POST para /login recebida.") # DEBUG
+        identificador = request.form.get('identificador')
+        senha_digitada = request.form.get('password')
+
+        print(f"DEBUG: Identificador recebido: {identificador}") # DEBUG
+        # NÃO imprima a senha digitada em produção! Apenas para depuração.
+        # print(f"DEBUG: Senha digitada: {senha_digitada}") # DEBUG (DESCOMENTAR APENAS PARA DEBUG EXTREMO E REMOVER DEPOIS)
+
+        # Verificação para Paciente (usa email)
+        paciente = Paciente.query.filter_by(email=identificador).first()
+        if paciente:
+            print(f"DEBUG: Paciente encontrado: {paciente.email}") # DEBUG
+            if check_password_hash(paciente.senha, senha_digitada):
+                print("DEBUG: Senha do paciente CORRETA.") # DEBUG
+                session['logged_in'] = True
+                session['user_id'] = paciente.id
+                session['user_type'] = 'paciente'
+                session['nome_usuario'] = paciente.nome
+                flash('Login de paciente realizado com sucesso!', 'success')
+                print("DEBUG: Redirecionando para aba_pacientes...") # DEBUG
+                return redirect(url_for('aba_pacientes'))
+            else:
+                print("DEBUG: Senha do paciente INCORRETA.") # DEBUG
+        else:
+            print("DEBUG: Paciente não encontrado por email.") # DEBUG
+        
+        # Verificação para Estagiário (usa email ou RA)
+        estagiario = Estagiario.query.filter_by(emailfsa=identificador).first()
+        if not estagiario: 
+            estagiario = Estagiario.query.filter_by(RA=identificador).first()
+            if estagiario:
+                print(f"DEBUG: Estagiário encontrado por RA: {estagiario.RA}") # DEBUG
+            else:
+                print("DEBUG: Estagiário NÃO encontrado por RA.") # DEBUG
+        else:
+            print(f"DEBUG: Estagiário encontrado por emailfsa: {estagiario.emailfsa}") # DEBUG
+
+
+        if estagiario and check_password_hash(estagiario.senha, senha_digitada):
+            print("DEBUG: Senha do estagiário CORRETA.") # DEBUG
+            session['logged_in'] = True
+            session['user_id'] = estagiario.id
+            session['user_type'] = 'estagiario'
+            session['nome_usuario'] = estagiario.nome
+            flash('Login de estagiário realizado com sucesso!', 'success')
+            print("DEBUG: Redirecionando para aba_estagiario...") # DEBUG
+            return redirect(url_for('aba_estagiario'))
+        else:
+            print("DEBUG: Senha do estagiário INCORRETA ou estagiário não encontrado.") # DEBUG
+
+        # Se nenhum login foi bem-sucedido
+        flash('Credenciais inválidas. Verifique seu e-mail/RA e senha.', 'error')
+        messages = session.pop('_flashes', []) # Captura as mensagens flash
+        print(f"DEBUG: Credenciais inválidas. Mensagens flash para render: {messages}") # DEBUG
+        print("DEBUG: Renderizando login.html com mensagens de erro.") # DEBUG
+        return render_template('login.html', messages=messages)
+    
+    # Se o método for GET, apenas renderiza a página de login
+    messages = session.pop('_flashes', [])
+    print(f"DEBUG: Requisição GET para /login. Mensagens flash: {messages}") # DEBUG
+    return render_template('login.html', messages=messages)
+
+# Rota de Logout (opcional, mas recomendado)
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('user_id', None)
+    session.pop('user_type', None)
+    session.pop('nome_usuario', None)
+    flash('Você foi desconectado.', 'info')
+    return redirect(url_for('login')) # Redireciona para a página de login
+
+
+
 # Rota de paciente
 @app.route('/cadastroPaciente', methods=['GET', 'POST'])
 def registrar_paciente():
@@ -30,6 +116,7 @@ def registrar_paciente():
     messages = session.pop('_flashes', [])
     return render_template("cadastroPaciente.html", messages=messages)
 
+    
 @app.route('/criarSenha', methods=['GET', 'POST'])
 def criar_senha():
     if request.method == 'POST':
@@ -57,7 +144,9 @@ def criar_senha():
             return render_template("criarSenha.html", messages=messages)
         
         print("DEBUG: Senha e confirmação válidas. Tentando criar paciente.") # DEBUG
-        hashed_senha = senha 
+        # CORREÇÃO: Hashing da senha do paciente
+        hashed_senha = generate_password_hash(senha, method='pbkdf2:sha256') 
+        
 
         dados_paciente = session['dados_paciente']
 
@@ -79,7 +168,7 @@ def criar_senha():
             email=dados_paciente['email'],
             endereco=dados_paciente['endereco'],
             numero_casa=dados_paciente['numero_casa'],
-            senha=hashed_senha
+            senha=hashed_senha # Usando a senha hasheada
         )
         print(f"DEBUG: Objeto Paciente criado: {novo_paciente}") # DEBUG
 
@@ -90,9 +179,8 @@ def criar_senha():
             print("DEBUG: db.session.commit() executado com sucesso. Dados salvos.") # DEBUG
             flash('Paciente cadastrado com sucesso!', 'success')
             session.pop('dados_paciente', None) 
-            # CORRIGIDO: url_for() espera o nome da função, não o nome do arquivo HTML
             print("DEBUG: Redirecionando para a rota agendamentos.") # DEBUG
-            return redirect(url_for('aba_pacientes'))
+            return redirect(url_for('triagem'))
         except Exception as e:
             db.session.rollback()
             print(f"DEBUG: ERRO DURANTE db.session.add/commit: {e}") # DEBUG CRÍTICO!
@@ -103,12 +191,43 @@ def criar_senha():
     messages = session.pop('_flashes', [])
     return render_template("criarSenha.html", messages=messages)
 
+
+@app.route('/triagem')
+def triagem():
+    print("DEBUG: Acessando a rota /triagem.")
+    messages = session.pop('_flashes', [])
+    return render_template("triagem.html", messages=messages)
+
+
+
+
+@app.route('/minhas_consultas')
+def consultas():
+    print("DEBUG: Acessando a rota /minhas_consultas.")
+    messages = session.pop('_flashes', [])
+    return render_template("minhas_consultas.html", messages=messages)
+
+
+
+
+
+
 # Rota para a página de agendamentos de triagem
 @app.route('/aba_pacientes')
 def aba_pacientes():
     print("DEBUG: Acessando a rota /aba_pacientes.") # DEBUG
     messages = session.pop('_flashes', []) # Para exibir mensagens flash se houver
     return render_template("aba_pacientes.html", messages=messages) # Assumindo que você tem agendamentos.html
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -173,15 +292,12 @@ def criar_senha_aluno():
             # Renderiza a mesma página com a mensagem de erro
             return render_template("criarSenha_aluno.html", messages=session.pop('_flashes', []))
 
-       #py (trecho da função criar_senha_aluno)
-
         novo_Estagiario = Estagiario(
             nome=dados_Estagiario['nome'],
             data_nascimento=data_nascimento_obj,
             RA=dados_Estagiario['RA'],
             cpf=dados_Estagiario['cpf'],
-            # ALTERE ESTA LINHA:
-            telefone_aluno=dados_Estagiario['telefone_aluno'], # <-- Use 'telefone_aluno' aqui
+            telefone_aluno=dados_Estagiario['telefone_aluno'], 
             emailfsa=dados_Estagiario['emailfsa'],
             curso_periodo=dados_Estagiario['curso_periodo'],
             senha=hashed_senha
@@ -199,7 +315,6 @@ def criar_senha_aluno():
             flash('Estagiário cadastrado com sucesso!', 'success')
             session.pop('dados_Estagiario', None) # Limpa os dados do estagiário da sessão
 
-            # ESTE É O ÚNICO RETORNO ESPERADO EM CASO DE SUCESSO DO POST
             return redirect(url_for('aba_estagiario')) 
         except Exception as e:
             db.session.rollback()
@@ -213,20 +328,14 @@ def criar_senha_aluno():
     messages = session.pop('_flashes', [])
     return render_template("criarSenha_aluno.html", messages=messages)
             
+
+            
 # Rota para a aba do estagiário
 @app.route('/aba_estagiario')
 def aba_estagiario():
     print("DEBUG: Acessando a rota /aba_estagiario.")
     messages = session.pop('_flashes', [])
     return render_template("aba_estagiario.html", messages=messages)
-
-# Rota raiz (você pode direcionar para a página de login, por exemplo)
-@app.route('/')
-def index():
-    return "Bem-vindo! <a href='/cadastroaluno'>Cadastrar Aluno</a>"
-
-
-
 
 
 # Rota para listar pacientes (para depuração)
@@ -237,3 +346,8 @@ def listar_pacientes():
     print(f"DEBUG: Pacientes encontrados no DB: {pacientes}") # DEBUG
     messages = session.pop('_flashes', [])
     return render_template('listar_pacientes.html', pacientes=pacientes, messages=messages)
+
+
+@app.route('/registro')
+def registro_Geral():
+ return render_template('registro.html')

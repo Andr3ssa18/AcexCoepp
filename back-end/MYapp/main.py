@@ -1,4 +1,4 @@
-# main.py
+
 import os # Adicione esta linha no topo
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import db
@@ -13,9 +13,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'fsa_teste.db')
 app.secret_key = 'uma_chave_muito_secreta_e_complexa_aqui' 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db.init_app(app)
-
+migrate = Migrate(app, db)
 
 from views import *
 

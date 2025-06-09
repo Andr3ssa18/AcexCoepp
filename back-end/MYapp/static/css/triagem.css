@@ -1,0 +1,370 @@
+:root {
+    --primary-color: #2D68C4; /* Um azul primário vibrante como no print */
+    --primary-dark: #23519B; /* Um tom mais escuro de azul para hover/ativação */
+    --primary-light: #C0DFFF; /* Um azul bem claro para fundos e realces */
+    --secondary-color: #6C7A89; /* Um cinza-azulado para textos secundários */
+    --success-color: #4CAF50; /* Verde para sucesso (mantido) */
+    --warning-color: #FFC107; /* Amarelo para avisos (mantido) */
+    --danger-color: #F44336; /* Vermelho para perigo/erros (mantido) */
+    --light-color: #F5F5F5; /* Cinza bem claro para fundos gerais (mantido) */
+    --dark-color: #2F3640; /* Azul escuro quase preto para textos principais */
+    --white: #ffffff; /* Branco (mantido) */
+
+    /* Variáveis para cores específicas do layout, baseadas no print */
+    --blue-bg-dark: #2F599C; /* Fundo do container principal (o azul escuro do "laptop") */
+    --white-card-bg: #FFFFFF; /* Fundo do card do formulário (branco) */
+    --text-color-dark: var(--dark-color); /* Cor de texto principal (herdando de dark-color) */
+    --text-color-light: #5C6A7A; /* Cor de texto secundária (um cinza médio-escuro) */
+    --primary-blue: var(--primary-color); /* Usando primary-color para elementos azuis */
+    --link-color: var(--primary-color); /* Cor dos links (herdando de primary-color) */
+    --button-bg: #4A89F5; /* Fundo dos botões de navegação (um azul um pouco mais claro) */
+    --button-hover-bg: #3A70D6; /* Fundo dos botões de navegação em hover */
+
+    --sidebar-width: 250px;
+    --header-height: 70px;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%); 
+    overflow: hidden;
+}
+
+.container {
+    background-color: var(--blue-bg-dark); /* Fundo do "laptop" */
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 900px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* NOVO: Estilos para o Seletor de Idioma como na imagem */
+.language-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    /* Estilos para o botão/dropdown */
+    background-color: rgba(255, 255, 255, 0.2); /* Fundo semi-transparente */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px; /* Borda arredondada */
+    padding: 8px 15px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; /* Para alinhar o texto e talvez um ícone */
+    align-items: center;
+    gap: 5px;
+}
+.language-selector select {
+    background-color: transparent;
+    color: white; /* Cor do texto no dropdown */
+    border: none; /* Remove a borda padrão */
+    padding: 0;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-appearance: none; /* Remove seta padrão em alguns navegadores */
+    -moz-appearance: none;
+    appearance: none;
+    /* Remove a background-image da seta customizada que eu havia adicionado */
+    background-image: none; 
+}
+/* Estilo para as opções dentro do dropdown (para quando ele está aberto) */
+.language-selector select option {
+    background-color: var(--blue-bg-dark); /* Fundo das opções */
+    color: white;
+}
+
+
+.header-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.header-form .title {
+    color: white;
+    font-size: 2.2em;
+    font-weight: 600;
+}
+
+.header-form .logo {
+    height: 40px;
+    width: auto;
+}
+
+.form-card {
+    background-color: var(--white-card-bg);
+    border-radius: 10px;
+    padding: 40px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+}
+
+.question {
+    color: var(--text-color-dark);
+    font-size: 1.5em;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    color: var(--text-color-light);
+    cursor: pointer;
+    /* Remova position: relative e padding-left: 35px; para usar input diretamente */
+    /* position: relative; */
+    /* padding-left: 35px; */
+}
+
+/* REMOVIDO: Estilos para o radio customizado ::before e ::after, pois vamos usar o input direto */
+/* .radio-label::before { ... } */
+/* .radio-label input[type="radio"]:checked + &::after { ... } */
+
+/* NOVO: Estilo para o input radio VISÍVEL e com margem */
+.radio-label input[type="radio"] {
+    /* Removido: position: absolute; opacity: 0; */
+    margin-right: 15px; /* Espaçamento entre o rádio e o texto */
+    width: 22px; /* Tamanho do rádio */
+    height: 22px;
+    min-width: 22px; /* Garante tamanho mínimo */
+    min-height: 22px; /* Garante tamanho mínimo */
+    appearance: none; /* Remove estilo padrão do navegador */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 2px solid var(--primary-blue); /* Borda azul */
+    border-radius: 50%; /* Faz com que seja um círculo */
+    outline: none; /* Remove o contorno de foco padrão */
+    cursor: pointer;
+    display: grid; /* Para centralizar o ponto interno */
+    place-content: center; /* Para centralizar o ponto interno */
+}
+
+.radio-label input[type="radio"]::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: inset 1em 1em var(--primary-blue); /* Ponto azul interno */
+    background-color: CanvasText; /* Fallback */
+}
+
+.radio-label input[type="radio"]:checked::before {
+    transform: scale(1);
+}
+
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 30px;
+    margin-bottom: 40px;
+    font-size: 0.95em;
+    color: var(--text-color-light);
+    text-align: left;
+}
+
+/* NOVO: Estilo para o input checkbox VISÍVEL e com margem */
+.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    min-width: 18px;
+    min-height: 18px;
+    cursor: pointer;
+    /* Removi accent-color, vamos estilizar melhor */
+    appearance: none; /* Remove estilo padrão */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 2px solid var(--primary-blue); /* Borda azul */
+    border-radius: 4px; /* Cantos levemente arredondados */
+    outline: none;
+    display: grid;
+    place-content: center;
+}
+
+.checkbox-group input[type="checkbox"]::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); /* Ícone de checkmark */
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    background-color: var(--primary-blue); /* Cor do checkmark */
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+    background-color: var(--primary-blue); /* Fundo azul quando marcado */
+    border-color: var(--primary-blue); /* Borda azul quando marcado */
+}
+
+.checkbox-group input[type="checkbox"]:checked::before {
+    transform: scale(1);
+    opacity: 1;
+}
+
+
+.checkbox-group .link {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.checkbox-group .link:hover {
+    text-decoration: underline;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    max-width: 500px;
+    margin-top: 30px;
+    color: white;
+}
+
+.nav-button {
+    background-color: var(--button-bg);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.nav-button .arrow {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 5px;
+}
+
+.arrow.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.arrow.left {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+}
+
+.progress-indicator {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: white;
+}
+
+/* Responsividade básica */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        height: auto;
+        padding: 20px;
+    }
+
+    .header-form {
+        flex-direction: column;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .header-form .title {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+
+    .language-selector {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+    }
+
+    .form-card {
+        width: 95%;
+        padding: 25px;
+    }
+
+    .question {
+        font-size: 1.3em;
+        margin-bottom: 20px;
+    }
+
+    .radio-label {
+        font-size: 1.1em;
+    }
+
+    .radio-label input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+    .radio-label input[type="radio"]::before {
+        width: 8px;
+        height: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        min-width: 16px;
+        min-height: 16px;
+    }
+    .checkbox-group input[type="checkbox"]::before {
+        width: 8px;
+        height: 8px;
+    }
+
+    .navigation {
+        width: 95%;
+        margin-top: 20px;
+    }
+
+    .nav-button {
+        width: 45px;
+        height: 45px;
+    }
+}

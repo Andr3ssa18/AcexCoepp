@@ -1,0 +1,374 @@
+:root {
+    --primary-blue: #2F599C; /* Azul escuro do fundo da imagem */
+    --secondary-blue: #3A70D6; /* Azul mais claro do gradiente do fundo */
+    --sidebar-dark-blue: #1A4A87; /* Azul mais escuro da barra lateral */
+    --card-background: #FFFFFF; /* Fundo branco dos cards */
+    --header-text-color: #FFFFFF; /* Cor do texto no cabeçalho */
+    --main-text-color: #333333; /* Cor principal dos textos nos cards */
+    --light-text-color: #666666; /* Cor de textos secundários nos cards */
+    --button-blue: #2196F3; /* Azul dos botões "Confirmar Presença" */
+    --button-hover-blue: #1976D2; /* Azul mais escuro para hover */
+    --confirmed-green: #4CAF50; /* Verde do status "Confirmado" */
+    --cancel-red: #F44336; /* Vermelho do botão "Não Posso" */
+    --details-button-bg: #E0E0E0; /* Cinza claro do botão "Detalhes" */
+    --details-button-hover-bg: #CCCCCC; /* Cinza para hover do botão Detalhes */
+    --back-button-bg: #555555; /* Cinza do botão "Voltar" */
+    --back-button-hover-bg: #444444; /* Cinza para hover do botão Voltar */
+    --border-color: #E0E0E0; /* Cor da borda entre o cabeçalho e o conteúdo */
+    --box-shadow-light: rgba(0, 0, 0, 0.1);
+    --box-shadow-dark: rgba(0, 0, 0, 0.2);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte similar ao Windows */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: var(--main-text-color);
+    overflow: hidden; /* Para evitar scroll da body */
+}
+
+.main-container {
+    background-color: var(--primary-blue); /* Fundo do "laptop" */
+    border-radius: 15px;
+    box-shadow: 0 10px 30px var(--box-shadow-dark);
+    width: 95%;
+    max-width: 1200px; /* Largura máxima para acomodar o layout da imagem */
+    height: 700px; /* Altura fixa para simular o notebook */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Garante que nada transborde */
+}
+
+.top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background-color: var(--primary-blue); /* Cabeçalho azul */
+    color: var(--header-text-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    min-height: 70px; /* Altura mínima do cabeçalho */
+}
+
+.header-logo {
+    height: 40px; /* Tamanho da logo */
+}
+
+.header-title {
+    flex-grow: 1; /* Permite que o título ocupe o espaço central */
+    text-align: center;
+}
+
+.header-title h1 {
+    font-size: 1.8em;
+    font-weight: 600;
+    margin: 0;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95em;
+}
+
+.user-avatar {
+    background-color: #fff;
+    color: var(--primary-blue);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.content-wrapper {
+    display: flex;
+    flex: 1; /* Ocupa o espaço restante verticalmente */
+}
+
+.sidebar {
+    width: 60px; /* Largura da barra lateral, bem pequena como na imagem */
+    background-color: var(--sidebar-dark-blue);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative; /* Para posicionar o texto da sidebar */
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sidebar-nav li {
+    margin-bottom: 25px; /* Espaçamento entre os ícones */
+}
+
+.sidebar-nav a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    color: rgba(255, 255, 255, 0.7); /* Cor dos ícones inativos */
+    font-size: 1.5em; /* Tamanho dos ícones */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.sidebar-nav a.active {
+    color: var(--white); /* Ícone ativo branco */
+    background-color: rgba(255, 255, 255, 0.1); /* Fundo sutil para o ativo */
+}
+
+.sidebar-nav a:hover {
+    color: var(--white);
+}
+
+.sidebar-text {
+    position: absolute;
+    left: 100%; /* Posiciona o texto à direita da sidebar */
+    top: 0; /* Alinha no topo */
+    height: 100%;
+    width: 150px; /* Largura para o texto */
+    background-color: var(--sidebar-dark-blue); /* Mesma cor de fundo da sidebar */
+    color: var(--white);
+    padding: 20px 10px 20px 5px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Alinha o texto ao topo */
+    gap: 30px; /* Espaçamento entre os textos dos itens de menu */
+    opacity: 0; /* Inicialmente oculto */
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none; /* Não impede cliques nos elementos abaixo */
+}
+
+/* Mostrar texto da sidebar ao passar o mouse sobre a sidebar */
+.sidebar:hover .sidebar-text {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto; /* Permite interação */
+}
+
+.sidebar-text span {
+    font-size: 0.9em; /* Tamanho do texto */
+    font-weight: 500;
+    padding-left: 10px; /* Pequeno espaçamento do ícone */
+    white-space: nowrap; /* Evita quebra de linha */
+    padding-top: 10px; /* Ajusta para alinhar com o ícone */
+}
+
+.sidebar-text span:first-of-type { /* "Agendamentos" - o primeiro item */
+    color: var(--white); /* Cor ativa */
+}
+
+
+.main-content {
+    flex: 1; /* Ocupa o restante do espaço horizontal */
+    background-color: #F8F8F8; /* Fundo cinza claro da área de conteúdo */
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Para rolagem se o conteúdo for muito grande */
+}
+
+.consultas-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.consultas-header h2 {
+    font-size: 1.6em;
+    color: var(--main-text-color);
+    margin: 0;
+    font-weight: 600;
+}
+
+.back-button {
+    background-color: var(--back-button-bg);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: var(--back-button-hover-bg);
+}
+
+.consultas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 2 colunas, responsivo */
+    gap: 20px;
+}
+
+.consulta-card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px var(--box-shadow-light);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.consulta-card h3 {
+    font-size: 1.2em;
+    color: var(--main-text-color);
+    margin: 0;
+}
+
+.consulta-card p {
+    font-size: 0.9em;
+    color: var(--light-text-color);
+    margin: 0;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: var(--white);
+    width: fit-content;
+}
+
+.confirmed-status {
+    background-color: var(--confirmed-green);
+}
+
+.status-badge i {
+    font-size: 1em;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto; /* Empurra os botões para baixo */
+}
+
+.action-button {
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: var(--white);
+}
+
+.action-button.confirm {
+    background-color: var(--button-blue);
+}
+
+.action-button.confirm:hover {
+    background-color: var(--button-hover-blue);
+}
+
+.action-button.cancel {
+    background-color: var(--cancel-red);
+}
+
+.action-button.cancel:hover {
+    background-color: #D32F2F; /* Tom mais escuro do vermelho */
+}
+
+.details-button {
+    background-color: var(--details-button-bg);
+    color: var(--main-text-color);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* Espaço entre ações e detalhes, se ambos existirem */
+    width: fit-content;
+    align-self: flex-start; /* Alinha o botão "Detalhes" à esquerda no card */
+}
+
+.details-button:hover {
+    background-color: var(--details-button-hover-bg);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .main-container {
+        height: auto; /* Altura automática em telas menores */
+        max-width: 100%;
+        border-radius: 0;
+    }
+
+    .top-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .content-wrapper {
+        flex-direction: column; /* Sidebar e conteúdo empilhados */
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row; /* Ícones em linha no mobile */
+        justify-content: space-around;
+        padding: 10px 0;
+    }
+
+    .sidebar-nav ul {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+    
+    .sidebar-nav li {
+        margin-bottom: 0;
+    }
+
+    .sidebar-text {
+        display: none; /* Oculta o texto na sidebar em telas pequenas */
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .consultas-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .consultas-grid {
+        grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+    }
+
+    .consulta-card .actions {
+        flex-direction: column;
+    }
+}

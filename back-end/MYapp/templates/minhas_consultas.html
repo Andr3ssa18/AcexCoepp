@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Consultas - Agendamentos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/minhas_consultas.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rljxXt9fS/p7d3Jm+d60d3iP7k4c/L7M4/tD/8N4q5l2zXjQ1/2nFf5k0x0L0Q0A0Q0A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="main-container">
+        <header class="top-header">
+            <div class="logo-area">
+                <img src="https://www.fsa.br/wp-content/uploads/2018/06/logo-fsa-p.png" alt="Logo FSA" class="header-logo">
+            </div>
+            <div class="header-title">
+                <h1>Agendamentos - Psicologia</h1>
+            </div>
+            <div class="user-area">
+                <span>Olá, Paciente</span>
+                <div class="user-avatar">P</div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li><a href="#" class="active"><i class="fas fa-calendar-alt"></i></a></li>
+                        <li><a href="#"><i class="fas fa-user-circle"></i></a></li>
+                        <li><a href="#"><i class="fas fa-sign-out-alt"></i></a></li>
+                    </ul>
+                </nav>
+                <div class="sidebar-text">
+                    <span>Agendamentos</span>
+                    <span>Perfil</span>
+                    <span>Sair</span>
+                </div>
+            </div>
+
+            <main class="main-content">
+                <div class="consultas-header">
+                    <button class="back-button" onclick="window.history.back()">
+                        &larr; VOLTAR
+                    </button>
+                    <h2>MINHAS CONSULTAS</h2>
+                </div>
+
+                <div class="consultas-grid">
+                    <div class="consulta-card confirmed">
+                        <h3>Tarde - 25/05/2025</h3>
+                        <p>16:00 - João Pereira (Online)</p>
+                        <div class="status-badge confirmed-status">
+                            <i class="fas fa-check-circle"></i> Confirmado
+                        </div>
+                        <button class="details-button">Detalhes</button>
+                    </div>
+
+                    <div class="consulta-card pending">
+                        <h3>Manhã - 01/06/2025</h3>
+                        <p>10:00 - Mariano Silva (Presencial)</p>
+                        <div class="actions">
+                            <button class="action-button confirm">Confirmar Presença</button>
+                            <button class="action-button cancel">Não Posso</button>
+                        </div>
+                        <button class="details-button">Detalhes</button>
+                    </div>
+
+                    <div class="consulta-card pending">
+                        <h3>Quarta-feira - Tarde</h3>
+                        <p>14:00 - Equipe de Triagem (Triagem)</p>
+                        <div class="actions">
+                            <button class="action-button confirm">Confirmar Presença</button>
+                            <button class="action-button cancel">Não Posso</button>
+                        </div>
+                        <button class="details-button">Detalhes</button>
+                    </div>
+
+                    <div class="consulta-card pending">
+                        <h3>Quarta-feira - Tarde</h3>
+                        <p>14:00 - Equipe de Triagem (Triagem)</p>
+                        <div class="actions">
+                            <button class="action-button confirm">Confirmar Presença</button>
+                            <button class="action-button cancel">Não Posso</button>
+                        </div>
+                        <button class="details-button">Detalhes</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
