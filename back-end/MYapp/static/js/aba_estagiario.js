@@ -285,6 +285,6 @@ function logout() {
     // Lógica de logout
     mostrarToast('Saindo do sistema...');
     setTimeout(() => {
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     }, 1500);
 }
