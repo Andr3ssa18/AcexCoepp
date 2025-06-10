@@ -19,9 +19,9 @@
         }
 
         .imagem {
-            position: absolute;
-            bottom: 40px;
-            left: 63%;
+            position: relative;
+            right: 178%;
+            top: 550px; 
             width: 260px;
             height: auto;
         }
@@ -93,57 +93,6 @@
             font-size: 24px;
         }
 
-        .social-login {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .social-btn {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background-color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .social-btn:hover {
-            background-color: #f9f9f9;
-        }
-
-        .social-btn.google {
-            border-color: #4285F4;
-            color: #4285F4;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: #777;
-            font-size: 14px;
-        }
-
-        .divider::before, .divider::after {
-            content: "";
-            flex: 1;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .divider::before {
-            margin-right: 10px;
-        }
-
-        .divider::after {
-            margin-left: 10px;
-        }
-
         .form-group {
             margin-bottom: 15px;
             text-align: left;
@@ -166,18 +115,6 @@
             box-sizing: border-box;
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            justify-content: flex-start;
-        }
-
-        .checkbox-group input {
-            width: auto;
-            margin-right: 8px;
-        }
-
         .login-btn {
             width: 100%;
             padding: 12px;
@@ -193,22 +130,6 @@
 
         .login-btn:hover {
             background-color: #053157;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .footer-links a {
-            color: #074276;
-            text-decoration: none;
-        }
-
-        .footer-links a:hover {
-            text-decoration: underline;
         }
 
         /* Estilos para mensagens flash */
@@ -262,14 +183,6 @@
                 {% endif %}
             {% endwith %}
 
-            <div class="social-login">
-                <button class="social-btn google">
-                    Cadastre-se com Google
-                </button>
-            </div>
-
-            <div class="divider">OU</div>
-
             <form id="loginForm" method="POST" action="{{ url_for('login') }}">
                 <div class="form-group">
                     <label for="identificador">E-mail ou RA</label>
@@ -281,17 +194,9 @@
                     <input type="password" id="password" name="password" required>
                 </div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Manter-me conectado</label>
-                </div>
-
                 <button type="submit" class="login-btn">Entrar</button>
             </form>
 
-            <div class="footer-links">
-                <a href="#">Esqueceu sua Senha?</a>
-            </div>
         </div>
     </div>
 
