@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Login</title>
     <style>
-        /* Seu CSS existente, sem alterações */
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,15 +14,8 @@
 
         body {
             display: flex;
-            height: 100vh;
-        }
-
-        .imagem {
-            position: relative;
-            right: 178%;
-            top: 550px; 
-            width: 260px;
-            height: auto;
+            min-height: 100vh;
+            flex-wrap: wrap;
         }
 
         .welcome-section {
@@ -36,109 +28,150 @@
             padding: 40px;
             color: white;
             text-align: center;
+            position: relative;
         }
 
         .welcome-content {
-            max-width: 350px;
+            max-width: 400px;
+            padding: 20px;
         }
 
         .welcome-title {
-            font-size: 40px;
+            font-size: 48px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             color: #FFFFFF;
         }
 
         .welcome-text {
-            font-size: 16px;
-            margin-bottom: 30px;
-            line-height: 1.5;
+            font-size: 20px;
+            margin-bottom: 40px;
+            line-height: 1.6;
         }
 
         .register-now {
             color: white;
             font-weight: 500;
             text-decoration: none;
-            border: 1px solid white;
-            padding: 12px 24px;
-            border-radius: 8px;
+            border: 2px solid white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
             transition: all 0.3s;
+            min-width: 280px;
+            display: inline-block;
+            text-align: center;
         }
 
         .register-now:hover {
             background-color: white;
             color: #4285F4;
+            transform: scale(1.05);
         }
 
         .login-container {
             background-color: white;
             width: 60%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 40px;
+            position: relative;
         }
 
         .login-form {
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .logo-container {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .logo-container img {
+            width: 220px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
         }
 
         h1 {
             text-align: left;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             color: #333;
             font-weight: 600;
-            font-size: 24px;
+            font-size: 32px;
+            width: 100%;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             text-align: left;
+            width: 100%;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             font-weight: 500;
             color: #555;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 15px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            font-size: 18px;
             box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #074276;
+            outline: none;
         }
 
         .login-btn {
             width: 100%;
-            padding: 12px;
+            max-width: 400px;
+            padding: 15px;
             background-color: #074276;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 18px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
 
         .login-btn:hover {
             background-color: #053157;
+            transform: scale(1.02);
         }
 
         /* Estilos para mensagens flash */
         .flash-message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 10px;
             text-align: center;
             font-weight: bold;
+            width: 110%;
+            font-size: 16px;
         }
 
         .flash-message.success {
@@ -158,6 +191,79 @@
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 1024px) {
+            .welcome-section, .login-container {
+                width: 50%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .welcome-section, .login-container {
+                width: 100%;
+                min-height: 50vh;
+            }
+
+            .welcome-title {
+                font-size: 36px;
+            }
+
+            .welcome-text {
+                font-size: 18px;
+            }
+
+            .login-form {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .logo-container img {
+                width: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-title {
+                font-size: 32px;
+            }
+
+            .welcome-text {
+                font-size: 16px;
+            }
+
+            .register-now {
+                padding: 12px 30px;
+                font-size: 16px;
+                min-width: 240px;
+            }
+
+            .login-form {
+                padding: 5px;
+            }
+
+            input {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .login-btn {
+                padding: 12px;
+                font-size: 16px;
+                max-width: 320px;
+            }
+
+            .logo-container img {
+                width: 150px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -165,8 +271,7 @@
         <div class="welcome-content">
             <h1 class="welcome-title">Bem-vindo de volta!</h1>
             <p class="welcome-text">Novo aqui?</p>
-             <a href='registro' class = "register-now">CADASTRE-SE AGORA</a>
-            
+            <a href='registro' class="register-now">CADASTRE-SE AGORA</a>
         </div>
     </div>
 
@@ -174,7 +279,6 @@
         <div class="login-form">
             <h1>Entrar</h1>
 
-            {# Adicione este bloco para exibir mensagens flash #}
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -197,16 +301,12 @@
                 <button type="submit" class="login-btn">Entrar</button>
             </form>
 
+            <div class="logo-container">
+                <a href="https://www.fsa.br/">
+                    <img src="https://www.fsa.br/wp-content/uploads/2018/06/logo-fsa-p.png" alt="Logo FSA">
+                </a>
+            </div>
         </div>
     </div>
-
-    <a href="https://www.fsa.br/">
-        <img src="https://www.fsa.br/wp-content/uploads/2018/06/logo-fsa-p.png" class="imagem">
-    </a>
-
-    <script>
-        // Removi o fetch API e deixei o formulário submeter de forma tradicional
-        // O Flask agora lida com o redirecionamento e as mensagens flash diretamente.
-    </script>
 </body>
 </html>

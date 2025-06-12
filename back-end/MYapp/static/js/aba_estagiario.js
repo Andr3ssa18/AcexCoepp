@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Carregar dados iniciais
     carregarConsultas();
+
+    // Adiciona o evento de busca quando a página de prontuários é carregada
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', buscarPaciente);
+    }
 });
 
 // Funções de API
@@ -61,13 +67,34 @@ async function carregarConsultas() {
     }
 }
 
-async function confirmarTriagemAPI(consultaId) {
-    const resultado = await fetchAPI(`/consultas/${consultaId}/confirmar-estagiario`, 'PUT');
-    
-    if (resultado) {
-        mostrarToast('Triagem confirmada com sucesso!');
-        // Recarregar consultas para atualizar a interface
-        carregarConsultas();
+async function confirmarTriagemAPI(solicitacaoId) {
+    try {
+        const dataAtual = new Date();
+        const dataFormatada = dataAtual.toISOString().slice(0, 16); // Formato: YYYY-MM-DDTHH:mm
+
+        const response = await fetch(`/api/estagiario/agendamentos/confirmar/${solicitacaoId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                data_agendamento: dataFormatada,
+                observacoes: 'Triagem confirmada pelo estagiário'
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Erro ao confirmar triagem');
+        }
+
+        mostrarToast('Triagem confirmada com sucesso!', 'success');
+        await carregarSolicitacoes(); // Recarrega a lista de solicitações
+        fecharModalConfirmacaoTriagem(); // Fecha o modal após a confirmação
+    } catch (error) {
+        console.error('Erro ao confirmar triagem:', error);
+        mostrarToast(error.message || 'Erro ao confirmar triagem', 'error');
     }
 }
 
@@ -110,6 +137,7 @@ function mostrarPagina(pagina) {
         pageTitle = 'Meus Horários';
     } else if (pagina === 'pagina-solicitacoes') {
         pageTitle = 'Solicitações de Triagem';
+        carregarSolicitacoes(); // Carrega as solicitações quando a página é aberta
     } else if (pagina === 'pagina-prontuarios') {
         pageTitle = 'Prontuários';
     } else if (pagina === 'pagina-comunicados') {
@@ -225,38 +253,36 @@ function mesSeguinte() {
 }
 
 // Funções de modal
-function abrirModalConfirmacaoTriagem(paciente, data, horario) {
+function abrirModalConfirmacaoTriagem(paciente, data, solicitacaoId) {
     const modal = document.getElementById('modal-confirmacao-triagem');
     const textoModal = document.getElementById('modal-confirmacao-texto');
     
     // Armazenar dados para uso na confirmação
     modal.dataset.paciente = paciente;
     modal.dataset.data = data;
-    modal.dataset.horario = horario;
+    modal.dataset.solicitacaoId = solicitacaoId;
     
-    textoModal.textContent = `Você está prestes a confirmar uma consulta de triagem para ${paciente} no dia ${data} às ${horario}. Deseja Continuar?`;
+    textoModal.textContent = `Você está prestes a confirmar uma consulta de triagem para ${paciente} no dia ${data}. Deseja continuar?`;
     
     modal.classList.add('active');
+}
+
+function confirmarTriagem() {
+    const modal = document.getElementById('modal-confirmacao-triagem');
+    const solicitacaoId = modal.dataset.solicitacaoId;
+    
+    if (!solicitacaoId) {
+        mostrarToast('Erro: ID da solicitação não encontrado', 'error');
+        return;
+    }
+
+    confirmarTriagemAPI(solicitacaoId);
 }
 
 function fecharModalConfirmacaoTriagem() {
     const modal = document.getElementById('modal-confirmacao-triagem');
     modal.classList.remove('active');
-}
-
-function confirmarTriagem() {
-    const modal = document.getElementById('modal-confirmacao-triagem');
-    const paciente = modal.dataset.paciente;
-    const data = modal.dataset.data;
-    const horario = modal.dataset.horario;
-    
-    // Simulação - em produção, usaria o ID real da consulta
-    const consultaId = 1;
-    
-    // Chamar API para confirmar triagem
-    confirmarTriagemAPI(consultaId);
-    
-    fecharModalConfirmacaoTriagem();
+    document.body.classList.remove('modal-active');
 }
 
 function abrirModalSucessoDisponibilidade() {
@@ -281,10 +307,234 @@ function mostrarToast(mensagem) {
 }
 
 // Função de logout
-function logout() {
-    // Lógica de logout
-    mostrarToast('Saindo do sistema...');
-    setTimeout(() => {
-        window.location.href = '/login';
-    }, 1500);
+async function logout() {
+    try {
+        mostrarToast('Deslogando do sistema...');
+        const response = await fetch('/logout');
+        if (response.ok) {
+            window.location.href = '/login';
+        } else {
+            throw new Error('Erro ao fazer logout');
+        }
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        mostrarToast('Erro ao deslogar. Tente novamente.', 'error');
+    }
+}
+
+// Função para carregar as solicitações de triagem
+async function carregarSolicitacoes() {
+    const solicitacoesList = document.querySelector('.solicitacoes-list');
+    
+    // Limpa completamente a lista antes de carregar
+    solicitacoesList.innerHTML = '<div class="loading">Carregando solicitações...</div>';
+
+    try {
+        const response = await fetch('/api/estagiario/solicitacoes');
+        if (!response.ok) {
+            throw new Error('Erro ao carregar solicitações');
+        }
+
+        const solicitacoes = await response.json();
+
+        // Limpa a lista novamente antes de adicionar as novas solicitações
+        solicitacoesList.innerHTML = '';
+
+        if (solicitacoes.length === 0) {
+            solicitacoesList.innerHTML = `
+                <div class="info-message">
+                    <p>Nenhuma solicitação de triagem pendente no momento.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Cria um Set para rastrear IDs já processados
+        const idsProcessados = new Set();
+        
+        solicitacoes.forEach(solicitacao => {
+            // Verifica se este ID já foi processado
+            if (idsProcessados.has(solicitacao.id)) {
+                return;
+            }
+            idsProcessados.add(solicitacao.id);
+
+            const solicitacaoElement = document.createElement('div');
+            solicitacaoElement.className = 'solicitacao-item';
+            solicitacaoElement.id = `solicitacao-${solicitacao.id}`;
+            solicitacaoElement.innerHTML = `
+                <div class="solicitacao-header">
+                    <div class="solicitacao-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
+                    </div>
+                    <div class="solicitacao-info">
+                        <h3>${solicitacao.paciente_nome}</h3>
+                        <div class="solicitacao-details">
+                            <p><strong>Solicitado em:</strong> ${solicitacao.data_solicitacao}</p>
+                            <p><strong>Observações:</strong> ${solicitacao.observacoes_paciente || 'Nenhuma observação'}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="solicitacao-status">
+                    <div class="status-badge pendente">Pendente</div>
+                    <div class="solicitacao-actions">
+                        <button class="btn btn-primary" onclick="abrirModalConfirmacaoTriagem('${solicitacao.paciente_nome}', '${solicitacao.data_solicitacao}', '${solicitacao.id}')">
+                            Confirmar Triagem
+                        </button>
+                    </div>
+                </div>
+            `;
+            solicitacoesList.appendChild(solicitacaoElement);
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar solicitações:', error);
+        solicitacoesList.innerHTML = `
+            <div class="error-message">
+                <p>Erro ao carregar solicitações. Por favor, tente novamente.</p>
+            </div>
+        `;
+    }
+}
+
+// Funções da página Minha Conta
+async function atualizarDadosContato() {
+    const telefone = document.getElementById('telefone').value;
+    const email = document.getElementById('email').value;
+
+    try {
+        const response = await fetch('/api/estagiario/dados', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                telefone: telefone,
+                email: email
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            mostrarToast('Dados atualizados com sucesso!');
+        } else {
+            throw new Error(data.error || 'Erro ao atualizar dados');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar dados:', error);
+        mostrarToast(error.message, 'error');
+    }
+}
+
+async function alterarSenha() {
+    const senhaAtual = document.getElementById('senha-atual').value;
+    const novaSenha = document.getElementById('nova-senha').value;
+    const confirmarSenha = document.getElementById('confirmar-senha').value;
+
+    if (!senhaAtual || !novaSenha || !confirmarSenha) {
+        mostrarToast('Por favor, preencha todos os campos', 'error');
+        return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+        mostrarToast('As senhas não coincidem', 'error');
+        return;
+    }
+
+    if (novaSenha.length < 8 || novaSenha.length > 20) {
+        mostrarToast('A senha deve ter entre 8 e 20 caracteres', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/estagiario/senha', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                senha_atual: senhaAtual,
+                nova_senha: novaSenha
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            mostrarToast('Senha alterada com sucesso!');
+            // Limpar os campos
+            document.getElementById('senha-atual').value = '';
+            document.getElementById('nova-senha').value = '';
+            document.getElementById('confirmar-senha').value = '';
+        } else {
+            throw new Error(data.error || 'Erro ao alterar senha');
+        }
+    } catch (error) {
+        console.error('Erro ao alterar senha:', error);
+        mostrarToast(error.message, 'error');
+    }
+}
+
+// Funções para a página de prontuários
+let searchTimeout;
+
+function buscarPaciente() {
+    const searchInput = document.querySelector('.search-input');
+    const prontuariosList = document.querySelector('.prontuarios-list');
+    
+    // Limpa o timeout anterior se existir
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+    
+    // Aguarda 500ms após o usuário parar de digitar
+    searchTimeout = setTimeout(async () => {
+        const nome = searchInput.value.trim();
+        
+        if (nome.length < 3) {
+            prontuariosList.innerHTML = '<div class="info-message">Digite pelo menos 3 caracteres para buscar.</div>';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/estagiario/buscar-paciente?nome=${encodeURIComponent(nome)}`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Erro ao buscar pacientes');
+            }
+            
+            if (data.length === 0) {
+                prontuariosList.innerHTML = '<div class="info-message">Nenhum paciente encontrado.</div>';
+                return;
+            }
+            
+            // Exibe os resultados
+            prontuariosList.innerHTML = data.map(paciente => `
+                <div class="prontuario-item">
+                    <div class="prontuario-info">
+                        <h3>${paciente.nome}</h3>
+                        <p>Email: ${paciente.email}</p>
+                        <p>Telefone: ${paciente.telefone}</p>
+                        <div class="consultas-previas">
+                            <h4>Consultas Anteriores:</h4>
+                            ${paciente.consultas.map(consulta => `
+                                <div class="consulta-previa">
+                                    <p><strong>Data:</strong> ${consulta.data}</p>
+                                    <p><strong>Observações:</strong> ${consulta.observacoes || 'Sem observações'}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            console.error('Erro ao buscar pacientes:', error);
+            prontuariosList.innerHTML = `<div class="error-message">Erro ao buscar pacientes: ${error.message}</div>`;
+        }
+    }, 500);
 }

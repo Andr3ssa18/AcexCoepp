@@ -15,14 +15,14 @@
     <span style="font-family: 'Times New Roman', Times, serif;">A</span>
         </div>
         <div class="title">Agendamentos - Psicologia</div>
-        <div class="profile" onclick="toggleDropdown()">
-            <div>Olá, Paciente</div>
+        <div class="profile">
+            <div>Olá, {{ paciente.nome.split(' ')[0] }}</div>
             <span>P</span>
             <div class="dropdown" id="dropdownMenu">
-                <a href="#" onclick="mostrarPagina('pagina-consultas')"><span>📅</span>Minhas Consultas</a>
-                <a href="#" onclick="mostrarPagina('pagina-meus-dados')"><span>👤</span>Minha Conta</a>
-                <a href="#" onclick="mostrarPagina('pagina-ajuda')"><span>❓</span>Ajuda</a>
-                <a href="#"><span>↩️</span>Sair da Conta</a>
+                <a href="#" data-page="pagina-consultas"><span>📅</span>Minhas Consultas</a>
+                <a href="#" data-page="pagina-meus-dados"><span>👤</span>Minha Conta</a>
+                <a href="#" data-page="pagina-ajuda"><span>❓</span>Ajuda</a>
+                <a href="{{ url_for('logout') }}"><span>↩️</span>Sair da Conta</a>
             </div>
         </div>
     </header>
@@ -92,36 +92,35 @@
                 </div>
                 <div class="form-group">
                     <label for="nome-completo">Nome Completo*</label>
-                    <input type="text" id="nome-completo" value="Paciente de Oliveira Santos" disabled>
+                    <input type="text" id="nome-completo" value="{{ paciente.nome }}" disabled>
                 </div>
                 <div class="form-group">
                     <label for="data-nascimento">Data de Nascimento*</label>
-                    <input type="text" id="data-nascimento" value="00/00/0000" disabled>
+                    <input type="text" id="data-nascimento" value="{{ paciente.data_nascimento.strftime('%d/%m/%Y') }}" disabled>
                 </div>
                 <div class="form-group">
                     <label for="genero">Gênero*</label>
-                    <select id="genero" enable>
-                        <option value="Homem">Homem</option>
-                        <option value="Mulher">Mulher</option>
-                        <option value="Outro">Outro</option>
-                        <option value="Honda Civic">Honda Civic</option>
+                    <select id="genero" disabled>
+                        <option value="Homem" {% if paciente.genero == 'Homem' %}selected{% endif %}>Homem</option>
+                        <option value="Mulher" {% if paciente.genero == 'Mulher' %}selected{% endif %}>Mulher</option>
+                        <option value="Outro" {% if paciente.genero == 'Outro' %}selected{% endif %}>Outro</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="cpf">CPF*</label>
-                    <input type="text" id="cpf" value="000.000.000-00" disabled>
+                    <input type="text" id="cpf" value="{{ paciente.cpf }}" disabled>
                 </div>
                 <div class="form-group">
                     <label for="telefone">Telefone*</label>
-                    <input type="text" id="telefone" value="(00) 0000-0000" enable>
+                    <input type="text" id="telefone" value="{{ paciente.telefone }}" disabled>
                 </div>
                 <div class="form-group">
                     <label for="email">Email*</label>
-                    <input type="email" id="email" value="oliveirapaciente153@email.com" enable>
+                    <input type="email" id="email" value="{{ paciente.email }}" disabled>
                 </div>
                 <div class="form-group">
                     <label for="endereco">Endereço*</label>
-                    <input type="text" id="endereco" value="Av. Príncipe de Gales, 821, Santo André - SP" enable>
+                    <input type="text" id="endereco" value="{{ paciente.endereco }}, {{ paciente.numero_casa }}" disabled>
                 </div>
                 <div class="action-buttons">
                     <button class="action-button secondary">Ajuda?</button>
@@ -332,7 +331,7 @@
             <p>Deseja solicitar triagem para <span id="triagem-info-confirmacao"></span>?</p>
             <div class="modal-action-buttons">
                 <button class="action-button secondary" onclick="fecharModalTriagem()">CANCELAR</button>
-                <button class="action-button primary" onclick="confirmarTriagem()">CONFIRMAR</button>
+                <button class="action-button primary" id="btn-confirmar-envio-triagem" onclick="enviarSolicitacaoTriagem()">CONFIRMAR</button>
             </div>
         </div>
     </div>
@@ -527,11 +526,11 @@
                     <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2V7h2v7z"/>
                 </svg>
             </div>
-            <h2>Tem certeza que não poderá comparecer?</h2>
-            <p>Essa consulta foi reservada especialmente para você. Ao cancelar, um novo agendamento será necessário com base na disponibilidade da equipe.</p>
+            <h2>Tem certeza que deseja cancelar esta solicitação?</h2>
+            <p>Ao cancelar, você precisará fazer uma nova solicitação de triagem.</p>
             <div class="modal-action-buttons">
-                <button class="action-button primary" onclick="fecharModalConfirmarCancelamento()">VOLTAR</button>
-                <button class="action-button danger" id="btn-confirmar-cancelamento-final">CANCELAR CONSULTA</button>
+                <button class="action-button secondary" onclick="fecharModalConfirmarCancelamento()">VOLTAR</button>
+                <button class="action-button danger" id="btn-confirmar-cancelamento-final">CANCELAR SOLICITAÇÃO</button>
             </div>
         </div>
     </div>

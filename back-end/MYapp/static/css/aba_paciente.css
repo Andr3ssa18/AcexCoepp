@@ -103,6 +103,10 @@ header {
     animation: fadeIn 0.3s ease-out; /* Animação de fade-in */
 }
 
+.dropdown.show {
+    display: block;
+}
+
 .dropdown a {
     color: #004a91;
     padding: 14px 20px; /* Más padding */
@@ -708,27 +712,39 @@ header {
 
 /* Toast Notification */
 .toast {
-    visibility: hidden;
-    min-width: 280px; /* Mais largo */
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 8px; /* Mais arredondado */
-    padding: 18px; /* Mais padding */
     position: fixed;
-    z-index: 1002;
+    bottom: 20px;
     left: 50%;
-    bottom: 40px; /* Mais acima */
     transform: translateX(-50%);
-    font-size: 1.1em; /* Maior */
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3); /* Sombra mais forte */
+    padding: 12px 24px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
     opacity: 0;
-    transition: opacity 0.4s ease-out, visibility 0.4s ease-out; /* Transição mais suave */
+    transition: opacity 0.3s ease-in-out;
+    text-align: center;
+    min-width: 300px;
+    max-width: 80%;
 }
 
 .toast.show {
-    visibility: visible;
     opacity: 1;
+}
+
+.toast.success {
+    background-color: #4CAF50;
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+.toast.error {
+    background-color: #f44336;
+    box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+}
+
+.toast.info {
+    background-color: #2196F3;
+    box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
 }
 
 /* Loading Spinner */
@@ -1438,5 +1454,285 @@ header {
     .consulta-confirmada-qrcode {
         width: 150px;
         height: 150px;
+    }
+}
+
+/* Estilos gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Container principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+}
+
+/* Cabeçalho */
+.header {
+    background-color: #074276;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Seção de triagem */
+.triagem-section {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.triagem-section h2 {
+    color: #074276;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+/* Formulário de triagem */
+.triagem-form {
+    display: grid;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group select,
+.form-group input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+}
+
+/* Botões */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.btn-primary {
+    background-color: #074276;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #053157;
+    transform: scale(1.02);
+}
+
+/* Mensagens de erro */
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+/* Toast messages */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90%;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+.toast.success {
+    background-color: #28a745;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.toast.error {
+    background-color: #dc3545;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+.toast.info {
+    background-color: #17a2b8;
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 1024px) {
+    .container {
+        padding: 15px;
+    }
+
+    .triagem-section {
+        padding: 20px;
+    }
+
+    .btn {
+        max-width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .triagem-section h2 {
+        font-size: 18px;
+    }
+
+    .form-group select,
+    .form-group input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        max-width: 200px;
+    }
+
+    .toast {
+        padding: 12px 24px;
+        font-size: 14px;
+        min-width: 240px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 18px;
+    }
+
+    .triagem-section {
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .triagem-section h2 {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .triagem-form {
+        gap: 15px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group select,
+    .form-group input {
+        padding: 8px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+        max-width: 180px;
+        border-radius: 6px;
+    }
+
+    .error-message {
+        font-size: 12px;
+    }
+
+    .toast {
+        padding: 10px 20px;
+        font-size: 13px;
+        min-width: 200px;
+        bottom: 10px;
+    }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 320px) {
+    .header h1 {
+        font-size: 16px;
+    }
+
+    .triagem-section h2 {
+        font-size: 15px;
+    }
+
+    .form-group select,
+    .form-group input {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        max-width: 160px;
+    }
+
+    .toast {
+        padding: 8px 16px;
+        font-size: 12px;
+        min-width: 180px;
     }
 }
