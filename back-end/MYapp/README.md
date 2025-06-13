@@ -111,11 +111,6 @@ O AcexCoepp é um sistema web desenvolvido para gerenciar o processo de triagem 
 - Melhorias de performance
 - Suporte técnico
 
-## Contribuição
-Para contribuir com o projeto:
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature
-3. Envie um pull request
 
 ## Licença
-Este projeto está sob a licença [dos alunos da FSA do curso de sistemas de informação ] 
+Este projeto está sob a licença [alunos da FSA do curso de sistemas de informação 3B] 

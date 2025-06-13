@@ -107,51 +107,24 @@ async function salvarDisponibilidadeAPI(disponibilidade) {
 }
 
 // Funções de navegação
-function mostrarPagina(pagina) {
-    // Ocultar todas as páginas
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => {
-        page.classList.remove('active');
+function mostrarPagina(paginaId) {
+    // Esconde todas as páginas
+    document.querySelectorAll('.page').forEach(pagina => {
+        pagina.style.display = 'none';
     });
     
-    // Mostrar a página selecionada
-    document.getElementById(pagina).classList.add('active');
+    // Mostra a página selecionada
+    document.getElementById(paginaId).style.display = 'block';
     
-    // Atualizar navegação lateral
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
+    // Atualiza o menu ativo
+    document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
-    
-    // Encontrar e ativar o item de navegação correspondente
-    const activeNavItem = document.querySelector(`.nav-item[onclick*="${pagina}"]`);
-    if (activeNavItem) {
-        activeNavItem.classList.add('active');
-    }
-    
-    // Atualizar título da página
-    let pageTitle = 'Portal do Estagiário';
-    if (pagina === 'pagina-minhas-consultas') {
-        pageTitle = 'Minhas Consultas';
-    } else if (pagina === 'pagina-meus-horarios') {
-        pageTitle = 'Meus Horários';
-    } else if (pagina === 'pagina-solicitacoes') {
-        pageTitle = 'Solicitações de Triagem';
-        carregarSolicitacoes(); // Carrega as solicitações quando a página é aberta
-    } else if (pagina === 'pagina-prontuarios') {
-        pageTitle = 'Prontuários';
-    } else if (pagina === 'pagina-comunicados') {
-        pageTitle = 'Comunicados';
-    } else if (pagina === 'pagina-agendar-consulta') {
-        pageTitle = 'Agendar Consulta';
-    }
-    
-    document.getElementById('page-title').textContent = pageTitle;
-    currentPage = pagina;
-    
-    // Fechar dropdown se estiver aberto
-    if (dropdownOpen) {
-        toggleDropdown();
+    document.querySelector(`[onclick="mostrarPagina('${paginaId}')"]`).classList.add('active');
+
+    // Carrega as solicitações quando a página de solicitações é exibida
+    if (paginaId === 'pagina-solicitacoes') {
+        carregarSolicitacoes();
     }
 }
 
@@ -296,13 +269,14 @@ function fecharModalSucessoDisponibilidade() {
 }
 
 // Funções de toast
-function mostrarToast(mensagem) {
-    const toast = document.getElementById('toast');
+function mostrarToast(mensagem, tipo = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${tipo}`;
     toast.textContent = mensagem;
-    toast.classList.add('show');
+    document.body.appendChild(toast);
     
     setTimeout(() => {
-        toast.classList.remove('show');
+        toast.remove();
     }, 3000);
 }
 

@@ -481,57 +481,14 @@
                 </div>
             </div>
 
-            <!-- Página de Administração Temporária -->
-            <div id="pagina-admin" class="page">
-                <div class="page-header">
-                    <h1>Administração Temporária</h1>
-                </div>
-                <div class="page-content">
-                    <div class="info-box warning">
-                        <p>⚠️ Esta página contém funções administrativas temporárias. Use com cautela!</p>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Gerenciamento de Agendamentos</h2>
-                        </div>
-                        <div class="card-content">
-                            <div class="admin-actions">
-                                <button class="btn btn-danger" onclick="confirmarExclusaoAgendamentos()">
-                                    Excluir Todos os Agendamentos
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Gerenciamento de Disponibilidade</h2>
-                        </div>
-                        <div class="card-content">
-                            <div class="admin-actions">
-                                <button class="btn btn-danger" onclick="confirmarExclusaoDisponibilidade()">
-                                    Excluir Todas as Disponibilidades
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Modal de Confirmação de Exclusão -->
-            <div id="modal-confirmacao-exclusao" class="modal">
+            <div id="modalConfirmacao" class="modal">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Confirmar Exclusão</h2>
-                    </div>
-                    <div class="modal-body">
-                        <p id="modal-exclusao-texto">Tem certeza que deseja excluir todos os agendamentos?</p>
-                        <p class="warning-text">⚠️ Esta ação não pode ser desfeita!</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-outline" onclick="fecharModalExclusao()">Cancelar</button>
-                        <button class="btn btn-danger" onclick="confirmarExclusao()">Confirmar Exclusão</button>
+                    <h2>Confirmar Exclusão</h2>
+                    <p>Tem certeza que deseja excluir este item?</p>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                        <button class="btn btn-danger" onclick="confirmarExclusao()">Excluir</button>
                     </div>
                 </div>
             </div>
@@ -790,6 +747,27 @@
                             </li>
                         </ul>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Administração -->
+    <div id="pagina-admin" class="page">
+        <div class="page-header">
+            <h1>Administração</h1>
+        </div>
+        <div class="page-content">
+            <div class="info-box">
+                <p>Gerencie usuários e pacientes do sistema</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2>Gerenciar Usuários</h2>
+                </div>
+                <div class="card-content">
+                    <a href="/admin/gerenciar" class="btn btn-primary btn-lg">Gerenciar Usuários</a>
                 </div>
             </div>
         </div>

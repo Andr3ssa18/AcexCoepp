@@ -27,8 +27,6 @@ def login():
         senha_digitada = request.form.get('password')
 
         print(f"DEBUG: Identificador recebido: {identificador}") # DEBUG
-        # NÃO imprima a senha digitada em produção! Apenas para depuração.
-        # print(f"DEBUG: Senha digitada: {senha_digitada}") # DEBUG (DESCOMENTAR APENAS PARA DEBUG EXTREMO E REMOVER DEPOIS)
 
         # Verificação para Paciente (usa email)
         paciente = Paciente.query.filter_by(email=identificador).first()
@@ -45,6 +43,8 @@ def login():
                 return redirect(url_for('aba_pacientes'))
             else:
                 print("DEBUG: Senha do paciente INCORRETA.") # DEBUG
+                flash('Senha incorreta. Por favor, tente novamente.', 'error')
+                return render_template('login.html')
         else:
             print("DEBUG: Paciente não encontrado por email.") # DEBUG
         
@@ -56,9 +56,10 @@ def login():
                 print(f"DEBUG: Estagiário encontrado por RA: {estagiario.RA}") # DEBUG
             else:
                 print("DEBUG: Estagiário NÃO encontrado por RA.") # DEBUG
+                flash('E-mail/RA não encontrado. Por favor, verifique suas credenciais.', 'error')
+                return render_template('login.html')
         else:
             print(f"DEBUG: Estagiário encontrado por emailfsa: {estagiario.emailfsa}") # DEBUG
-
 
         if estagiario and check_password_hash(estagiario.senha, senha_digitada):
             print("DEBUG: Senha do estagiário CORRETA.") # DEBUG
@@ -71,13 +72,8 @@ def login():
             return redirect(url_for('aba_estagiario'))
         else:
             print("DEBUG: Senha do estagiário INCORRETA ou estagiário não encontrado.") # DEBUG
-
-        # Se nenhum login foi bem-sucedido
-        flash('Credenciais inválidas. Verifique seu e-mail/RA e senha.', 'error')
-        messages = session.pop('_flashes', []) # Captura as mensagens flash
-        print(f"DEBUG: Credenciais inválidas. Mensagens flash para render: {messages}") # DEBUG
-        print("DEBUG: Renderizando login.html com mensagens de erro.") # DEBUG
-        return render_template('login.html', messages=messages)
+            flash('Senha incorreta. Por favor, tente novamente.', 'error')
+            return render_template('login.html')
     
     # Se o método for GET, apenas renderiza a página de login
     messages = session.pop('_flashes', [])
@@ -97,10 +93,28 @@ def logout():
 
 
 # Rota de paciente
+@app.route('/termo_responsavel', methods=['GET', 'POST'])
+def termo_responsavel():
+    if request.method == 'POST':
+        # Salvar os dados do responsável na sessão
+        dados_responsavel = {
+            'nome_responsavel': request.form['nomeResponsavel'],
+            'cpf_responsavel': request.form['cpfResponsavel'],
+            'telefone_responsavel': request.form['telefoneResponsavel'],
+            'email_responsavel': request.form['emailResponsavel'],
+            'parentesco': request.form['parentesco']
+        }
+        session['dados_responsavel'] = dados_responsavel
+        return redirect(url_for('criar_senha'))
+    
+    messages = session.pop('_flashes', [])
+    return render_template('termo_responsavel.html', messages=messages)
+
 @app.route('/cadastroPaciente', methods=['GET', 'POST'])
 def registrar_paciente():
     if request.method == 'POST':
         print("DEBUG: Recebido POST para /cadastroPaciente") # DEBUG
+        
         dados_paciente = {
             'nome': request.form['nomeForm'],
             'data_nascimento': request.form['dataNascimentoForm'],
@@ -112,6 +126,7 @@ def registrar_paciente():
             'numero_casa': request.form['numeroCasaForm']
         }
         session['dados_paciente'] = dados_paciente
+        
         flash('Dados do paciente salvos temporariamente. Agora crie sua senha.', 'info')
         print("DEBUG: Redirecionando para criar_senha") # DEBUG
         return redirect(url_for('criar_senha'))
@@ -133,7 +148,7 @@ def criar_senha():
 
         senha = request.form['password']
         confirmar_senha = request.form['confirm_password']
-
+        
         if senha != confirmar_senha:
             flash('As senhas não coincidem.', 'error')
             messages = session.pop('_flashes', [])
@@ -149,7 +164,6 @@ def criar_senha():
         print("DEBUG: Senha e confirmação válidas. Tentando criar paciente.") # DEBUG
         # CORREÇÃO: Hashing da senha do paciente
         hashed_senha = generate_password_hash(senha, method='pbkdf2:sha256') 
-        
 
         dados_paciente = session['dados_paciente']
 
@@ -180,17 +194,25 @@ def criar_senha():
             print("DEBUG: Paciente adicionado à sessão do DB.") # DEBUG
             db.session.commit()
             print("DEBUG: db.session.commit() executado com sucesso. Dados salvos.") # DEBUG
+            
+            # Fazer login automático após o cadastro
+            session['logged_in'] = True
+            session['user_id'] = novo_paciente.id
+            session['user_type'] = 'paciente'
+            session['nome_usuario'] = novo_paciente.nome
+            
             flash('Paciente cadastrado com sucesso!', 'success')
             session.pop('dados_paciente', None) 
-            print("DEBUG: Redirecionando para a rota agendamentos.") # DEBUG
+            print("DEBUG: Redirecionando para a rota triagem.") # DEBUG
             return redirect(url_for('triagem'))
+            
         except Exception as e:
             db.session.rollback()
             print(f"DEBUG: ERRO DURANTE db.session.add/commit: {e}") # DEBUG CRÍTICO!
             flash(f'Ocorreu um erro ao cadastrar o paciente: {e}', 'error')
             messages = session.pop('_flashes', []) 
             return render_template("criarSenha.html", messages=messages)
-            
+    
     messages = session.pop('_flashes', [])
     return render_template("criarSenha.html", messages=messages)
 
@@ -198,6 +220,12 @@ def criar_senha():
 @app.route('/triagem')
 def triagem():
     print("DEBUG: Acessando a rota /triagem.")
+    
+    # Verifica se o usuário está logado e é um paciente
+    if 'logged_in' not in session or session.get('user_type') != 'paciente':
+        flash('Acesso negado. Por favor, faça o login como paciente.', 'error')
+        return redirect(url_for('login'))
+    
     messages = session.pop('_flashes', [])
     return render_template("triagem.html", messages=messages)
 
@@ -363,14 +391,7 @@ def aba_estagiario():
     return render_template("aba_estagiario.html", estagiario=estagiario, messages=messages)
 
 
-# Rota para listar pacientes (para depuração)
-@app.route('/listar_pacientes')
-def listar_pacientes():
-    print("DEBUG: Acessando a rota /listar_pacientes.") # DEBUG
-    pacientes = Paciente.query.all()
-    print(f"DEBUG: Pacientes encontrados no DB: {pacientes}") # DEBUG
-    messages = session.pop('_flashes', [])
-    return render_template('listar_pacientes.html', pacientes=pacientes, messages=messages)
+
 
 
 @app.route('/registro')
@@ -882,3 +903,113 @@ def buscar_paciente():
     except Exception as e:
         print(f"Erro ao buscar pacientes: {e}")
         return jsonify({'error': f'Erro ao buscar pacientes: {str(e)}'}), 500
+
+@app.route('/admin/gerenciar', methods=['GET'])
+def gerenciar_usuarios():
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        flash('Acesso negado. Por favor, faça login como estagiário.', 'error')
+        return redirect(url_for('login'))
+    
+    pacientes = Paciente.query.all()
+    estagiarios = Estagiario.query.all()
+    return render_template('gerenciar_usuarios.html', pacientes=pacientes, estagiarios=estagiarios)
+
+@app.route('/admin/editar_paciente/<int:id>', methods=['GET', 'POST'])
+def editar_paciente(id):
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        return jsonify({'error': 'Acesso negado'}), 403
+    
+    paciente = Paciente.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            paciente.nome = data.get('nome', paciente.nome)
+            paciente.data_nascimento = datetime.datetime.strptime(data.get('data_nascimento'), '%Y-%m-%d').date()
+            paciente.genero = data.get('genero', paciente.genero)
+            paciente.cpf = data.get('cpf', paciente.cpf)
+            paciente.telefone = data.get('telefone', paciente.telefone)
+            paciente.email = data.get('email', paciente.email)
+            paciente.endereco = data.get('endereco', paciente.endereco)
+            paciente.numero_casa = data.get('numero_casa', paciente.numero_casa)
+            
+            db.session.commit()
+            return jsonify({'message': 'Paciente atualizado com sucesso'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
+    
+    return jsonify({
+        'id': paciente.id,
+        'nome': paciente.nome,
+        'data_nascimento': paciente.data_nascimento.strftime('%Y-%m-%d'),
+        'genero': paciente.genero,
+        'cpf': paciente.cpf,
+        'telefone': paciente.telefone,
+        'email': paciente.email,
+        'endereco': paciente.endereco,
+        'numero_casa': paciente.numero_casa
+    })
+
+@app.route('/admin/editar_estagiario/<int:id>', methods=['GET', 'POST'])
+def editar_estagiario(id):
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        return jsonify({'error': 'Acesso negado'}), 403
+    
+    estagiario = Estagiario.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            estagiario.nome = data.get('nome', estagiario.nome)
+            estagiario.data_nascimento = datetime.datetime.strptime(data.get('data_nascimento'), '%Y-%m-%d').date()
+            estagiario.RA = data.get('RA', estagiario.RA)
+            estagiario.cpf = data.get('cpf', estagiario.cpf)
+            estagiario.telefone_aluno = data.get('telefone_aluno', estagiario.telefone_aluno)
+            estagiario.emailfsa = data.get('emailfsa', estagiario.emailfsa)
+            estagiario.curso_periodo = data.get('curso_periodo', estagiario.curso_periodo)
+            
+            db.session.commit()
+            return jsonify({'message': 'Estagiário atualizado com sucesso'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
+    
+    return jsonify({
+        'id': estagiario.id,
+        'nome': estagiario.nome,
+        'data_nascimento': estagiario.data_nascimento.strftime('%Y-%m-%d'),
+        'RA': estagiario.RA,
+        'cpf': estagiario.cpf,
+        'telefone_aluno': estagiario.telefone_aluno,
+        'emailfsa': estagiario.emailfsa,
+        'curso_periodo': estagiario.curso_periodo
+    })
+
+@app.route('/admin/deletar_paciente/<int:id>', methods=['DELETE'])
+def deletar_paciente(id):
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        return jsonify({'error': 'Acesso negado'}), 403
+    
+    try:
+        paciente = Paciente.query.get_or_404(id)
+        db.session.delete(paciente)
+        db.session.commit()
+        return jsonify({'message': 'Paciente deletado com sucesso'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/admin/deletar_estagiario/<int:id>', methods=['DELETE'])
+def deletar_estagiario(id):
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        return jsonify({'error': 'Acesso negado'}), 403
+    
+    try:
+        estagiario = Estagiario.query.get_or_404(id)
+        db.session.delete(estagiario)
+        db.session.commit()
+        return jsonify({'message': 'Estagiário deletado com sucesso'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500

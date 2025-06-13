@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-edit {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+        .modal-content {
+            border-radius: 15px;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        .form-control:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Gerenciar Usuários</h2>
+        
+        <!-- Seção de Pacientes -->
+        <div class="table-container">
+            <h3>Pacientes</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Telefone</th>
+                            <th>Email</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paciente in pacientes %}
+                        <tr>
+                            <td>{{ paciente.nome }}</td>
+                            <td>{{ paciente.cpf }}</td>
+                            <td>{{ paciente.telefone }}</td>
+                            <td>{{ paciente.email }}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-edit" onclick="editarPaciente({{ paciente.id }})">Editar</button>
+                                <button class="btn btn-delete" onclick="confirmarDelecao('paciente', {{ paciente.id }})">Excluir</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Seção de Estagiários -->
+        <div class="table-container">
+            <h3>Estagiários</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>RA</th>
+                            <th>CPF</th>
+                            <th>Email FSA</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estagiario in estagiarios %}
+                        <tr>
+                            <td>{{ estagiario.nome }}</td>
+                            <td>{{ estagiario.RA }}</td>
+                            <td>{{ estagiario.cpf }}</td>
+                            <td>{{ estagiario.emailfsa }}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-edit" onclick="editarEstagiario({{ estagiario.id }})">Editar</button>
+                                <button class="btn btn-delete" onclick="confirmarDelecao('estagiario', {{ estagiario.id }})">Excluir</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div class="modal fade" id="modalEdicao" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Usuário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEdicao">
+                        <input type="hidden" id="editId">
+                        <input type="hidden" id="editTipo">
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="editNome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control" id="editDataNascimento" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">CPF</label>
+                            <input type="text" class="form-control" id="editCpf" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" class="form-control" id="editTelefone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" required>
+                        </div>
+                        <div id="camposEstagiario" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">RA</label>
+                                <input type="text" class="form-control" id="editRA">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email FSA</label>
+                                <input type="email" class="form-control" id="editEmailFSA">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Curso e Período</label>
+                                <input type="text" class="form-control" id="editCursoPeriodo">
+                            </div>
+                        </div>
+                        <div id="camposPaciente" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Endereço</label>
+                                <input type="text" class="form-control" id="editEndereco">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Número</label>
+                                <input type="text" class="form-control" id="editNumeroCasa">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="modalConfirmacao" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir este usuário?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmarExclusao()">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let usuarioParaExcluir = null;
+        const modalEdicao = new bootstrap.Modal(document.getElementById('modalEdicao'));
+        const modalConfirmacao = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+
+        function editarPaciente(id) {
+            fetch(`/admin/editar_paciente/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('editTipo').value = 'paciente';
+                    document.getElementById('editNome').value = data.nome;
+                    document.getElementById('editDataNascimento').value = data.data_nascimento;
+                    document.getElementById('editCpf').value = data.cpf;
+                    document.getElementById('editTelefone').value = data.telefone;
+                    document.getElementById('editEmail').value = data.email;
+                    document.getElementById('editEndereco').value = data.endereco;
+                    document.getElementById('editNumeroCasa').value = data.numero_casa;
+                    
+                    document.getElementById('camposPaciente').style.display = 'block';
+                    document.getElementById('camposEstagiario').style.display = 'none';
+                    
+                    modalEdicao.show();
+                });
+        }
+
+        function editarEstagiario(id) {
+            fetch(`/admin/editar_estagiario/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('editTipo').value = 'estagiario';
+                    document.getElementById('editNome').value = data.nome;
+                    document.getElementById('editDataNascimento').value = data.data_nascimento;
+                    document.getElementById('editCpf').value = data.cpf;
+                    document.getElementById('editTelefone').value = data.telefone_aluno;
+                    document.getElementById('editEmail').value = data.emailfsa;
+                    document.getElementById('editRA').value = data.RA;
+                    document.getElementById('editEmailFSA').value = data.emailfsa;
+                    document.getElementById('editCursoPeriodo').value = data.curso_periodo;
+                    
+                    document.getElementById('camposPaciente').style.display = 'none';
+                    document.getElementById('camposEstagiario').style.display = 'block';
+                    
+                    modalEdicao.show();
+                });
+        }
+
+        function salvarEdicao() {
+            const id = document.getElementById('editId').value;
+            const tipo = document.getElementById('editTipo').value;
+            const data = {
+                nome: document.getElementById('editNome').value,
+                data_nascimento: document.getElementById('editDataNascimento').value,
+                cpf: document.getElementById('editCpf').value,
+                telefone: document.getElementById('editTelefone').value,
+                email: document.getElementById('editEmail').value
+            };
+
+            if (tipo === 'paciente') {
+                data.endereco = document.getElementById('editEndereco').value;
+                data.numero_casa = document.getElementById('editNumeroCasa').value;
+            } else {
+                data.RA = document.getElementById('editRA').value;
+                data.emailfsa = document.getElementById('editEmailFSA').value;
+                data.curso_periodo = document.getElementById('editCursoPeriodo').value;
+            }
+
+            fetch(`/admin/editar_${tipo}/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert('Usuário atualizado com sucesso!');
+                    location.reload();
+                } else {
+                    alert('Erro ao atualizar usuário: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Erro ao atualizar usuário: ' + error);
+            });
+        }
+
+        function confirmarDelecao(tipo, id) {
+            usuarioParaExcluir = { tipo, id };
+            modalConfirmacao.show();
+        }
+
+        function confirmarExclusao() {
+            if (!usuarioParaExcluir) return;
+
+            const { tipo, id } = usuarioParaExcluir;
+            fetch(`/admin/deletar_${tipo}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert('Usuário excluído com sucesso!');
+                    location.reload();
+                } else {
+                    alert('Erro ao excluir usuário: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Erro ao excluir usuário: ' + error);
+            })
+            .finally(() => {
+                usuarioParaExcluir = null;
+                modalConfirmacao.hide();
+            });
+        }
+    </script>
+</body>
+</html> 

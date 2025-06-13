@@ -14,25 +14,33 @@
                 <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="Logo FSA" class="logo">
             </div>
 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <h2 class="question">Você já fez alguma consulta na COEPP?</h2>
             <form id="triagemForm">
                 <div class="radio-options-group">
                     <label class="radio-option-label">
                         <input type="radio" name="consultaCOEPP" id="radioNo" value="no">
-                        No
+                        Não
                     </label>
                     <label class="radio-option-label">
                         <input type="radio" name="consultaCOEPP" id="radioYes" value="yes">
-                        Yes
+                        Sim
                     </label>
                 </div>
 
                 <div class="checkbox-terms-group" style="margin-top: 20px; margin-bottom: 20px;">
-                    <label class="radio-option-label"> <input type="checkbox" id="agreeTerms">
+                    <label class="radio-option-label"> 
+                        <input type="checkbox" id="agreeTerms">
                         Eu concordo com os <a href="#" style="color: var(--primary-blue); text-decoration: none;">Termos de Uso</a> e a <a href="#" style="color: var(--primary-blue); text-decoration: none;">Política de Privacidade</a>
                     </label>
                 </div>
-
             </form>
 
             <div class="navigation">
