@@ -352,6 +352,12 @@ def criar_senha_aluno():
             flash('Estagiário cadastrado com sucesso!', 'success')
             session.pop('dados_Estagiario', None) # Limpa os dados do estagiário da sessão
 
+            # Set session variables for the newly registered intern
+            session['logged_in'] = True
+            session['user_id'] = novo_Estagiario.id
+            session['user_type'] = 'estagiario'
+            session['nome_usuario'] = novo_Estagiario.nome
+
             return redirect(url_for('aba_estagiario')) 
         except Exception as e:
             db.session.rollback()
