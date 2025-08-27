@@ -22,7 +22,7 @@ Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de p
 
 ### [Júlia Abrantes Silva](https://github.com/juliabrantes)
 
-### Thiago da Silva Azevedo
+### [Thiago da Silva Azevedo](https://github.com/Thiago1dev)
 
 ### [Wesley Kenzo Ito](https://github.com/Wesley-Ito)
 
