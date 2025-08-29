@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Consultas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Minhas Consultas de Triagem</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% if agendamentos %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Data Solicitação</th>
+                        <th>Data Agendamento</th>
+                        <th>Estagiário</th>
+                        <th>Observações</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agendamento in agendamentos %}
+                    <tr>
+                        <td>{{ agendamento.id }}</td>
+                        <td>{{ agendamento.status.capitalize() }}</td>
+                        <td>{{ agendamento.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            {% if agendamento.data_agendamento %}
+                                {{ agendamento.data_agendamento.strftime('%d/%m/%Y %H:%M') }}
+                            {% else %}
+                                Aguardando Agendamento
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if agendamento.estagiario %}
+                                {{ agendamento.estagiario.nome }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ agendamento.observacoes_paciente or 'N/A' }}</td>
+                        <td>
+                            {% if agendamento.status == 'agendado' %}
+                                <a href="{{ url_for('confirmar_agendamento', agendamento_id=agendamento.id) }}" class="btn btn-success">Confirmar Presença</a>
+                                <a href="{{ url_for('cancelar_agendamento_paciente', agendamento_id=agendamento.id) }}" class="btn btn-danger">Cancelar</a>
+                            {% elif agendamento.status == 'solicitado' %}
+                                <span>Aguardando Estagiário</span>
+                                <a href="{{ url_for('cancelar_agendamento_paciente', agendamento_id=agendamento.id) }}" class="btn btn-danger">Cancelar Solicitação</a>
+                            {% else %}
+                                Nenhuma Ação
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Você ainda não tem nenhuma solicitação ou agendamento de triagem.</p>
+        {% endif %}
+        <p><a href="{{ url_for('aba_pacientes') }}">Voltar para a Página do Paciente</a></p>
+    </div>
+</body>
+</html>

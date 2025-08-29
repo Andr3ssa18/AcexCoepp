@@ -1,40 +1,116 @@
-<div align="center"> 
-<h1>Projeto AcexCoepp</h1> 
-</div>
+# AcexCoepp - Sistema de Triagem e Gestão de Pacientes
 
-## Ideia Principal
-Criar um site que facilite a vida tanto dos pacientes quanto dos estudantes de psicologia. Nele, dá pra marcar consultas e encontrar vagas de estágio na clínica de forma rápida e organizada. Isso ajuda na formação dos alunos e ainda melhora o acesso ao cuidado com a saúde mental.
+## Visão Geral
+O AcexCoepp é um sistema web desenvolvido para gerenciar o processo de triagem e atendimento de pacientes, com foco especial em estudantes pisicologia. O sistema até o momento permite o cadastro de pacientes, triagem inicial, solicitações de atendimento e acompanhamento do status dos casos.
 
-## Linguagens Utilizadas
-![HTML5](https://img.shields.io/badge/HTML5-000?style=for-the-badge&logo=html5)
-![CSS3](https://img.shields.io/badge/CSS3-000?style=for-the-badge&logo=css3&logoColor=blue)
-![JavaScript](https://img.shields.io/badge/JavaScript-000?style=for-the-badge&logo=javascript&logoColor=yellow)
-![Python](https://img.shields.io/badge/Python-000?style=for-the-badge&logo=python&logoColor=yellow)
-![SQL](https://img.shields.io/badge/SQL-000?style=for-the-badge&logo=mysql&logoColor=white)
+## Funcionalidades Principais
 
-## Praticipantes
+### 1. Autenticação e Controle de Acesso
+- Login seguro para diferentes tipos de usuários (pacientes e estagiários)
+- Sistema de cadastro de novos usuários
+- Proteção de rotas baseada em perfil de acesso
 
-### [Alan dos Anjos Cabral](https://github.com/AlanKenji7)
+### 2. Módulo de Pacientes
+- Cadastro completo de pacientes com informações pessoais
+- Sistema de triagem com classificação de prioridade
+- Acompanhamento do status do atendimento
+- Histórico de solicitações
 
-### [Andressa Rosa Cruz](https://github.com/Andr3ssa18)
-  
-### [Guilherme Cordeiro da Silva](https://github.com/GuilhermeSilvaGit)
+### 3. Módulo de Estagiários
+- Visualização de solicitações de atendimento
+- Gerenciamento de status dos casos
+- Interface para atualização de informações
+- Sistema de notificações
 
-### [Júlia Abrantes Silva](https://github.com/juliabrantes)
+### 4. Interface Responsiva
+- Design adaptativo para diferentes dispositivos
+- Layout otimizado para desktop, tablet e mobile
+- Experiência de usuário consistente em todas as plataformas
 
-### [Thiago da Silva Azevedo](https://github.com/Thiago1dev)
+## Tecnologias Utilizadas
 
-### [Wesley Kenzo Ito](https://github.com/Wesley-Ito)
+### Frontend
+- HTML5
+- CSS3 (com variáveis CSS para temas)
+- JavaScript
+- Design responsivo
+- Animações e transições suaves
 
-### [Yasmin Menezes Santana](https://github.com/YasminMenezes06)
+### Backend
+- Python
+- Framework web
+- Sistema de autenticação
+- Banco de dados
 
-## Professor Orientador
+## Estrutura do Projeto exemplo:
 
-### [Manoel Guilherme de Faria Moraes](https://github.com/profmanoel)
+```
+├── MYapp/
+│   ├── static/
+│   │   ├── css/
+│   │   │   ├── aba_estagiario.css
+│   │   │   ├── aba_paciente.css
+│   │   │   ├── cadastroaluno.css
+│   │   │   └── login.css
+│   │   └── js/
+│   │       └── main.js
+│   ├── templates/
+│   │   ├── aba_estagiario.html
+│   │   ├── aba_paciente.html
+│   │   ├── cadastroaluno.html
+│   │   └── login.html
+│   └── app.py
+```
 
-## Visual do Site
+## Características Técnicas
 
-## Paleta de cores
+### Design System
+- Paleta de cores consistente
+- Tipografia padronizada
+- Componentes reutilizáveis
+- Sistema de grid responsivo
+
+### Responsividade
+- Breakpoints otimizados:
+  - Desktop: > 1200px
+  - Tablet: 768px - 1199px
+  - Mobile: 320px - 767px
+- Layout fluido
+- Elementos adaptáveis
+
+### Segurança
+- Autenticação segura
+- Proteção contra CSRF
+- Validação de dados
+- Sanitização de inputs
+
+## Instalação e Configuração
+
+1. Clone o repositório
+2. Instale as dependências
+3. Configure as variáveis de ambiente
+4. Execute o servidor de desenvolvimento
+
+## Uso
+
+### Pacientes
+1. Acesse a página de login
+2. Faça login ou cadastre-se
+3. Preencha o formulário de triagem
+4. Acompanhe o status do atendimento
+
+### Estagiários
+1. Acesse a página de login
+2. Faça login com credenciais de estagiário
+3. Visualize as solicitações pendentes
+4. Gerencie os casos atribuídos
+
+## Manutenção e Suporte
+- Atualizações regulares
+- Correção de bugs
+- Melhorias de performance
+- Suporte técnico
 
 
-
+## Licença
+Este projeto está sob a licença [alunos da FSA do curso de sistemas de informação 3B] 

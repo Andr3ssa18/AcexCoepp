@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Agendamentos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aba_paciente.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Meus Agendamentos</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="solicitar-container">
+            <form action="{{ url_for('solicitar_triagem') }}" method="post">
+                <button type="submit">Solicitar Nova Triagem</button>
+            </form>
+        </div>
+
+        <div class="lista-container">
+            <h2>Histórico de Agendamentos</h2>
+            {% if agendamentos %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data da Solicitação</th>
+                            <th>Data do Agendamento</th>
+                            <th>Horário</th>
+                            <th>Estagiário</th>
+                            <th>Status</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agendamento in agendamentos %}
+                            <tr>
+                                <td>{{ agendamento.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>{{ agendamento.data_agendamento.strftime('%d/%m/%Y') if agendamento.data_agendamento else 'Aguardando' }}</td>
+                                <td>{{ agendamento.horario_agendamento.strftime('%H:%M') if agendamento.horario_agendamento else 'Aguardando' }}</td>
+                                <td>{{ agendamento.estagiario.nome if agendamento.estagiario else 'Aguardando' }}</td>
+                                <td>{{ agendamento.status }}</td>
+                                <td>
+                                    {% if agendamento.status == 'aceito' %}
+                                        <form action="{{ url_for('confirmar_presenca', id=agendamento.id) }}" method="post">
+                                            <button type="submit">Confirmar Presença</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Você ainda não possui nenhum agendamento.</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('aba_pacientes') }}">Voltar</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-success {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.alert-success { background-color: #2ecc71; }
+.alert-error { background-color: #e74c3c; }
+.alert-warning { background-color: #f39c12; }
+.alert-info { background-color: #3498db; }
+
+
+.consultas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.consulta-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #fff;
+}
+
+.status-solicitado .status-badge { background-color: #f39c12; } /* Laranja */
+.status-agendado .status-badge { background-color: #3498db; } /* Azul */
+.status-confirmado .status-badge { background-color: #2ecc71; } /* Verde */
+.status-cancelado .status-badge { background-color: #e74c3c; } /* Vermelho */
+
+.data-solicitacao {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.card-body {
+    padding: 15px;
+    line-height: 1.6;
+}
+
+.card-body h4 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.card-body p {
+    margin: 5px 0;
+}
+
+.card-body .confirm-text {
+    margin-top: 10px;
+    font-weight: 500;
+    color: #c0392b;
+}
+
+.card-footer {
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.card-footer form {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.no-action {
+    color: #95a5a6;
+    font-style: italic;
+}
+
+.info-box {
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.back-link a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
+}

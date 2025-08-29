@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações de Triagem</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aba_estagiario.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Solicitações de Triagem Pendentes</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="lista-container">
+            {% if solicitacoes %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Data da Solicitação</th>
+                            <th>Agendar Data</th>
+                            <th>Agendar Horário</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solicitacao in solicitacoes %}
+                            <tr>
+                                <td>{{ solicitacao.paciente.nome }}</td>
+                                <td>{{ solicitacao.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <form action="{{ url_for('aceitar_triagem', id=solicitacao.id) }}" method="post">
+                                    <td>
+                                        <input type="date" name="data_agendamento" required>
+                                    </td>
+                                    <td>
+                                        <input type="time" name="horario_agendamento" required>
+                                    </td>
+                                    <td>
+                                        <button type="submit">Aceitar e Agendar</button>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Não há solicitações de triagem pendentes no momento.</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('aba_estagiario') }}">Voltar</a>
+    </div>
+</body>
+</html>

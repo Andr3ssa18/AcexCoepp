@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Disponibilidade</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aba_estagiario.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gerenciar Minha Disponibilidade</h1>
+            <p>Olá, {{ session.get('nome_usuario', 'Estagiário') }}!</p>
+            <a href="{{ url_for('logout') }}" class="logout-button">Sair</a>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <h2>Adicionar Novo Horário</h2>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <ul class="flashes">
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                <form action="{{ url_for('gerenciar_disponibilidade') }}" method="post">
+                    <div class="form-group">
+                        <label for="data">Data:</label>
+                        <input type="date" id="data" name="data" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_inicio">Hora de Início:</label>
+                        <input type="time" id="hora_inicio" name="hora_inicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_fim">Hora de Fim:</label>
+                        <input type="time" id="hora_fim" name="hora_fim" required>
+                    </div>
+                    <button type="submit" class="button">Adicionar Horário</button>
+                </form>
+            </div>
+
+            <div class="disponibilidade-lista">
+                <h2>Meus Horários Disponíveis</h2>
+                {% if disponibilidades %}
+                    <ul>
+                        {% for d in disponibilidades %}
+                            <li>
+                                <span>{{ d.data.strftime('%d/%m/%Y') }} das {{ d.hora_inicio.strftime('%H:%M') }} às {{ d.hora_fim.strftime('%H:%M') }}</span>
+                                <form action="{{ url_for('remover_disponibilidade', id=d.id) }}" method="post" style="display: inline;">
+                                    <button type="submit" class="remove-button">Remover</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Você ainda não cadastrou nenhum horário.</p>
+                {% endif %}
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2024 Clínica de Psicologia FSA</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Pacientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to top, #074276, #64a1d7);
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            color: #333;
+            border-radius: 20px;
+            padding: 20px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        h1 {
+            text-align: center;
+            color: #074276;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #074276;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .no-patients {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+        .back-button {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #074276;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #053052;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pacientes Cadastrados</h1>
+
+        {% if pacientes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    </tr>
+            </thead>
+            <tbody>
+                {% for paciente in pacientes %}
+                <tr>
+                    <td>{{ paciente.id }}</td>
+                    <td>{{ paciente.nome }}</td>
+                    <td>{{ paciente.cpf }}</td>
+                    <td>{{ paciente.email }}</td>
+                    <td>{{ paciente.telefone }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-patients">Nenhum paciente cadastrado ainda.</p>
+        {% endif %}
+
+        <a href="{{ url_for('registrar_paciente') }}" class="back-button">Cadastrar Novo Paciente</a>
+    </div>
+</body>
+</html>
