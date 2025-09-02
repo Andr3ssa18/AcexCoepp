@@ -8,7 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Minhas Consultas de Triagem</h1>
+        {% if user_type == 'paciente' %}
+            <h1>Minhas Consultas de Triagem</h1>
+        {% else %}
+            <h1>Minhas Consultas Confirmadas</h1>
+        {% endif %}
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flashes">
@@ -27,7 +32,11 @@
                         <th>Status</th>
                         <th>Data Solicitação</th>
                         <th>Data Agendamento</th>
-                        <th>Estagiário</th>
+                        {% if user_type == 'paciente' %}
+                            <th>Estagiário</th>
+                        {% else %}
+                            <th>Paciente</th>
+                        {% endif %}
                         <th>Observações</th>
                         <th>Ações</th>
                     </tr>
@@ -36,8 +45,26 @@
                     {% for agendamento in agendamentos %}
                     <tr>
                         <td>{{ agendamento.id }}</td>
-                        <td>{{ agendamento.status.capitalize() }}</td>
-                        <td>{{ agendamento.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            {% if agendamento.status == 'solicitado' %}
+                                <span class="status-badge status-solicitado">Solicitado</span>
+                            {% elif agendamento.status == 'confirmado' %}
+                                <span class="status-badge status-confirmado">Confirmado</span>
+                            {% elif agendamento.status == 'concluido' %}
+                                <span class="status-badge status-concluido">Concluído</span>
+                            {% elif agendamento.status == 'cancelado' %}
+                                <span class="status-badge status-cancelado">Cancelado</span>
+                            {% else %}
+                                {{ agendamento.status.capitalize() }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if agendamento.data_solicitacao %}
+                                {{ agendamento.data_solicitacao.strftime('%d/%m/%Y %H:%M') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                         <td>
                             {% if agendamento.data_agendamento %}
                                 {{ agendamento.data_agendamento.strftime('%d/%m/%Y %H:%M') }}
@@ -45,23 +72,51 @@
                                 Aguardando Agendamento
                             {% endif %}
                         </td>
+                        {% if user_type == 'paciente' %}
+                            <td>
+                                {% if agendamento.estagiario %}
+                                    {{ agendamento.estagiario.nome }}
+                                {% else %}
+                                    Aguardando Atribuição
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td>
+                                {% if agendamento.paciente %}
+                                    {{ agendamento.paciente.nome }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        {% endif %}
                         <td>
-                            {% if agendamento.estagiario %}
-                                {{ agendamento.estagiario.nome }}
+                            {% if user_type == 'paciente' %}
+                                {{ agendamento.observacoes_paciente or 'N/A' }}
                             {% else %}
-                                N/A
+                                {{ agendamento.observacoes_estagiario or 'N/A' }}
                             {% endif %}
                         </td>
-                        <td>{{ agendamento.observacoes_paciente or 'N/A' }}</td>
                         <td>
-                            {% if agendamento.status == 'agendado' %}
-                                <a href="{{ url_for('confirmar_agendamento', agendamento_id=agendamento.id) }}" class="btn btn-success">Confirmar Presença</a>
-                                <a href="{{ url_for('cancelar_agendamento_paciente', agendamento_id=agendamento.id) }}" class="btn btn-danger">Cancelar</a>
-                            {% elif agendamento.status == 'solicitado' %}
-                                <span>Aguardando Estagiário</span>
-                                <a href="{{ url_for('cancelar_agendamento_paciente', agendamento_id=agendamento.id) }}" class="btn btn-danger">Cancelar Solicitação</a>
+                            {% if user_type == 'paciente' %}
+                                {% if agendamento.status == 'confirmado' %}
+                                    <button class="btn btn-success" onclick="confirmarPresenca({{ agendamento.id }})">Confirmar Presença</button>
+                                    <button class="btn btn-danger" onclick="cancelarConsulta({{ agendamento.id }})">Cancelar</button>
+                                {% elif agendamento.status == 'solicitado' %}
+                                    <span class="text-muted">Aguardando Estagiário</span>
+                                    <button class="btn btn-danger" onclick="cancelarConsulta({{ agendamento.id }})">Cancelar Solicitação</button>
+                                {% elif agendamento.status == 'concluido' %}
+                                    <span class="text-muted">Consulta Finalizada</span>
+                                {% else %}
+                                    <span class="text-muted">Nenhuma Ação</span>
+                                {% endif %}
                             {% else %}
-                                Nenhuma Ação
+                                {% if agendamento.status == 'confirmado' %}
+                                    <button class="btn btn-primary" onclick="finalizarConsulta({{ agendamento.id }})">Finalizar Consulta</button>
+                                {% elif agendamento.status == 'concluido' %}
+                                    <span class="text-muted">Consulta Finalizada</span>
+                                {% else %}
+                                    <span class="text-muted">Nenhuma Ação</span>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>
@@ -69,9 +124,178 @@
                 </tbody>
             </table>
         {% else %}
-            <p>Você ainda não tem nenhuma solicitação ou agendamento de triagem.</p>
+            {% if user_type == 'paciente' %}
+                <p>Você ainda não tem nenhuma solicitação ou agendamento de triagem.</p>
+            {% else %}
+                <p>Você ainda não tem nenhuma consulta confirmada.</p>
+            {% endif %}
         {% endif %}
-        <p><a href="{{ url_for('aba_pacientes') }}">Voltar para a Página do Paciente</a></p>
+        
+        <div class="back-button">
+            {% if user_type == 'paciente' %}
+                <a href="{{ url_for('aba_pacientes') }}" class="btn btn-secondary">Voltar para a Página do Paciente</a>
+            {% else %}
+                <a href="{{ url_for('aba_estagiario') }}" class="btn btn-secondary">Voltar para a Página do Estagiário</a>
+            {% endif %}
+        </div>
     </div>
+    
+    <!-- Scripts JavaScript -->
+    <script>
+        // Função para confirmar presença na consulta
+        function confirmarPresenca(agendamentoId) {
+            if (confirm('Deseja confirmar sua presença nesta consulta?')) {
+                // Aqui você pode implementar a lógica para confirmar presença
+                alert('Presença confirmada com sucesso!');
+                location.reload(); // Recarrega a página para atualizar o status
+            }
+        }
+        
+        // Função para cancelar consulta
+        function cancelarConsulta(agendamentoId) {
+            if (confirm('Tem certeza que deseja cancelar esta consulta?')) {
+                // Aqui você pode implementar a lógica para cancelar consulta
+                alert('Consulta cancelada com sucesso!');
+                location.reload(); // Recarrega a página para atualizar o status
+            }
+        }
+        
+        // Função para finalizar consulta (estagiário)
+        function finalizarConsulta(agendamentoId) {
+            if (confirm('Deseja finalizar esta consulta?')) {
+                // Aqui você pode implementar a lógica para finalizar consulta
+                alert('Consulta finalizada com sucesso!');
+                location.reload(); // Recarrega a página para atualizar o status
+            }
+        }
+    </script>
+    
+    <!-- Estilos CSS para os badges de status -->
+    <style>
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-solicitado {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-confirmado {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-concluido {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status-cancelado {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .text-muted {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .flashes {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .flashes li {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        
+        .flashes .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .flashes .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .flashes .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
 </body>
 </html>

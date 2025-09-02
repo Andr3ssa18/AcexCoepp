@@ -1,9 +1,10 @@
 from flask_mail import Message
+from main import mail, app
 import logging
 
 logger = logging.getLogger(__name__)
 
-def enviar_email_confirmacao_consulta(mail, app, paciente_email, nome_paciente, data_consulta, hora_consulta, profissional):
+def enviar_email_confirmacao_consulta(paciente_email, nome_paciente, data_consulta, hora_consulta, profissional):
     """
     Envia um email de confirmação de consulta para o paciente
     """
@@ -56,7 +57,7 @@ Equipe FSA
         logger.error(f"Detalhes do erro: {type(e).__name__}")
         return False
 
-def configurar_email_simples(app):
+def configurar_email_simples():
     """
     Configuração simples do email - apenas para teste
     """

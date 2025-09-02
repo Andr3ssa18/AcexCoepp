@@ -5,7 +5,6 @@ from flask_migrate import Migrate
 import logging
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
-from config import config
 
 # Configurar logging básico
 logging.basicConfig(level=logging.DEBUG)
@@ -14,39 +13,43 @@ logger = logging.getLogger(__name__)
 # Carregar variáveis de ambiente
 load_dotenv(override=True)
 
-def create_app(config_name='default'):
-    app = Flask(__name__)
-    
-    # Carregar configuração
-    app.config.from_object(config[config_name])
-    
-    # Configurar logging do Flask
-    app.logger.setLevel(logging.DEBUG)
-    
-    # Inicializar extensões
-    db.init_app(app)
-    migrate = Migrate(app, db)
-    
-    # Inicializar o Flask-Mail
-    mail = Mail(app)
-    
-    # Importar e inicializar views
-    from views import init_app as init_views
-    init_views(app, mail)
-    
-    return app
+app = Flask(__name__)
 
-# Criar a aplicação
-app = create_app(os.environ.get('FLASK_ENV', 'development'))
+# Configurar logging do Flask
+app.logger.setLevel(logging.DEBUG)
+
+# Configurações do Flask-Mail (simples)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'fundacaofsaacex@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'zdmd efek cxjc lgtj')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME', 'fundacaofsaacex@gmail.com')
+
+# Log simples
+app.logger.info("Sistema de email configurado")
+app.logger.info(f"Email configurado: {app.config['MAIL_USERNAME']}")
+
+# Inicializar o Flask-Mail
+mail = Mail(app)
+
+# Obtenha o caminho absoluto do diretório onde main.py está
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Configurações do banco de dados
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'fsa_teste.db')
+app.secret_key = 'uma_chave_muito_secreta_e_complexa_aqui' 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Inicializar extensões
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# Importar views DEPOIS de inicializar app e db
+from views import *
 
 if __name__ == '__main__':
-    try:
-        with app.app_context():
-            db.create_all()
-            app.logger.info("Banco de dados inicializado com sucesso")
-        
-        app.logger.info("Aplicação Flask iniciando...")
-        app.run(debug=True, host='0.0.0.0', port=5000)
-    except Exception as e:
-        app.logger.error(f"Erro ao iniciar aplicação: {e}")
-        raise 
+    with app.app_context():
+        db.create_all()
+    app.logger.info("Aplicação Flask iniciando...")
+    app.run(debug=True) 
