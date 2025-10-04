@@ -111,15 +111,15 @@
                 </div>
                 <div class="form-group">
                     <label for="telefone">Telefone*</label>
-                    <input type="text" id="telefone" value="{{ paciente.telefone }}" disabled>
+                    <input type="text" id="telefone" value="{{ paciente.telefone }}" maxlength="15" disabled>
                 </div>
                 <div class="form-group">
                     <label for="email">Email*</label>
-                    <input type="email" id="email" value="{{ paciente.email }}" disabled>
+                    <input type="email" id="email" value="{{ paciente.email }}" maxlength="100" disabled>
                 </div>
                 <div class="form-group">
                     <label for="endereco">Endereço*</label>
-                    <input type="text" id="endereco" value="{{ paciente.endereco }}, {{ paciente.numero_casa }}" disabled>
+                    <input type="text" id="endereco" value="{{ paciente.endereco }}, {{ paciente.numero_casa }}" maxlength="150" disabled>
                 </div>
                 <div class="action-buttons">
                     <button class="action-button secondary">Ajuda?</button>
