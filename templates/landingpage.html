@@ -26,6 +26,7 @@ header {
   align-items: center;
   padding: 15px 30px;
 }
+
 header nav a {
   margin: 0 15px;
   color: #003366;
@@ -54,28 +55,40 @@ header nav a {
   padding: 100px 30px 60px;
 }
 .hero {
-  background: url('/static/imagem1.jpg') no-repeat center center/cover;
   height: 500px;
   display: flex;
   flex-direction: column;
-  justify-content: center; 
+  justify-content: center;
   align-items: flex-start;
   padding: 150px 50px 50px;
   color: #003366;
-  }
+  position: relative; /* Essencial para o posicionamento do pseudo-elemento */
+  z-index: 1; /* Garante que o conteúdo fique por cima */
+}
+
+/* Pseudo-elemento para carregar e inverter a imagem */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/static/imagem1.jpg') no-repeat center center/cover;
+  transform: scaleX(-1);
+  z-index: -1;
+}
 
 .hero h1 {
   font-size: 2em;
   margin-bottom: 10px;
   color: #003366; 
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); 
 }
 
 .hero p {
   font-size: 1.2em;
   margin-bottom: 20px;
   color: #ffffff; 
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); 
 }
 .hero .btn {
   background: #003366;
@@ -151,20 +164,23 @@ footer {
   background-color: #ccc;
 }
 .hero-alt {
-  background: url('/static/imagem3.jpg') no-repeat center center/cover;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+              url('/static/imagem3.jpg') no-repeat center center/cover;
   height: 500px;
   display: flex;
-  justify-content: center;  
-  align-items: center;      
-  padding: 0 30px;          
+  justify-content: center;    
+  align-items: center;        
+  padding: 0 30px;            
   text-align: center;
-  color: white;
+  color: white; 
 }
 
 .hero-alt h1 {
   font-size: 2em;
-  max-width: 700px;  
+  max-width: 700px;    
   text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8); 
+  font-style: italic; 
+  position: relative; 
 }
 
 .convite {
@@ -179,6 +195,10 @@ footer {
 .convite h2 {
   font-size: 2em;
   margin-bottom: 30px;
+}
+
+.convite .btn {
+    text-shadow: none;
 }
 
 footer {
@@ -388,7 +408,7 @@ footer.rodape {
 
 <body>
   <header>
-    <img src="{{ url_for('static', filename='logomenor.png') }}" alt="Logo FSA" width="80" />
+    <img src="{{ url_for('static', filename='logomenor.png') }}" alt="Logo FSA" width="80"/>
   <nav>
     <a class="btn" href="#profissionais">PSICÓLOGOS</a>
     <a class="btn" href="#sobre">SOBRE</a>
@@ -399,8 +419,13 @@ footer.rodape {
   </header>
 
   <div class="hero">
-    <h1>Conheça a COEPP, O Centro de Orientação Educacional, Profissional e Psicológico.</h1>
-    <p>Cuidando da sua saúde mental com atenção, escuta e acolhimento.</p>
+    <h1>
+      Conheça a COEPP,<br>
+      O Centro de Orientação <br> 
+      Educacional, Profissional <br> 
+      e Psicológico.
+    </h1> 
+    <p>Cuidando da sua saúde mental com <br>atenção, escuta e acolhimento.</p>
     <a href="/login" class="btn">AGENDAR ATENDIMENTO</a>
   </div>
 
@@ -463,7 +488,7 @@ footer.rodape {
   </div>
 
   <div class="hero-alt">
-  <h1>Atendimento com estudantes supervisionados por professores especializados.</h1>
+  <h1>“Atendimento com estudantes supervisionados por professores especializados.”</h1>
 </div>
 <div class="convite">
   <h2>Quer conversar? A COEPP está de portas abertas!</h2>

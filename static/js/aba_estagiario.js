@@ -73,19 +73,16 @@ async function carregarConsultas() {
     }
 }
 
-async function confirmarTriagemAPI(solicitacaoId) {
+async function confirmarTriagemAPI(solicitacaoId, dataAgendamento, observacoes) {
     try {
-        const dataAtual = new Date();
-        const dataFormatada = dataAtual.toISOString().slice(0, 16); // Formato: YYYY-MM-DDTHH:mm
-
         const response = await fetch(`/api/estagiario/agendamentos/confirmar/${solicitacaoId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                data_agendamento: dataFormatada,
-                observacoes: 'Triagem confirmada pelo estagiário'
+                data_agendamento: dataAgendamento,
+                observacoes: observacoes || 'Triagem confirmada pelo estagiário'
             })
         });
 
@@ -362,7 +359,17 @@ function abrirModalConfirmacaoTriagem(paciente, data, solicitacaoId) {
     modal.dataset.data = data;
     modal.dataset.solicitacaoId = solicitacaoId;
     
-    textoModal.textContent = `Você está prestes a confirmar uma consulta de triagem para ${paciente} no dia ${data}. Deseja continuar?`;
+    textoModal.textContent = `Você está prestes a confirmar uma consulta de triagem para ${paciente}. Defina a data e horário da consulta abaixo:`;
+    
+    // Definir data mínima como hoje
+    const hoje = new Date();
+    const dataMinima = hoje.toISOString().split('T')[0];
+    document.getElementById('data-consulta').min = dataMinima;
+    
+    // Limpar campos
+    document.getElementById('data-consulta').value = '';
+    document.getElementById('hora-consulta').value = '';
+    document.getElementById('observacoes-consulta').value = '';
     
     modal.classList.add('active');
 }
@@ -376,7 +383,25 @@ function confirmarTriagem() {
         return;
     }
 
-    confirmarTriagemAPI(solicitacaoId);
+    // Validar campos obrigatórios
+    const dataConsulta = document.getElementById('data-consulta').value;
+    const horaConsulta = document.getElementById('hora-consulta').value;
+    const observacoes = document.getElementById('observacoes-consulta').value;
+
+    if (!dataConsulta) {
+        mostrarToast('Por favor, selecione a data da consulta', 'error');
+        return;
+    }
+
+    if (!horaConsulta) {
+        mostrarToast('Por favor, selecione o horário da consulta', 'error');
+        return;
+    }
+
+    // Combinar data e hora no formato correto
+    const dataAgendamento = `${dataConsulta}T${horaConsulta}`;
+
+    confirmarTriagemAPI(solicitacaoId, dataAgendamento, observacoes);
 }
 
 function fecharModalConfirmacaoTriagem() {

@@ -1,3 +1,6 @@
+/* Importação da fonte Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 :root {
     --primary-color: #2D68C4;
     --primary-dark: #23519B;
@@ -7,7 +10,7 @@
     --warning-color: #FFC107;
     --danger-color: #F44336;
     --light-color: #F5F5F5;
-    --dark-color: #2F3640;
+    --dark-color: #000000;
     --white: #ffffff;
 
     --blue-bg-dark: #2F599C;
@@ -17,7 +20,7 @@
     --primary-blue: var(--primary-color);
     --link-color: var(--primary-color);
 
-   
+    
     --new-button-bg: #074276; 
     --new-button-hover-bg: #053052; 
     --new-button-size: 40px; 
@@ -26,7 +29,7 @@
 
 body {
     margin: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif; 
     background: linear-gradient(to top, #074276, #64a1d7);
     display: flex;
     justify-content: center;
@@ -78,23 +81,23 @@ body {
 
 .header-form .title {
     color: var(--text-color-dark);
-    font-size: 2.2em;
-    font-weight: 600;
-    margin-right: 30px; 
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
 }
 
 .header-form .logo {
-    height: 55px; 
-    width: auto;
-    order: 1;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 100px;
+    height: auto;
 }
 
 .question {
-    color: var(--text-color-dark);
-    font-size: 1.5em;
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 10px;
-    text-align: left;
+    margin: 0;
 }
 
 .radio-options-group {
@@ -111,6 +114,9 @@ body {
     font-size: 1.2em;
     color: var(--text-color-light);
     cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
 }
 
 .radio-option-label input {
@@ -146,52 +152,25 @@ body {
     transform: scale(1);
 }
 
-.navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-top: auto;
-    padding: 0;
-    box-sizing: border-box;
-}
+.botoes-navegacao {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
 
-.nav-button {
-    background-color: var(--new-button-bg);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: var(--new-button-size);
-    height: var(--new-button-size);
-    font-size: var(--new-button-font-size);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
-}
-
-.nav-button:hover {
-    background-color: var(--new-button-hover-bg);
-}
-
-.nav-button .arrow {
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    display: inline-block;
-    padding: 5px;
-}
-
-.arrow.right {
-    transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
-}
-
-.arrow.left {
-    transform: rotate(135deg);
-    -webkit-transform: rotate(135deg);
-}
+    .botao-navegacao {
+      background-color: #074276;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
 
 @media (max-width: 768px) {
     .container {
@@ -211,18 +190,24 @@ body {
     }
 
     .header-form .title {
-        font-size: 1.8em;
-        margin-bottom: 0;
-        margin-right: 15px; 
+        color: var(--text-color-dark);
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
     }
 
     .header-form .logo {
-        height: 40px; 
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        width: 100px;
+        height: auto;
     }
 
     .question {
-        font-size: 1.3em;
-        margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
     }
 
     .radio-options-group {
@@ -245,14 +230,5 @@ body {
         height: 8px;
     }
 
-    .navigation {
-        width: 100%;
-        margin-top: 20px;
-    }
 
-    .nav-button {
-        width: calc(var(--new-button-size) * 0.9);
-        height: calc(var(--new-button-size) * 0.9);
-        font-size: calc(var(--new-button-font-size) * 0.9);
-    }
 }

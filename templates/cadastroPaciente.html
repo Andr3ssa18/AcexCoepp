@@ -97,15 +97,14 @@
     <h2>Paciente</h2>
 
     <form action="/cadastroPaciente" method="post">
-        <input type="text" id="nome" name="nomeForm" placeholder="Nome completo" required>
+        <input type="text" id="nome" name="nomeForm" placeholder="Nome completo" maxlength="100" required>
 
         <div class="linha-inputs">
-            <input type="date" id="nascimento" name="dataNascimentoForm" placeholder="Data de nascimento" max="2020-12-31" required>
+            <input type="date" id="nascimento" name="dataNascimentoForm" placeholder="Data de nascimento" max="" required>
             <select id="genero" name="generoForm" required>
                 <option value="">Selecione o gênero</option>
                 <option value="Feminino">Feminino</option>
                 <option value="Masculino">Masculino</option>
-                <option value="Outros">Outros</option>
             </select>
         </div>
 
@@ -114,10 +113,11 @@
             <input type="text" id="telefone" name="TelefoneForm" placeholder="(DDD) Telefone" maxlength="15" oninput="formatarTelefone(this)" required>
         </div>
 
-        <input type="email" id="email" name="emailForm" placeholder="E-mail" required>
+        <input type="email" id="email" name="emailForm" placeholder="E-mail" maxlength="100" required>
+        
         <div class="linha-inputs">
-            <input type="text" id="endereco" name="enderecoForm" placeholder="Endereço" required>
-            <input type="text" id="numero" name="numeroCasaForm" placeholder="Número" style="max-width: 120px;" required>
+            <input type="text" id="endereco" name="enderecoForm" placeholder="Endereço" maxlength="150" required>
+            <input type="text" id="numero" name="numeroCasaForm" placeholder="Número" maxlength="10" style="max-width: 120px;" required>
         </div>
 
         <div class="botoes-navegacao">
@@ -155,6 +155,46 @@
 
       input.value = valor;
     }
+
+    function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11 ||
+                cpf === "00000000000" ||
+                cpf === "11111111111" ||
+                cpf === "22222222222" ||
+                cpf === "33333333333" ||
+                cpf === "44444444444" ||
+                cpf === "55555555555" ||
+                cpf === "66666666666" ||
+                cpf === "77777777777" ||
+                cpf === "88888888888" ||
+                cpf === "99999999999") {
+                return false;
+            }
+            let soma = 0;
+            for (let i = 0; i < 9; i++) {
+                soma += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let resto = 11 - (soma % 11);
+            if (resto === 10 || resto === 11) {
+                resto = 0;
+            }
+            if (resto !== parseInt(cpf.charAt(9))) {
+                return false;
+            }
+            soma = 0;
+            for (let i = 0; i < 10; i++) {
+                soma += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            resto = 11 - (soma % 11);
+            if (resto === 10 || resto === 11) {
+                resto = 0;
+            }
+            if (resto !== parseInt(cpf.charAt(10))) {
+                return false;
+            }
+            return true;
+        }
   </script>
 </body>
 </html>
