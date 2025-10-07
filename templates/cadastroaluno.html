@@ -133,7 +133,7 @@
         {% endwith %}
 
          <form action="/cadastroaluno" method="post">
-            <input type="text" id="nome" name="nomeForm" placeholder="Nome completo" maxlength="100" required>
+            <input type="text" id="nome" name="nomeForm" placeholder="Nome completo" required>
 
             <div class="linha-inputs">
                 <input type="date" id="nascimento" name="dataNascimentoForm" placeholder="Data de Nascimento" required>
@@ -145,7 +145,7 @@
                 <input type="text" id="telefone" name="Telefone_alunoForm" placeholder="(DDD) Telefone" maxlength="15" oninput="formatarTelefone(this)" required>
             </div>
 
-            <input type="email" id="email_institucional" name="emailFsaForm" placeholder="E-mail Institucional" maxlength="100" required>
+            <input type="email" id="email_institucional" name="emailFsaForm" placeholder="E-mail Institucional" required>
             <select id="curso_periodo" name="cursoPeriodoForm" required>
                 <option value="" disabled selected hidden>Curso - Semestre</option>
                 <option value="Psicologia - 7º Semestre">Psicologia - 7º Semestre</option>
