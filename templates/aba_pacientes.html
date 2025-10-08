@@ -10,9 +10,9 @@
 <body>
     <header>
        <div class="logo">
-    <span style="font-family: 'Times New Roman', Times, serif;">F</span>
-    <span style="font-family: 'Times New Roman', Times, serif;">S</span>
-    <span style="font-family: 'Times New Roman', Times, serif;">A</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">F</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">S</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">A</span>
         </div>
         <div class="title">Agendamentos - Psicologia</div>
         <div class="profile">
@@ -43,16 +43,16 @@
     </div>
 
     <div id="pagina-consultas" class="page">
-      <div class="page-header">
-        <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
-            </svg>
-            VOLTAR
-        </button>
-         <div class="main-title">Minhas Consultas</div>
-         <div class="header-spacer"></div>
-      </div>
+        <div class="page-header">
+            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
+                </svg>
+                VOLTAR
+            </button>
+            <div class="main-title">Minhas Consultas</div>
+            <div class="header-spacer"></div>
+        </div>
         <div class="card-container" id="container-meus-agendamentos">
             </div>
         <div id="no-appointments-message" class="info-message">
@@ -78,11 +78,11 @@
             <div class="main-title">Minha Conta</div>
             <div class="header-spacer"></div>
         </div>
-
         <div class="tabs-navigation">
             <button class="tab-button active" onclick="mostrarSubAba('sub-aba-meus-dados', this)">Meus Dados</button>
             <button class="tab-button" onclick="mostrarSubAba('sub-aba-notificacoes', this)">Notificações</button>
             <button class="tab-button" onclick="mostrarSubAba('sub-aba-mudar-senha', this)">Mudar Senha</button>
+            <button class="tab-button" onclick="mostrarSubAba('sub-aba-mudar-horario', this)">Mudar Horário</button>
         </div>
 
         <div id="sub-aba-meus-dados" class="sub-tab-content active">
@@ -103,27 +103,26 @@
                     <select id="genero" disabled>
                         <option value="Homem" {% if paciente.genero == 'Homem' %}selected{% endif %}>Homem</option>
                         <option value="Mulher" {% if paciente.genero == 'Mulher' %}selected{% endif %}>Mulher</option>
-                        <option value="Outro" {% if paciente.genero == 'Outro' %}selected{% endif %}>Outro</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="cpf">CPF*</label>
-                    <input type="text" id="cpf" value="{{ paciente.cpf }}" disabled>
+                    <input type="text" id="cpf" value="{{ paciente.cpf }}"  disabled>
                 </div>
                 <div class="form-group">
                     <label for="telefone">Telefone*</label>
-                    <input type="text" id="telefone" value="{{ paciente.telefone }}" disabled>
+                    <input type="text" id="telefone" value="{{ paciente.telefone }}" maxlength="15" oninput="formatarTelefone(this)" disabled>
                 </div>
                 <div class="form-group">
                     <label for="email">Email*</label>
-                    <input type="email" id="email" value="{{ paciente.email }}" disabled>
+                    <input type="email" id="email" value="{{ paciente.email }}" maxlength="100" disabled>
                 </div>
                 <div class="form-group">
                     <label for="endereco">Endereço*</label>
-                    <input type="text" id="endereco" value="{{ paciente.endereco }}, {{ paciente.numero_casa }}" disabled>
+                    <input type="text" id="endereco" value="{{ paciente.endereco }}, {{ paciente.numero_casa }}" maxlength="150" disabled>
                 </div>
                 <div class="action-buttons">
-                    <button class="action-button secondary">Ajuda?</button>
+                    <button class="action-button secondary" onclick="mostrarPagina('pagina-ajuda')">Ajuda?</button>
                     <button class="action-button primary" onclick="salvarDados()">Salvar</button>
                 </div>
             </div>
@@ -139,18 +138,9 @@
                     <label for="notif-email">Receber notificações por E-mail</label>
                 </div>
                 <div class="form-group notification-option">
-                    <input type="checkbox" id="notif-sms">
-                    <label for="notif-sms">Receber notificações por SMS</label>
-                </div>
-                <div class="form-group notification-option">
                     <input type="checkbox" id="notif-app" checked>
                     <label for="notif-app">Receber notificações pelo aplicativo</label>
                 </div>
-                <div class="form-group notification-option">
-                    <input type="checkbox" id="notif-ofertas">
-                    <label for="notif-ofertas">Receber ofertas e novidades</label>
-                </div>
-
                 <div class="action-buttons">
                     <button class="action-button primary" onclick="salvarNotificacoes()">Salvar Preferências</button>
                 </div>
@@ -164,17 +154,17 @@
 
                 <div class="form-group">
                     <label for="senha-atual">Senha Atual*</label>
-                    <input type="password" id="senha-atual" placeholder="Digite sua senha atual">
+                    <input type="password" id="senha-atual" placeholder="Digite sua senha atual" maxlength="20">
                     <span class="error-message" id="error-senha-atual"></span>
                 </div>
                 <div class="form-group">
                     <label for="nova-senha">Nova Senha*</label>
-                    <input type="password" id="nova-senha" placeholder="Digite sua nova senha">
+                    <input type="password" id="nova-senha" placeholder="Digite sua nova senha" maxlength="20">
                     <span class="error-message" id="error-nova-senha"></span>
                 </div>
                 <div class="form-group">
                     <label for="confirmar-nova-senha">Confirmar Nova Senha*</label>
-                    <input type="password" id="confirmar-nova-senha" placeholder="Confirme sua nova senha">
+                    <input type="password" id="confirmar-nova-senha" placeholder="Confirme sua nova senha" maxlength="20">
                     <span class="error-message" id="error-confirmar-nova-senha"></span>
                 </div>
 
@@ -183,8 +173,60 @@
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- Nova sub-aba para Mudar Horário -->
+        <div id="sub-aba-mudar-horario" class="sub-tab-content">
+            <div class="form-container">
+                <h3>Mudar Horário de Preferência</h3>
+                <p class="description">Selecione seus horários preferenciais para futuros agendamentos. Isso nos ajudará a oferecer opções que melhor se adequem à sua disponibilidade.</p>
+
+                <div class="selection-form-group">
+                    <label for="mudar-dia-semana">Dia da Semana Preferido*</label>
+                    <select id="mudar-dia-semana">
+                        <option value="">Selecione o Dia da Semana</option>
+                        <option value="Segunda-feira">Segunda-feira</option>
+                        <option value="Terça-feira">Terça-feira</option>
+                        <option value="Quarta-feira">Quarta-feira</option>
+                        <option value="Quinta-feira">Quinta-feira</option>
+                        <option value="Sexta-feira">Sexta-feira</option>
+                        <option value="Sábado">Sábado</option>
+                    </select>
+                    <span class="error-message" id="error-mudar-dia-semana"></span>
+                </div>
+
+                <div class="selection-form-group">
+                    <label for="mudar-periodo">Período Preferido*</label>
+                    <select id="mudar-periodo">
+                        <option value="">Selecione o Período</option>
+                        <option value="Manhã">Manhã (08:00 - 12:00)</option>
+                        <option value="Tarde">Tarde (13:00 - 17:00)</option>
+                        <option value="Noite">Noite (18:00 - 22:00)</option>
+                    </select>
+                    <span class="error-message" id="error-mudar-periodo"></span>
+                </div>
+
+                <div class="selection-form-group">
+                    <label>Horários Preferidos*</label>
+                    <div class="time-slots-grid" id="mudar-time-slots-grid">
+                        <!-- Horários serão gerados dinamicamente -->
+                    </div>
+                    <span class="error-message" id="error-mudar-horario-especifico"></span>
+                </div>
+
+                <div class="preference-summary" id="mudar-preference-summary" style="display: none;">
+                    <h4>Preferência Selecionada:</h4>
+                    <p><strong>Dia da Semana:</strong> <span id="mudar-selected-weekday-display"></span></p>
+                    <p><strong>Período:</strong> <span id="mudar-selected-period-display"></span></p>
+                    <p><strong>Horário:</strong> <span id="mudar-selected-time-display"></span></p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-button secondary" onclick="limparPreferenciasHorario()">Limpar</button>
+                    <button class="action-button primary">Salvar Preferências</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="pagina-confirmacao-final" class="page">
         <div class="page-header">
@@ -534,7 +576,6 @@
             </div>
         </div>
     </div>
-
 
     <div id="toast-notification" class="toast"></div>
 
