@@ -1,5 +1,9 @@
-// aba_paciente.js - VERSÃO INTEGRADA E SIMPLIFICADA
+// aba_paciente.js - VERSÃO ORGANIZADA
 console.log("DEBUG: aba_paciente.js CARREGADO E SENDO INTERPRETADO");
+
+// =============================================================================
+// CONFIGURAÇÕES E ESTADO
+// =============================================================================
 
 // --- Elementos Comuns (Cache de DOM para performance) ---
 const elements = {
@@ -53,9 +57,18 @@ const elements = {
 
     // Página Não Posso Comparecer
     motivoNaoPosso: document.getElementById('motivo-nao-posso'),
+
+    // Mudar Horário
+    mudarDiaSemana: document.getElementById('mudar-dia-semana'),
+    mudarPeriodo: document.getElementById('mudar-periodo'),
+    mudarTimeSlotsGrid: document.getElementById('mudar-time-slots-grid'),
+    mudarPreferenceSummary: document.getElementById('mudar-preference-summary'),
+    mudarSelectedWeekdayDisplay: document.getElementById('mudar-selected-weekday-display'),
+    mudarSelectedPeriodDisplay: document.getElementById('mudar-selected-period-display'),
+    mudarSelectedTimeDisplay: document.getElementById('mudar-selected-time-display')
 };
 
-// --- Estado Global (para dados temporários e gerenciamento de modais/ações) ---
+// --- Estado Global ---
 const appState = {
     currentActivePage: 'pagina-principal',
     selectedTriagem: {
@@ -63,8 +76,8 @@ const appState = {
         periodo: null,
         horario: null
     },
-    botaoHorarioAtivo: null, // Referência ao botão de horário selecionado
-    consultaEmContexto: null, // Variável para armazenar a consulta em ação (confirmar, cancelar, etc.)
+    botaoHorarioAtivo: null,
+    consultaEmContexto: null,
     
     preferenciasNotificacao: {
         email: true,
@@ -73,20 +86,23 @@ const appState = {
         ofertas: false
     },
 
-    // Seus dados de horários por período, agora dentro de appState
     horariosPorPeriodo: {
         'Manhã': ["08:00", "09:00", "10:00", "11:00"],
         'Tarde': ["13:00", "14:00", "15:00", "16:00"],
         'Noite': ["18:00", "19:00", "20:00", "21:00"]
-    }
+    },
+
+    preferenciasHorario: null
 };
 
-// --- Funções Utilitárias ---
+// =============================================================================
+// FUNÇÕES UTILITÁRIAS
+// =============================================================================
 
 function showToast(message, type = 'success') {
     const toast = elements.toastNotification;
     toast.textContent = message;
-    toast.className = 'toast'; // Remove classes anteriores
+    toast.className = 'toast';
     toast.classList.add('show');
     toast.classList.add(type);
     
@@ -105,49 +121,61 @@ function hideSpinner() {
 
 function formatarDataParaExibicao(dataString) {
     if (!dataString) return '';
-    // Garante que a data está no formato YYYY-MM-DD
     const parts = dataString.split('-');
     if (parts.length === 3) {
-        return `${parts[2]}/${parts[1]}/${parts[0]}`; // DD/MM/YYYY
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
-    return dataString; // Retorna original se não for YYYY-MM-DD
+    return dataString;
 }
 
 function calcularHoraFim(horaInicio) {
     if (!horaInicio) return '';
     const [horas, minutos] = horaInicio.split(':').map(Number);
-    const data = new Date(); // Data arbitrária para cálculo
+    const data = new Date();
     data.setHours(horas, minutos, 0, 0);
-    data.setHours(data.getHours() + 1); // Adiciona 1 hora
+    data.setHours(data.getHours() + 1);
     return `${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}`;
 }
 
-// --- Funções de Navegação e Modais ---
+function formatarTelefone(input) {
+    let valor = input.value.replace(/\D/g, "");
+    if (valor.length > 11) valor = valor.slice(0, 11);
+
+    if (valor.length >= 1) {
+      valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+    }
+    if (valor.length > 10) {
+        valor = valor.slice(0, 10) + "-" + valor.slice(10);
+    }
+    input.value = valor;
+}
+
+// =============================================================================
+// NAVEGAÇÃO E MODAIS
+// =============================================================================
 
 function goToPage(pageId) {
     elements.pages.forEach(p => p.classList.remove('active'));
     const paginaAtiva = document.getElementById(pageId);
     if (paginaAtiva) {
         paginaAtiva.classList.add('active');
-        appState.currentActivePage = pageId; // Atualiza o estado da página ativa
+        appState.currentActivePage = pageId;
     }
 
-    // Fecha todos os modais ao mudar de página
     document.querySelectorAll('.modal-overlay').forEach(modal => {
         modal.classList.remove('active');
     });
-    document.body.classList.remove('modal-active'); // Garante que o corpo não tem a classe modal-active
+    document.body.classList.remove('modal-active');
 
-    // Ações específicas ao mudar de página
     if (pageId === 'pagina-consultas') {
         atualizarListaConsultas();
-    } else if (pageId === 'pagina-horarios-triagem') {
-        resetTriagemSelection(); // Reseta os campos da triagem
-        updateAvailableTimes(); // Garante que os horários são carregados ao entrar na página
     } else if (pageId === 'pagina-meus-dados') {
-        // Assegura que a primeira sub-aba 'Meus Dados' está ativa ao entrar na página
-        // E carrega as preferências de notificação
-        showSubTab('sub-aba-meus-dados', document.querySelector('.tab-button.active') || document.querySelector('.tab-button'));
+        setTimeout(() => {
+            const primeiraAba = document.querySelector('.tab-button');
+            if (primeiraAba) {
+                showSubTab('sub-aba-meus-dados', primeiraAba);
+            }
+        }, 50);
         carregarPreferenciasNotificacao();
     }
 }
@@ -157,10 +185,21 @@ function toggleDropdown() {
 }
 
 function showSubTab(subTabId, buttonElement) {
-    document.querySelectorAll('.sub-tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(subTabId).classList.add('active');
-
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    console.log("Mostrando sub-aba:", subTabId);
+    
+    document.querySelectorAll('.sub-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const subTabElement = document.getElementById(subTabId);
+    if (subTabElement) {
+        subTabElement.classList.add('active');
+    }
+    
     if (buttonElement) {
         buttonElement.classList.add('active');
     }
@@ -168,14 +207,27 @@ function showSubTab(subTabId, buttonElement) {
 
 function openModal(modalElement) {
     modalElement.classList.add('active');
-    document.body.classList.add('modal-active'); // Adiciona a classe ao body para evitar scroll
+    document.body.classList.add('modal-active');
 }
 
-// --- Funções da Página "Minha Conta" ---
+function closeModal(modalElement) {
+    console.log("[closeModal] Fechando modal:", modalElement ? modalElement.id : 'Elemento Nulo');
+    if (modalElement) {
+        modalElement.classList.remove('active');
+    }
+    if (!document.querySelector('.modal-overlay.active')) {
+        document.body.classList.remove('modal-active');
+    }
+    console.log("[closeModal] Limpando appState.consultaEmContexto.");
+    appState.consultaEmContexto = null;
+}
+
+// =============================================================================
+// MINHA CONTA
+// =============================================================================
 
 function enableEditMode() {
     elements.inputsMeusDados.forEach(input => {
-        // Mantém disabled para campos que não devem ser editáveis pelo paciente (Nome Completo, Data Nasc, CPF)
         if (input.id !== 'nome-completo' && input.id !== 'data-nascimento' && input.id !== 'cpf') {
             input.disabled = false;
         }
@@ -186,22 +238,20 @@ function enableEditMode() {
 function saveAccountData() {
     showSpinner();
 
-    // Coleta os dados dos campos editáveis
     const formData = new FormData();
     formData.append('genero', document.getElementById('genero').value);
     formData.append('telefone', document.getElementById('telefone').value);
     formData.append('email', document.getElementById('email').value);
-    formData.append('endereco', document.getElementById('endereco').value); // O endereço já está combinado
+    formData.append('endereco', document.getElementById('endereco').value);
 
     fetch('/atualizar_dados_paciente', {
         method: 'POST',
-        body: new URLSearchParams(formData) // Envia como form-urlencoded
+        body: new URLSearchParams(formData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
             showToast(data.message, 'success');
-            // Desabilita os campos novamente após o sucesso
             elements.inputsMeusDados.forEach(input => {
                 if (input.id !== 'nome-completo' && input.id !== 'data-nascimento' && input.id !== 'cpf') {
                     input.disabled = true;
@@ -281,19 +331,20 @@ function changePassword() {
     }, 800);
 }
 
-// --- Funções da Página "Horários de Triagem" ---
+// =============================================================================
+// HORÁRIOS DE TRIAGEM
+// =============================================================================
 
 function updateAvailableTimes() {
     const diaSemana = elements.selectDiaSemana.value;
     const periodo = elements.selectPeriodo.value;
     elements.timeSlotsGrid.innerHTML = '';
     
-    // Limpa mensagens de erro e resumo ao mudar a seleção
     document.getElementById('error-dia-semana').textContent = '';
     document.getElementById('error-periodo').textContent = '';
     document.getElementById('error-horario-especifico').textContent = '';
     
-    appState.selectedTriagem.horario = null; // Reseta o horário selecionado da triagem
+    appState.selectedTriagem.horario = null;
     elements.scheduleSummary.style.display = 'none';
 
     if (appState.botaoHorarioAtivo) {
@@ -308,7 +359,7 @@ function updateAvailableTimes() {
                 const button = document.createElement('button');
                 button.classList.add('time-slot-button');
                 button.textContent = `${horario} - ${calcularHoraFim(horario)}`;
-                button.dataset.time = horario; // Guarda o horário no dataset
+                button.dataset.time = horario;
                 button.addEventListener('click', () => selectTriagemTime(button));
                 elements.timeSlotsGrid.appendChild(button);
             });
@@ -329,7 +380,7 @@ function selectTriagemTime(button) {
 
     appState.selectedTriagem.diaSemana = elements.selectDiaSemana.value;
     appState.selectedTriagem.periodo = elements.selectPeriodo.value;
-    appState.selectedTriagem.horario = button.dataset.time; // Pega do dataset do botão
+    appState.selectedTriagem.horario = button.dataset.time;
 
     elements.selectedWeekdayDisplay.textContent = appState.selectedTriagem.diaSemana;
     elements.selectedPeriodDisplay.textContent = appState.selectedTriagem.periodo;
@@ -364,7 +415,6 @@ function validateAndOpenTriagemModal() {
 }
 
 async function confirmTriagemRequest() {
-    // Desabilita o botão para evitar múltiplos cliques
     const confirmButton = document.getElementById('btn-confirmar-envio-triagem');
     if (!confirmButton) {
         console.error('Botão de confirmação não encontrado');
@@ -372,7 +422,7 @@ async function confirmTriagemRequest() {
     }
 
     if (confirmButton.disabled) {
-        return; // Evita múltiplas chamadas simultâneas
+        return;
     }
     
     confirmButton.disabled = true;
@@ -407,7 +457,6 @@ async function confirmTriagemRequest() {
             throw new Error(data.error || 'Ocorreu um erro ao enviar a solicitação.');
         }
 
-        // Se chegou aqui, a solicitação foi bem-sucedida
         showToast('Solicitação de triagem enviada com sucesso!', 'success');
         resetTriagemSelection();
         goToPage('pagina-triagem-sucesso');
@@ -416,7 +465,6 @@ async function confirmTriagemRequest() {
         showToast(error.message || 'Erro de comunicação com o servidor. Tente novamente.', 'error');
     } finally {
         hideSpinner();
-        // Reabilita o botão independentemente do resultado
         if (confirmButton) {
             confirmButton.disabled = false;
             confirmButton.textContent = 'CONFIRMAR';
@@ -424,7 +472,6 @@ async function confirmTriagemRequest() {
     }
 }
 
-// Função para resetar a seleção de triagem
 function resetTriagemSelection() {
     appState.selectedTriagem = {
         diaSemana: null,
@@ -432,21 +479,17 @@ function resetTriagemSelection() {
         horario: null
     };
 
-    // Resetar os selects
     const selectDiaSemana = document.getElementById('select-dia-semana');
     const selectPeriodo = document.getElementById('select-periodo');
     if (selectDiaSemana) selectDiaSemana.value = '';
     if (selectPeriodo) selectPeriodo.value = '';
 
-    // Limpar a grade de horários
     const timeSlotsGrid = document.getElementById('time-slots-grid');
     if (timeSlotsGrid) timeSlotsGrid.innerHTML = '';
 
-    // Esconder o resumo
     const scheduleSummary = document.getElementById('schedule-summary');
     if (scheduleSummary) scheduleSummary.style.display = 'none';
 
-    // Limpar mensagens de erro
     const errorElements = [
         'error-dia-semana',
         'error-periodo',
@@ -458,24 +501,23 @@ function resetTriagemSelection() {
     });
 }
 
-// --- Funções da Página "Minhas Consultas" ---
+// =============================================================================
+// MINHAS CONSULTAS
+// =============================================================================
 
-// Função para comparar datas e horários de consultas para ordenação
 function compareAppointments(a, b) {
     const dataA = a.data_agendamento ? new Date(a.data_agendamento) : (a.data_solicitacao ? new Date(a.data_solicitacao) : null);
     const dataB = b.data_agendamento ? new Date(b.data_agendamento) : (b.data_solicitacao ? new Date(b.data_solicitacao) : null);
 
-    // Priorizar agendamentos com data_agendamento
     if (a.data_agendamento && !b.data_agendamento) return -1;
     if (!a.data_agendamento && b.data_agendamento) return 1;
 
-    // Se ambos têm ou não têm data_agendamento, ordenar pela data (agendamento ou solicitação)
     if (dataA && dataB) {
-        return dataB - dataA; // Mais recentes primeiro
+        return dataB - dataA;
     } else if (dataA) {
-        return -1; // A com data vem antes
+        return -1;
     } else if (dataB) {
-        return 1;  // B com data vem antes
+        return 1;
     }
     return 0;
 }
@@ -502,13 +544,10 @@ async function atualizarListaConsultas() {
         elements.containerMeusAgendamentos.style.display = 'grid';
         agendamentos.sort(compareAppointments);
 
-        // Filtra apenas as solicitações de triagem não concluídas e consultas ativas
         const consultasFiltradas = agendamentos.filter(ag => {
-            // Mantém apenas solicitações de triagem não concluídas
             if (ag.tipo_atendimento === 'Solicitação de Triagem') {
                 return ag.status === 'solicitado';
             }
-            // Mantém apenas consultas ativas
             if (ag.tipo_atendimento === 'Consulta') {
                 return ['confirmado', 'agendado'].includes(ag.status);
             }
@@ -577,7 +616,7 @@ async function atualizarListaConsultas() {
 
 function viewAppointmentDetails(consulta) {
     console.log("[viewAppointmentDetails] Iniciada com consulta:", consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
-    appState.consultaEmContexto = consulta; // Define a consulta em contexto
+    appState.consultaEmContexto = consulta;
     const conteudo = elements.detalhesConsultaConteudo;
 
     let dataExibicao = "A definir";
@@ -602,7 +641,6 @@ function viewAppointmentDetails(consulta) {
         <p><strong>Status:</strong> <span class="status-text ${consulta.status.replace('_', '-')}">${consulta.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></p>
     `;
 
-    // Adicionar botões de ação condicionalmente
     if (consulta.status !== 'cancelado_paciente' && consulta.status !== 'cancelado_estagiario' && consulta.status !== 'finalizado') {
         conteudo.innerHTML += `
                 <h3 style="margin-top: 20px;">Ações</h3>
@@ -611,8 +649,6 @@ function viewAppointmentDetails(consulta) {
                     ${consulta.data_agendamento ? '<button class="action-button warning" disabled>Reagendar (Em breve)</button>' : ''}
                 </div>`;
         
-        // Adiciona o event listener dinamicamente para garantir que 'consulta' seja o objeto correto.
-        // Usar setTimeout para garantir que o elemento está no DOM antes de adicionar o listener.
         setTimeout(() => {
             const cancelButton = document.getElementById(`btn-detalhes-cancelar-${consulta.id}`);
             if (cancelButton) {
@@ -649,7 +685,7 @@ async function cancelAppointment() {
         if (response.ok) {
             showToast(data.message, 'success');
             closeModal(elements.modalConfirmarCancelamento);
-            await atualizarListaConsultas(); // Atualiza a lista após o cancelamento
+            await atualizarListaConsultas();
             goToPage('pagina-consultas');
         } else {
             showToast(data.error || 'Erro ao cancelar a consulta.', 'error');
@@ -671,18 +707,18 @@ function openCancelAppointmentModal(consulta) {
     openModal(elements.modalConfirmarCancelamento);
 }
 
-function showCannotAttendPage(consulta) { // Renomeada de 'mostrarPaginaNaoPosso'
+function showCannotAttendPage(consulta) {
     appState.consultaEmContexto = consulta;
     goToPage('pagina-nao-posso-comparecer');
 }
 
-function closeCannotAttendPage() { // Renomeada de 'fecharNaoPosso'
+function closeCannotAttendPage() {
     goToPage('pagina-consultas');
-    elements.motivoNaoPosso.value = ''; // Limpa o campo de texto
+    elements.motivoNaoPosso.value = '';
     appState.consultaEmContexto = null;
 }
 
-function sendCannotAttendReasonAndCancel() { // Renomeada de 'enviarNaoPosso'
+function sendCannotAttendReasonAndCancel() {
     if (!appState.consultaEmContexto) {
         showToast('Erro: Nenhuma consulta selecionada.');
         return;
@@ -697,14 +733,10 @@ function sendCannotAttendReasonAndCancel() { // Renomeada de 'enviarNaoPosso'
     showSpinner();
     setTimeout(() => {
         hideSpinner();
-        // No lugar de alterar o estado local, chamamos a função de cancelamento que interage com o backend
-        // e depois atualiza a lista.
-        // A lógica de "motivo" pode ser adicionada ao corpo da requisição de cancelamento se necessário.
-        // Por ora, vamos apenas cancelar.
         if (appState.consultaEmContexto) {
-            cancelAppointment(); // Reutiliza a função de cancelamento
+            cancelAppointment();
             goToPage('pagina-consultas');
-            elements.motivoNaoPosso.value = ''; // Limpa o campo
+            elements.motivoNaoPosso.value = '';
             appState.consultaEmContexto = null;
             showToast('Solicitação de cancelamento enviada.', "success");
         } else {
@@ -713,11 +745,12 @@ function sendCannotAttendReasonAndCancel() { // Renomeada de 'enviarNaoPosso'
     }, 1500);
 }
 
-// Função para gerar o QR Code
-function generateQRCode() { // Renomeada de 'gerarQRCode'
+// =============================================================================
+// CONSULTA CONFIRMADA E QR CODE
+// =============================================================================
+
+function generateQRCode() {
     const qrCodeContainer = elements.consultaConfirmadaQrcode;
-    
-    // Limpa o conteúdo anterior
     qrCodeContainer.innerHTML = '';
     
     const qrCodeImg = document.createElement('img');
@@ -726,12 +759,11 @@ function generateQRCode() { // Renomeada de 'gerarQRCode'
          paciente: document.getElementById('nome-completo') ? document.getElementById('nome-completo').value : "Paciente",
          data: appState.consultaEmContexto.data_agendamento ? new Date(appState.consultaEmContexto.data_agendamento).toLocaleDateString('pt-BR') : 'A Definir',
          hora: appState.consultaEmContexto.data_agendamento ? new Date(appState.consultaEmContexto.data_agendamento).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : 'A Definir',
-         local: 'COEPP - Fundação Santo André',  // Local fixo por enquanto
+         local: 'COEPP - Fundação Santo André',
          tipo: appState.consultaEmContexto.tipo_atendimento,
          estagiario: appState.consultaEmContexto.estagiario_nome || "A definir",
          id: appState.consultaEmContexto.id
      } : {
-         // Dados mínimos para um QR code válido, mesmo sem consulta
          paciente: document.getElementById('nome-completo') ? document.getElementById('nome-completo').value : "Paciente",
          data: 'A Definir',
          hora: 'A Definir',
@@ -752,8 +784,7 @@ function generateQRCode() { // Renomeada de 'gerarQRCode'
     qrCodeContainer.appendChild(qrCodeImg);
 }
 
-// Função para baixar o QR Code
-function downloadQRCode() { // Renomeada de 'baixarQRCode'
+function downloadQRCode() {
     const qrCodeImg = elements.consultaConfirmadaQrcode.querySelector('img');
     
     if (!qrCodeImg) {
@@ -777,34 +808,200 @@ function downloadQRCode() { // Renomeada de 'baixarQRCode'
     showToast('QR Code baixado com sucesso!', "success");
 }
 
-// --- Event Listeners (Melhor prática para separar HTML e JS) ---
+// =============================================================================
+// MUDAR HORÁRIO
+// =============================================================================
+
+function inicializarMudarHorario() {
+    if (elements.mudarDiaSemana) {
+        elements.mudarDiaSemana.addEventListener('change', atualizarHorariosMudar);
+    }
+    if (elements.mudarPeriodo) {
+        elements.mudarPeriodo.addEventListener('change', atualizarHorariosMudar);
+    }
+    
+    carregarPreferenciasHorarioSalvas();
+}
+
+function atualizarHorariosMudar() {
+    const dia = elements.mudarDiaSemana ? elements.mudarDiaSemana.value : '';
+    const periodo = elements.mudarPeriodo ? elements.mudarPeriodo.value : '';
+    const timeSlotsGrid = elements.mudarTimeSlotsGrid;
+    const summary = elements.mudarPreferenceSummary;
+    
+    if (!timeSlotsGrid) return;
+    
+    timeSlotsGrid.innerHTML = '';
+    
+    if (!dia || !periodo) {
+        if (summary) summary.style.display = 'none';
+        return;
+    }
+    
+    let horarios = [];
+    if (periodo === 'Manhã') {
+        horarios = ['08:00', '09:00', '10:00', '11:00'];
+    } else if (periodo === 'Tarde') {
+        horarios = ['13:00', '14:00', '15:00', '16:00'];
+    } else if (periodo === 'Noite') {
+        horarios = ['18:00', '19:00', '20:00', '21:00'];
+    }
+    
+    horarios.forEach(horario => {
+        const timeSlot = document.createElement('div');
+        timeSlot.className = 'time-slot';
+        timeSlot.textContent = horario;
+        timeSlot.onclick = () => selecionarHorarioMudar(horario, timeSlot);
+        timeSlotsGrid.appendChild(timeSlot);
+    });
+    
+    atualizarResumoMudar();
+}
+
+function selecionarHorarioMudar(horario, element) {
+    document.querySelectorAll('#mudar-time-slots-grid .time-slot').forEach(slot => {
+        slot.classList.remove('selected');
+    });
+    
+    element.classList.add('selected');
+    
+    if (elements.mudarSelectedTimeDisplay) {
+        elements.mudarSelectedTimeDisplay.textContent = horario;
+    }
+    atualizarResumoMudar();
+}
+
+function atualizarResumoMudar() {
+    const dia = elements.mudarDiaSemana ? elements.mudarDiaSemana.value : '';
+    const periodo = elements.mudarPeriodo ? elements.mudarPeriodo.value : '';
+    const horarioSelecionado = document.querySelector('#mudar-time-slots-grid .time-slot.selected');
+    const summary = elements.mudarPreferenceSummary;
+    
+    if (dia && periodo && horarioSelecionado && summary) {
+        if (elements.mudarSelectedWeekdayDisplay) {
+            elements.mudarSelectedWeekdayDisplay.textContent = dia;
+        }
+        if (elements.mudarSelectedPeriodDisplay) {
+            elements.mudarSelectedPeriodDisplay.textContent = periodo;
+        }
+        if (elements.mudarSelectedTimeDisplay) {
+            elements.mudarSelectedTimeDisplay.textContent = horarioSelecionado.textContent;
+        }
+        summary.style.display = 'block';
+    } else if (summary) {
+        summary.style.display = 'none';
+    }
+}
+
+function salvarPreferenciasHorario() {
+    const dia = elements.mudarDiaSemana ? elements.mudarDiaSemana.value : '';
+    const periodo = elements.mudarPeriodo ? elements.mudarPeriodo.value : '';
+    const horarioSelecionado = document.querySelector('#mudar-time-slots-grid .time-slot.selected');
+    
+    let isValid = true;
+    
+    if (!dia) {
+        document.getElementById('error-mudar-dia-semana').textContent = 'Selecione um dia da semana';
+        isValid = false;
+    } else {
+        document.getElementById('error-mudar-dia-semana').textContent = '';
+    }
+    
+    if (!periodo) {
+        document.getElementById('error-mudar-periodo').textContent = 'Selecione um período';
+        isValid = false;
+    } else {
+        document.getElementById('error-mudar-periodo').textContent = '';
+    }
+    
+    if (!horarioSelecionado) {
+        document.getElementById('error-mudar-horario-especifico').textContent = 'Selecione um horário específico';
+        isValid = false;
+    } else {
+        document.getElementById('error-mudar-horario-especifico').textContent = '';
+    }
+    
+    if (!isValid) return;
+    
+    const preferencias = {
+        dia: dia,
+        periodo: periodo,
+        horario: horarioSelecionado.textContent
+    };
+    
+    showSpinner();
+    setTimeout(() => {
+        hideSpinner();
+        localStorage.setItem('preferenciasHorario', JSON.stringify(preferencias));
+        showToast('Preferências de horário salvas com sucesso!', 'success');
+    }, 1000);
+}
+
+function carregarPreferenciasHorarioSalvas() {
+    const preferenciasSalvas = localStorage.getItem('preferenciasHorario');
+    if (preferenciasSalvas) {
+        const preferencias = JSON.parse(preferenciasSalvas);
+        
+        if (elements.mudarDiaSemana) elements.mudarDiaSemana.value = preferencias.dia;
+        if (elements.mudarPeriodo) elements.mudarPeriodo.value = preferencias.periodo;
+        
+        atualizarHorariosMudar();
+        
+        setTimeout(() => {
+            const timeSlots = document.querySelectorAll('#mudar-time-slots-grid .time-slot');
+            timeSlots.forEach(slot => {
+                if (slot.textContent === preferencias.horario) {
+                    slot.classList.add('selected');
+                    atualizarResumoMudar();
+                }
+            });
+        }, 100);
+    }
+}
+
+function limparPreferenciasHorario() {
+    if (elements.mudarDiaSemana) elements.mudarDiaSemana.value = '';
+    if (elements.mudarPeriodo) elements.mudarPeriodo.value = '';
+    if (elements.mudarTimeSlotsGrid) elements.mudarTimeSlotsGrid.innerHTML = '';
+    if (elements.mudarPreferenceSummary) elements.mudarPreferenceSummary.style.display = 'none';
+    
+    document.getElementById('error-mudar-dia-semana').textContent = '';
+    document.getElementById('error-mudar-periodo').textContent = '';
+    document.getElementById('error-mudar-horario-especifico').textContent = '';
+    
+    localStorage.removeItem('preferenciasHorario');
+    
+    showToast('Preferências limpas!', 'info');
+}
+
+// =============================================================================
+// EVENT LISTENERS E INICIALIZAÇÃO
+// =============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DEBUG: DOMContentLoaded disparado!");
-    goToPage('pagina-principal'); // Inicia na página principal
+    goToPage('pagina-principal');
 
     // Eventos do Header
     const profileElement = document.querySelector('.profile');
     if (profileElement) {
         profileElement.addEventListener('click', (event) => {
-            event.stopPropagation(); // Impede que o clique se propague para o window
+            event.stopPropagation();
             toggleDropdown();
         });
     }
 
-    // Adiciona evento de clique para os itens do menu
     if (elements.dropdownMenu) {
         elements.dropdownMenu.addEventListener('click', (event) => {
             const link = event.target.closest('a');
             if (link && link.dataset.page) {
-                event.preventDefault(); // Previne o comportamento padrão do link
+                event.preventDefault();
                 goToPage(link.dataset.page);
-                toggleDropdown(); // Fecha o menu após o clique
+                toggleDropdown();
             }
         });
     }
 
-    // Fecha o dropdown se clicar fora dele
     window.addEventListener('click', (event) => {
         if (elements.dropdownMenu && elements.dropdownMenu.classList.contains('show')) {
             if (!profileElement.contains(event.target)) {
@@ -825,17 +1022,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const changePassButton = document.querySelector('#sub-aba-mudar-senha .action-button.primary');
     if (changePassButton) changePassButton.addEventListener('click', changePassword);
-    
+
     // Eventos da página "Horários de Triagem"
-    elements.selectDiaSemana.addEventListener('change', updateAvailableTimes);
-    elements.selectPeriodo.addEventListener('change', updateAvailableTimes);
-    elements.confirmSelectionButton.addEventListener('click', validateAndOpenTriagemModal);
+    if (elements.selectDiaSemana) {
+        elements.selectDiaSemana.addEventListener('change', updateAvailableTimes);
+    }
+    if (elements.selectPeriodo) {
+        elements.selectPeriodo.addEventListener('change', updateAvailableTimes);
+    }
+    if (elements.confirmSelectionButton) {
+        elements.confirmSelectionButton.addEventListener('click', validateAndOpenTriagemModal);
+    }
 
     // Eventos dos Modais
-    document.querySelector('#modal-detalhes-consulta .modal-action-buttons .action-button.secondary').addEventListener('click', () => closeModal(elements.modalDetalhesConsulta));
-    document.querySelector('#modal-triagem .modal-action-buttons .action-button.secondary').addEventListener('click', () => closeModal(elements.modalTriagem));
-    document.querySelector('#modal-triagem .modal-action-buttons .action-button.primary').addEventListener('click', confirmTriagemRequest);
-    document.querySelector('#modal-confirmar-cancelamento .modal-action-buttons .action-button.secondary').addEventListener('click', () => closeModal(elements.modalConfirmarCancelamento));
+    document.querySelector('#modal-detalhes-consulta .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalDetalhesConsulta));
+    document.querySelector('#modal-triagem .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalTriagem));
+    document.querySelector('#modal-triagem .modal-action-buttons .action-button.primary')?.addEventListener('click', confirmTriagemRequest);
+    document.querySelector('#modal-confirmar-cancelamento .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalConfirmarCancelamento));
     
     if (elements.btnConfirmarCancelamentoFinal) {
         console.log("[DOMContentLoaded] Botão #btn-confirmar-cancelamento-final ENCONTRADO. Adicionando listener.");
@@ -846,61 +1049,55 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("[DOMContentLoaded] ERRO: Botão #btn-confirmar-cancelamento-final NÃO encontrado no DOM.");
     }
+
     // Eventos da Página "Consulta Confirmada"
-    document.querySelector('.consulta-confirmada-download').addEventListener('click', downloadQRCode);
-    document.querySelector('.consulta-confirmada-voltar').addEventListener('click', () => goToPage('pagina-consultas'));
+    document.querySelector('.consulta-confirmada-download')?.addEventListener('click', downloadQRCode);
+    document.querySelector('.consulta-confirmada-voltar')?.addEventListener('click', () => goToPage('pagina-consultas'));
 
     // Eventos da Página "Não Posso Comparecer"
-    document.querySelector('#pagina-nao-posso-comparecer .action-button.secondary').addEventListener('click', closeCannotAttendPage);
-    document.querySelector('#pagina-nao-posso-comparecer .action-button.primary').addEventListener('click', sendCannotAttendReasonAndCancel);
+    document.querySelector('#pagina-nao-posso-comparecer .action-button.secondary')?.addEventListener('click', closeCannotAttendPage);
+    document.querySelector('#pagina-nao-posso-comparecer .action-button.primary')?.addEventListener('click', sendCannotAttendReasonAndCancel);
+
+    // Inicializar funcionalidade "Mudar Horário"
+    inicializarMudarHorario();
 });
 
-// --- Definição ÚNICA de closeModal ---
-function closeModal(modalElement) {
-    console.log("[closeModal] Fechando modal:", modalElement ? modalElement.id : 'Elemento Nulo');
-    if (modalElement) {
-        modalElement.classList.remove('active');
-    }
-    // Só remove modal-active do body se nenhum outro modal estiver aberto
-    if (!document.querySelector('.modal-overlay.active')) {
-        document.body.classList.remove('modal-active');
-    }
-    console.log("[closeModal] Limpando appState.consultaEmContexto.");
-    appState.consultaEmContexto = null; // Limpa o contexto da consulta ao fechar modais
-}
+// =============================================================================
+// MAPEAMENTO PARA FUNÇÕES GLOBAIS (compatibilidade com onclick no HTML)
+// =============================================================================
 
-// --- Mapeamento para funções globais (para compatibilidade com `onclick` no HTML) ---
-// Mantenha estes se seu HTML ainda usa `onclick="funcao()"`.
-// Em um projeto novo, você removeria todos os onclicks e usaria apenas addEventListener.
-// Remove as funções globais que não são mais necessárias para o menu
 window.mostrarPagina = goToPage;
 window.mostrarSubAba = showSubTab;
 
-// --- Funções da Página "Minha Conta" ---
+// Página "Minha Conta"
 window.habilitarEdicao = enableEditMode;
 window.salvarDados = saveAccountData;
 window.salvarNotificacoes = saveNotificationPreferences;
 window.mudarSenha = changePassword;
 
-// --- Funções da Página "Horários de Triagem" ---
+// Página "Horários de Triagem"
 window.atualizarHorariosDisponiveis = updateAvailableTimes;
 window.validarEabrirModalTriagem = validateAndOpenTriagemModal;
-window.enviarSolicitacaoTriagem = confirmTriagemRequest; // Mapeando o nome antigo para o novo, se o HTML ainda usar
+window.enviarSolicitacaoTriagem = confirmTriagemRequest;
 
-// --- Funções da Página "Minhas Consultas" ---
-window.atualizarListaConsultas = atualizarListaConsultas; // Caso seja chamada diretamente
-window.mostrarDetalhesConsulta = viewAppointmentDetails; // Detalhes da consulta
-window.mostrarPaginaNaoPosso = showCannotAttendPage; // Abre a página "Não posso comparecer"
-window.enviarNaoPosso = sendCannotAttendReasonAndCancel; // Envia o motivo e cancela
-window.fecharNaoPosso = closeCannotAttendPage; // Fecha a página "Não posso comparecer"
+// Página "Minhas Consultas"
+window.atualizarListaConsultas = atualizarListaConsultas;
+window.mostrarDetalhesConsulta = viewAppointmentDetails;
+window.mostrarPaginaNaoPosso = showCannotAttendPage;
+window.enviarNaoPosso = sendCannotAttendReasonAndCancel;
+window.fecharNaoPosso = closeCannotAttendPage;
 
 window.fecharModalDetalhes = () => closeModal(elements.modalDetalhesConsulta);
-window.cancelarConsulta = () => openCancelAppointmentModal(appState.consultaEmContexto); // Abre o modal de cancelamento a partir dos detalhes
-window.abrirModalConfirmarCancelamento = openCancelAppointmentModal; // Para botões diretos
-window.fecharModalConfirmarCancelamento = () => closeModal(elements.modalConfirmarCancelamento); // Já existe no addEventListener
-window.executarCancelamentoFinal = cancelAppointment; // Ação final de cancelamento
+window.cancelarConsulta = () => openCancelAppointmentModal(appState.consultaEmContexto);
+window.abrirModalConfirmarCancelamento = openCancelAppointmentModal;
+window.fecharModalConfirmarCancelamento = () => closeModal(elements.modalConfirmarCancelamento);
+window.executarCancelamentoFinal = cancelAppointment;
 
 window.fecharModalTriagem = () => closeModal(elements.modalTriagem);
 
-window.gerarQRCode = generateQRCode; // Mantido se houver chamadas diretas
-window.baixarQRCode = downloadQRCode; // Mantido se houver chamadas diretas
+window.gerarQRCode = generateQRCode;
+window.baixarQRCode = downloadQRCode;
+
+// Funcionalidade "Mudar Horário"
+window.salvarPreferenciasHorario = salvarPreferenciasHorario;
+window.limparPreferenciasHorario = limparPreferenciasHorario;
