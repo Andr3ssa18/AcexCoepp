@@ -131,7 +131,7 @@
                                     Sábado
                                 </label>
                             </div>
-                            <button class="btn btn-primary btn-block" id="btn-todos-dias">TODOS</button>
+                            <button class="btn btn-primary btn-block" id="btn-todos-dias">Todos</button>
                         </div>
                     </div>
                     
@@ -157,7 +157,7 @@
                                     Noite
                                 </label>
                             </div>
-                            <button class="btn btn-primary btn-block" id="btn-todos-periodos">TODOS</button>
+                            <button class="btn btn-primary btn-block" id="btn-todos-periodos">Todos</button>
                         </div>
                     </div>
                     
@@ -167,7 +167,7 @@
                         </div>
                         <div class="card-content">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Ex: 14:00 às 16:00">
+                                <input type="text" class="form-control" placeholder="Ex: 14:00 às 16:00" maxlength="100">
                             </div>
                         </div>
                     </div>
@@ -290,11 +290,11 @@
                             <form id="form-contato">
                                 <div class="form-group">
                                     <label>Telefone</label>
-                                    <input type="tel" class="form-control" value="{{ estagiario.telefone_aluno }}" id="telefone">
+                                    <input type="tel" class="form-control" value="{{ estagiario.telefone_aluno }}" id="telefone" oninput="formatarTelefone(this)" maxlength="15">
                                 </div>
                                 <div class="form-group">
                                     <label>E-mail Pessoal</label>
-                                    <input type="email" class="form-control" value="{{ estagiario.email }}" id="email">
+                                    <input type="email" class="form-control" value="{{ estagiario.email }}" id="email" maxlength="100">
                                 </div>
                                 <div class="action-buttons">
                                     <button type="button" class="btn btn-primary" onclick="atualizarDadosContato()">Salvar Alterações</button>
@@ -311,15 +311,15 @@
                             <form id="form-senha">
                                 <div class="form-group">
                                     <label>Senha Atual</label>
-                                    <input type="password" class="form-control" id="senha-atual">
+                                    <input type="password" class="form-control" id="senha-atual" maxlength="20">
                                 </div>
                                 <div class="form-group">
                                     <label>Nova Senha</label>
-                                    <input type="password" class="form-control" id="nova-senha">
+                                    <input type="password" class="form-control" id="nova-senha" maxlength="20">
                                 </div>
                                 <div class="form-group">
                                     <label>Confirmar Nova Senha</label>
-                                    <input type="password" class="form-control" id="confirmar-senha">
+                                    <input type="password" class="form-control" id="confirmar-senha" maxlength="20">
                                 </div>
                                 <div class="action-buttons">
                                     <button type="button" class="btn btn-primary" onclick="alterarSenha()">Alterar Senha</button>
@@ -481,6 +481,25 @@
                 </div>
             </div>
 
+                <div id="pagina-admin" class="page">
+                    <div class="page-header">
+                        <h1>Administração</h1>
+                    </div>
+                    <div class="page-content">
+                        <div class="info-box">
+                            <p>Gerencie usuários e pacientes do sistema</p>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Gerenciar Usuários</h2>
+                            </div>
+                            <div class="card-content">
+                                <a href="/admin/gerenciar" class="btn btn-primary btn-lg">Gerenciar Usuários</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             <!-- Modal de Confirmação de Exclusão -->
             <div id="modalConfirmacao" class="modal">
                 <div class="modal-content">
@@ -523,8 +542,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger btn-lg" onclick="fecharModalConfirmacaoTriagem()">CANCELAR</button>
-                <button class="btn btn-primary btn-lg" onclick="confirmarTriagem()">CONFIRMAR</button>
+                <button class="btn btn-danger btn-lg" onclick="fecharModalConfirmacaoTriagem()">Cancelar</button>
+                <button class="btn btn-primary btn-lg" onclick="confirmarTriagem()">Confirmar</button>
             </div>
         </div>
     </div>
@@ -577,9 +596,27 @@
     <div id="toast" class="toast"></div>
     <script src="{{ url_for('static', filename='js/aba_estagiario.js') }}"></script>
     <script>
+
+        // Adicione esta função ao seu script existente
+        function mostrarPaginaAdmin() {
+            mostrarPagina('pagina-admin');
+        }
         // Função para abrir o modal de finalização de consulta
         function abrirModalFinalizarConsulta(consultaId) {
             document.getElementById('modal-finalizar-consulta').style.display = 'flex';
+        }
+
+        function formatarTelefone(input) {
+            let valor = input.value.replace(/\D/g, "");
+            if (valor.length > 11) valor = valor.slice(0, 11);
+
+            if (valor.length >= 1) {
+                valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+            }
+            if (valor.length > 10) {
+                valor = valor.slice(0, 10) + "-" + valor.slice(10);
+            }
+            input.value = valor;
         }
 
         // Função para fechar o modal de finalização de consulta
@@ -662,6 +699,7 @@
         }
     </script>
 
+
     <!-- Página de Ajuda -->
     <div id="pagina-ajuda" class="page">
         <div class="page-header">
@@ -669,7 +707,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                     <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
                 </svg>
-                VOLTAR
+                Voltar
             </button>
             <h1>Ajuda</h1>
             <div class="header-spacer"></div>
@@ -762,27 +800,6 @@
                             </li>
                         </ul>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Página de Administração -->
-    <div id="pagina-admin" class="page">
-        <div class="page-header">
-            <h1>Administração</h1>
-        </div>
-        <div class="page-content">
-            <div class="info-box">
-                <p>Gerencie usuários e pacientes do sistema</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <h2>Gerenciar Usuários</h2>
-                </div>
-                <div class="card-content">
-                    <a href="/admin/gerenciar" class="btn btn-primary btn-lg">Gerenciar Usuários</a>
                 </div>
             </div>
         </div>
