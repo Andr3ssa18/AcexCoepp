@@ -2,10 +2,10 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro do Paciente</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Seu CSS existente */
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
@@ -88,6 +88,115 @@
       width: 100px;
       height: auto;
     }
+
+    .erro {
+      border-color: #ff0000 !important;
+    }
+
+    .mensagem-erro {
+      color: #ff0000;
+      font-size: 12px;
+      margin-top: -8px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* Tablets (768px para baixo) */
+    @media (max-width: 768px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .cartao {
+        width: 100%;
+        max-width: 500px;
+        padding: 30px 20px;
+      }
+
+      .cartao h2 {
+        font-size: 22px;
+      }
+
+      .logo-img {
+        width: 80px;
+        top: 15px;
+        right: 15px;
+      }
+    }
+
+    /* Celulares (576px para baixo) */
+    @media (max-width: 576px) {
+      .cartao {
+        padding: 25px 15px;
+        margin: 10px;
+      }
+
+      .cartao h2 {
+        font-size: 20px;
+        padding-right: 90px;
+      }
+
+      .logo-img {
+        width: 70px;
+        top: 10px;
+        right: 10px;
+      }
+
+      .linha-inputs {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .cartao input,
+      .cartao select {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .botao-navegacao {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+      }
+
+      .linha-inputs input[style*="max-width: 120px"] {
+        max-width: 100px !important;
+      }
+    }
+
+    /* Celulares pequenos (400px para baixo) */
+    @media (max-width: 400px) {
+      .cartao {
+        padding: 20px 12px;
+      }
+
+      .cartao h2 {
+        font-size: 18px;
+        padding-right: 80px;
+      }
+
+      .logo-img {
+        width: 60px;
+      }
+
+      .cartao input,
+      .cartao select {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .botao-navegacao {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+
+      .linha-inputs input[style*="max-width: 120px"] {
+        max-width: 80px !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -96,38 +205,66 @@
 
     <h2>Paciente</h2>
 
-    <form action="/cadastroPaciente" method="post">
-        <input type="text" id="nome" name="nomeForm" placeholder="Nome completo" required>
+    <form id="formPaciente" action="/cadastroPaciente" method="post">
+        <!-- Nome -->
+        <input type="text" id="nome" name="nomeForm" placeholder="Nome completo" maxlength="100" required>
+        <span id="erroNome" class="mensagem-erro"></span>
 
+        <!-- Data de Nascimento e Gênero -->
         <div class="linha-inputs">
-            <input type="date" id="nascimento" name="dataNascimentoForm" placeholder="Data de nascimento" max="2020-12-31" required>
-            <select id="genero" name="generoForm" required>
-                <option value="">Selecione o gênero</option>
-                <option value="Feminino">Feminino</option>
-                <option value="Masculino">Masculino</option>
-                <option value="Outros">Outros</option>
-            </select>
+            <div style="flex: 1;">
+                <input type="date" id="nascimento" name="dataNascimentoForm" placeholder="Data de nascimento" max="" required>
+                <span id="erroNascimento" class="mensagem-erro"></span>
+            </div>
+            <div style="flex: 1;">
+                <select id="genero" name="generoForm" required>
+                    <option value="">Selecione o gênero</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">Masculino</option>
+                </select>
+                <span id="erroGenero" class="mensagem-erro"></span>
+            </div>
         </div>
 
+        <!-- CPF e Telefone -->
         <div class="linha-inputs">
-            <input type="text" id="cpf" name="cpfForm" placeholder="CPF" maxlength="14" oninput="formatarCPF(this)" required>
-            <input type="text" id="telefone" name="TelefoneForm" placeholder="(DDD) Telefone" maxlength="15" oninput="formatarTelefone(this)" required>
+            <div style="flex: 1;">
+                <input type="text" id="cpf" name="cpfForm" placeholder="CPF" maxlength="14" oninput="formatarCPF(this)" required>
+                <span id="erroCpf" class="mensagem-erro"></span>
+            </div>
+            <div style="flex: 1;">
+                <input type="text" id="telefone" name="TelefoneForm" placeholder="(DDD) Telefone" maxlength="15" oninput="formatarTelefone(this)" required>
+                <span id="erroTelefone" class="mensagem-erro"></span>
+            </div>
         </div>
 
-        <input type="email" id="email" name="emailForm" placeholder="E-mail" required>
+        <!-- E-mail -->
+        <input type="email" id="email" name="emailForm" placeholder="E-mail" maxlength="100" required>
+        <span id="erroEmail" class="mensagem-erro"></span>
+        
+        <!-- Endereço e Número -->
         <div class="linha-inputs">
-            <input type="text" id="endereco" name="enderecoForm" placeholder="Endereço" required>
-            <input type="text" id="numero" name="numeroCasaForm" placeholder="Número" style="max-width: 120px;" required>
+            <div style="flex: 1;">
+                <input type="text" id="endereco" name="enderecoForm" placeholder="Endereço" maxlength="150" required>
+                <span id="erroEndereco" class="mensagem-erro"></span>
+            </div>
+            <div style="flex: 1; max-width: 120px;">
+                <input type="text" id="numero" name="numeroCasaForm" placeholder="Número" maxlength="10" required>
+                <span id="erroNumero" class="mensagem-erro"></span>
+            </div>
         </div>
 
         <div class="botoes-navegacao">
             <button class="botao-navegacao" type="button" onclick="voltar()">&#8592;</button>
-            <button class="botao-navegacao" type="submit">&#8594;</button>
+            <button class="botao-navegacao" type="button" onclick="validarFormulario()">&#8594;</button>
         </div>
     </form>
   </div>
 
   <script>
+    // Configurar data máxima como hoje
+    document.getElementById('nascimento').max = new Date().toISOString().split('T')[0];
+
     function voltar() {
       window.history.back();
     }
@@ -155,6 +292,360 @@
 
       input.value = valor;
     }
+
+    function validarCPF(cpf) {
+      cpf = cpf.replace(/\D/g, '');
+      if (cpf.length !== 11 ||
+          cpf === "00000000000" ||
+          cpf === "11111111111" ||
+          cpf === "22222222222" ||
+          cpf === "33333333333" ||
+          cpf === "44444444444" ||
+          cpf === "55555555555" ||
+          cpf === "66666666666" ||
+          cpf === "77777777777" ||
+          cpf === "88888888888" ||
+          cpf === "99999999999") {
+          return false;
+      }
+      let soma = 0;
+      for (let i = 0; i < 9; i++) {
+          soma += parseInt(cpf.charAt(i)) * (10 - i);
+      }
+      let resto = 11 - (soma % 11);
+      if (resto === 10 || resto === 11) {
+          resto = 0;
+      }
+      if (resto !== parseInt(cpf.charAt(9))) {
+          return false;
+      }
+      soma = 0;
+      for (let i = 0; i < 10; i++) {
+          soma += parseInt(cpf.charAt(i)) * (11 - i);
+      }
+      resto = 11 - (soma % 11);
+      if (resto === 10 || resto === 11) {
+          resto = 0;
+      }
+      if (resto !== parseInt(cpf.charAt(10))) {
+          return false;
+      }
+      return true;
+    }
+
+    function validarEmail(email) {
+      // Regex mais precisa para validação de e-mail
+      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      
+      // Verifica se o e-mail corresponde ao padrão
+      if (!regex.test(email)) {
+        return false;
+      }
+      
+      // Verifica comprimento máximo
+      if (email.length > 254) {
+        return false;
+      }
+      
+      // Divide o e-mail em partes
+      const partes = email.split('@');
+      if (partes.length !== 2) {
+        return false;
+      }
+      
+      const [localPart, domainPart] = partes;
+      
+      // Valida parte local (antes do @)
+      if (localPart.length === 0 || localPart.length > 64) {
+        return false;
+      }
+      
+      // Valida domínio (depois do @)
+      if (domainPart.length === 0 || domainPart.length > 253) {
+        return false;
+      }
+      
+      // Verifica se o domínio tem pelo menos um ponto
+      if (domainPart.indexOf('.') === -1) {
+        return false;
+      }
+      
+      // Verifica se não começa ou termina com ponto
+      if (domainPart.startsWith('.') || domainPart.endsWith('.')) {
+        return false;
+      }
+      
+      // Verifica se não tem dois pontos consecutivos
+      if (domainPart.includes('..')) {
+        return false;
+      }
+      
+      // Lista de domínios inválidos ou provisórios
+      const dominiosInvalidos = [
+        'example.com',
+        'test.com',
+        'localhost',
+        'email.com',
+        'mail.com',
+        'email.com.br',
+        'teste.com',
+        'fake.com'
+      ];
+      
+      if (dominiosInvalidos.includes(domainPart.toLowerCase())) {
+        return false;
+      }
+      
+      return true;
+    }
+
+    function validarTelefone(telefone) {
+      const numeroLimpo = telefone.replace(/\D/g, '');
+      return numeroLimpo.length === 10 || numeroLimpo.length === 11;
+    }
+
+    function calcularIdade(dataNascimento) {
+      const hoje = new Date();
+      const nascimento = new Date(dataNascimento);
+      let idade = hoje.getFullYear() - nascimento.getFullYear();
+      const mes = hoje.getMonth() - nascimento.getMonth();
+      
+      if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+        idade--;
+      }
+      
+      return idade;
+    }
+
+    function limparErros() {
+      const erros = document.querySelectorAll('.mensagem-erro');
+      erros.forEach(erro => erro.textContent = '');
+      
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => input.classList.remove('erro'));
+    }
+
+    function exibirErro(campo, mensagem) {
+      const elementoErro = document.getElementById(`erro${campo}`);
+      if (elementoErro) {
+        elementoErro.textContent = mensagem;
+      }
+      const elementoInput = document.getElementById(campo.toLowerCase());
+      if (elementoInput) {
+        elementoInput.classList.add('erro');
+      }
+    }
+
+    function obterMensagemErroEmail(email) {
+      if (!email) {
+        return 'E-mail é obrigatório';
+      }
+      
+      // Verifica formato básico
+      if (!email.includes('@')) {
+        return 'E-mail deve conter @';
+      }
+      
+      const partes = email.split('@');
+      if (partes.length !== 2) {
+        return 'Formato de e-mail inválido';
+      }
+      
+      const [localPart, domainPart] = partes;
+      
+      // Verifica parte local
+      if (localPart.length === 0) {
+        return 'Parte local do e-mail não pode estar vazia';
+      }
+      
+      if (localPart.length > 64) {
+        return 'Parte local do e-mail muito longa';
+      }
+      
+      // Verifica domínio
+      if (domainPart.length === 0) {
+        return 'Domínio do e-mail não pode estar vazio';
+      }
+      
+      if (domainPart.length > 253) {
+        return 'Domínio do e-mail muito longo';
+      }
+      
+      if (!domainPart.includes('.')) {
+        return 'Domínio deve conter um ponto';
+      }
+      
+      if (domainPart.startsWith('.') || domainPart.endsWith('.')) {
+        return 'Domínio não pode começar ou terminar com ponto';
+      }
+      
+      if (domainPart.includes('..')) {
+        return 'Domínio não pode conter dois pontos consecutivos';
+      }
+      
+      // Verifica comprimento total
+      if (email.length > 254) {
+        return 'E-mail muito longo (máximo 254 caracteres)';
+      }
+      
+      return 'E-mail inválido';
+    }
+
+    function validarFormulario() {
+      limparErros();
+      
+      // Obter valores dos campos
+      const nome = document.getElementById('nome').value.trim();
+      const nascimento = document.getElementById('nascimento').value;
+      const genero = document.getElementById('genero').value;
+      const cpf = document.getElementById('cpf').value;
+      const telefone = document.getElementById('telefone').value;
+      const email = document.getElementById('email').value.trim();
+      const endereco = document.getElementById('endereco').value.trim();
+      const numero = document.getElementById('numero').value.trim();
+      
+      let valido = true;
+      
+      // Validar nome (campo obrigatório)
+      if (!nome) {
+        exibirErro('Nome', 'Nome completo é obrigatório');
+        valido = false;
+      }
+      // REMOVIDA A VALIDAÇÃO DE MÍNIMO DE 3 CARACTERES
+      
+      // Validar data de nascimento (campo obrigatório)
+      if (!nascimento) {
+        exibirErro('Nascimento', 'Data de nascimento é obrigatória');
+        valido = false;
+      } else {
+        const idade = calcularIdade(nascimento);
+        if (idade < 0) {
+          exibirErro('Nascimento', 'Data de nascimento não pode ser no futuro');
+          valido = false;
+        }
+      }
+      
+      // Validar gênero (campo obrigatório)
+      if (!genero) {
+        exibirErro('Genero', 'Gênero é obrigatório');
+        valido = false;
+      }
+      
+      // Validar CPF (campo obrigatório)
+      if (!cpf) {
+        exibirErro('Cpf', 'CPF é obrigatório');
+        valido = false;
+      } else if (!validarCPF(cpf)) {
+        exibirErro('Cpf', 'CPF inválido');
+        valido = false;
+      }
+      
+      // Validar telefone (campo obrigatório)
+      if (!telefone) {
+        exibirErro('Telefone', 'Telefone é obrigatório');
+        valido = false;
+      } else if (!validarTelefone(telefone)) {
+        exibirErro('Telefone', 'Telefone inválido');
+        valido = false;
+      }
+      
+      // Validar email (campo obrigatório)
+      if (!email) {
+        exibirErro('Email', 'E-mail é obrigatório');
+        valido = false;
+      } else if (!validarEmail(email)) {
+        const mensagemErro = obterMensagemErroEmail(email);
+        exibirErro('Email', mensagemErro);
+        valido = false;
+      }
+      
+      // Validar endereço (campo obrigatório)
+      if (!endereco) {
+        exibirErro('Endereco', 'Endereço é obrigatório');
+        valido = false;
+      }
+      
+      // Validar número (campo obrigatório)
+      if (!numero) {
+        exibirErro('Numero', 'Número é obrigatório');
+        valido = false;
+      } else if (!/^\d+$/.test(numero)) {
+        exibirErro('Numero', 'Número deve conter apenas dígitos');
+        valido = false;
+      }
+      
+      // Se todas as validações passaram
+      if (valido) {
+        const idade = calcularIdade(nascimento);
+        
+        // Se for menor de idade, redirecionar para termo de responsável
+        if (idade < 18) {
+          // Armazenar dados temporariamente (poderia ser em sessionStorage ou enviar para o servidor)
+          sessionStorage.setItem('dadosPaciente', JSON.stringify({
+            nome, nascimento, genero, cpf, telefone, email, endereco, numero
+          }));
+          
+          window.location.href = '/termo_responsavel';
+        } else {
+          // Se for maior de idade, enviar formulário normalmente
+          document.getElementById('formPaciente').submit();
+        }
+      }
+    }
+
+    // Validação em tempo real para campos obrigatórios
+    document.addEventListener('DOMContentLoaded', function() {
+      const camposObrigatorios = document.querySelectorAll('input[required], select[required]');
+      
+      camposObrigatorios.forEach(campo => {
+        campo.addEventListener('blur', function() {
+          const valor = this.value.trim();
+          const campoId = this.id;
+          
+          if (!valor) {
+            let mensagem = '';
+            
+            switch(campoId) {
+              case 'nome':
+                mensagem = 'Nome completo é obrigatório';
+                break;
+              case 'nascimento':
+                mensagem = 'Data de nascimento é obrigatória';
+                break;
+              case 'genero':
+                mensagem = 'Gênero é obrigatório';
+                break;
+              case 'cpf':
+                mensagem = 'CPF é obrigatório';
+                break;
+              case 'telefone':
+                mensagem = 'Telefone é obrigatório';
+                break;
+              case 'email':
+                mensagem = 'E-mail é obrigatório';
+                break;
+              case 'endereco':
+                mensagem = 'Endereço é obrigatório';
+                break;
+              case 'numero':
+                mensagem = 'Número é obrigatório';
+                break;
+              default:
+                mensagem = 'Este campo é obrigatório';
+            }
+            
+            exibirErro(campoId.charAt(0).toUpperCase() + campoId.slice(1), mensagem);
+          } else {
+            // Limpa o erro se o campo foi preenchido
+            const elementoErro = document.getElementById(`erro${campoId.charAt(0).toUpperCase() + campoId.slice(1)}`);
+            if (elementoErro) {
+              elementoErro.textContent = '';
+            }
+            this.classList.remove('erro');
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
