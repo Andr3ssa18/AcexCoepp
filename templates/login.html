@@ -192,6 +192,242 @@
             border: 1px solid #bee5eb;
         }
 
+        /* Link Esqueci Senha */
+        .forgot-password {
+            text-align: center;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .forgot-password a {
+            color: #074276;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: #333;
+            font-weight: 600;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .modal-instructions {
+            background-color: #f8f9fa;
+            border-left: 4px solid #074276;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+
+        .modal-instructions p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .password-strength-container {
+            margin-bottom: 20px;
+        }
+
+        .password-strength-bar {
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .password-strength-bar-inner {
+            height: 100%;
+            width: 0%;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .password-strength-text {
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+        }
+
+        .password-length-error {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .modal-btn-primary {
+            background-color: #074276;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background-color: #053157;
+            transform: scale(1.02);
+        }
+
+        .modal-btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .modal-success {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .modal-success-icon {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .modal-message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            display: none;
+        }
+
+        .modal-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .modal-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .modal-message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #074276;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Media Queries para Responsividade */
         @media (max-width: 1024px) {
             .welcome-section, .login-container {
@@ -228,6 +464,11 @@
             .logo-container img {
                 width: 180px;
             }
+
+            .modal-content {
+                padding: 20px;
+                margin: 20px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -263,6 +504,14 @@
             .logo-container img {
                 width: 150px;
             }
+
+            .modal-content {
+                padding: 15px;
+            }
+
+            .modal-title {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -295,7 +544,11 @@
 
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input type="password" id="password" name="password" maxlength="20" required>
+                    <input type="password" id="password" name="password" minlength="8" maxlength="20" required>
+                </div>
+
+                <div class="forgot-password">
+                    <a onclick="openForgotPasswordModal()">Esqueci minha senha</a>
                 </div>
 
                 <button type="submit" class="login-btn">Entrar</button>
@@ -308,5 +561,298 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Esqueci Senha -->
+    <div id="forgotPasswordModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Redefinir Senha</h2>
+                <button class="close-modal" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+            
+            <p class="modal-subtitle">Digite seu email para receber o link de redefinição</p>
+
+            <div id="forgotPasswordMessage" class="modal-message"></div>
+
+            <div class="modal-instructions">
+                <p><strong>Como funciona:</strong></p>
+                <p>1. Digite seu email cadastrado</p>
+                <p>2. Enviaremos um link de redefinição</p>
+                <p>3. Clique no link e crie uma nova senha</p>
+            </div>
+
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotEmail">Email cadastrado</label>
+                    <input type="email" id="forgotEmail" name="email" required maxlength="100" placeholder="E-mail">
+                </div>
+
+                <div class="loading" id="forgotPasswordLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Enviando email...</p>
+                </div>
+
+                <button type="submit" class="modal-btn modal-btn-primary" id="forgotPasswordSubmit">Enviar Link de Redefinição</button>
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="closeForgotPasswordModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Redefinir Senha -->
+    <div id="resetPasswordModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Criar Nova Senha</h2>
+                <button class="close-modal" onclick="closeResetPasswordModal()">&times;</button>
+            </div>
+            
+            <div id="resetPasswordMessage" class="modal-message"></div>
+
+            <form id="resetPasswordForm">
+                <input type="hidden" id="resetToken" name="token">
+                
+                <div class="form-group">
+                    <label for="newPassword">Nova Senha</label>
+                    <input type="password" id="newPassword" name="nova_senha" required minlength="8" maxlength="20" placeholder="Digite sua nova senha">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Nova Senha</label>
+                    <input type="password" id="confirmPassword" name="confirmar_senha" required minlength="8" maxlength="20" placeholder="Digite novamente a nova senha">
+                </div>
+
+                <div class="loading" id="resetPasswordLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Redefinindo senha...</p>
+                </div>
+
+                <button type="submit" class="modal-btn modal-btn-primary" id="resetPasswordSubmit">Redefinir Senha</button>
+                <button type="button" class="modal-btn modal-btn-secondary" onclick="closeResetPasswordModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Sucesso -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-success">
+                <div class="modal-success-icon">✓</div>
+                <h2 class="modal-title">Email Enviado!</h2>
+                <p>Enviamos um link de redefinição para seu email.</p>
+                <p>Verifique sua caixa de entrada e siga as instruções.</p>
+                <button type="button" class="modal-btn modal-btn-primary" onclick="closeSuccessModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funções para controlar os modais
+        function openForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('active');
+            hideMessage('forgotPasswordMessage');
+            document.getElementById('forgotEmail').value = '';
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('active');
+        }
+
+        function openResetPasswordModal(token) {
+            document.getElementById('resetToken').value = token;
+            document.getElementById('resetPasswordModal').classList.add('active');
+            hideMessage('resetPasswordMessage');
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.remove('active');
+        }
+
+        function openSuccessModal() {
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+            closeForgotPasswordModal();
+        }
+
+        // Fechar modal ao clicar fora do conteúdo
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Formulário Esqueci Senha
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgotEmail').value;
+            const submitBtn = document.getElementById('forgotPasswordSubmit');
+            const loading = document.getElementById('forgotPasswordLoading');
+            
+            if (!email) {
+                showMessage('forgotPasswordMessage', 'Por favor, digite seu email.', 'error');
+                return;
+            }
+
+            // Validação robusta de email
+            if (!isValidEmail(email)) {
+                showMessage('forgotPasswordMessage', 'Por favor, digite um email válido.', 'error');
+                return;
+            }
+
+            // Mostrar loading
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            hideMessage('forgotPasswordMessage');
+
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+
+                const response = await fetch('/esqueci-senha', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                console.log('Resposta do servidor:', data);
+
+                if (data.success === true) {
+                    openSuccessModal();
+                } else {
+                    const errorMsg = data.error || data.message || 'Erro ao enviar email. Tente novamente.';
+                    const lowerError = errorMsg.toLowerCase();
+                    
+                    if (lowerError.includes('não cadastrado') || 
+                        lowerError.includes('não encontrado') ||
+                        lowerError.includes('email não existe') ||
+                        lowerError.includes('usuário não encontrado') ||
+                        lowerError.includes('email não cadastrado')) {
+                        showMessage('forgotPasswordMessage', 'Email não cadastrado no sistema.', 'error');
+                    } else {
+                        showMessage('forgotPasswordMessage', errorMsg, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('forgotPasswordMessage', 'Erro de conexão. Tente novamente.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        // Formulário Redefinir Senha - SIMPLIFICADO
+        document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const token = document.getElementById('resetToken').value;
+            const submitBtn = document.getElementById('resetPasswordSubmit');
+            const loading = document.getElementById('resetPasswordLoading');
+            
+            if (!newPassword || !confirmPassword) {
+                showMessage('resetPasswordMessage', 'Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+
+            // Apenas verifica se tem pelo menos 8 caracteres
+            if (newPassword.length < 8) {
+                showMessage('resetPasswordMessage', 'A senha deve ter no mínimo 8 caracteres.', 'error');
+                return;
+            }
+
+            if (newPassword.length > 20) {
+                showMessage('resetPasswordMessage', 'A senha deve ter no máximo 20 caracteres.', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showMessage('resetPasswordMessage', 'As senhas não são iguais', 'error');
+                return;
+            }
+
+            // Mostrar loading
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                const formData = new FormData();
+                formData.append('token', token);
+                formData.append('nova_senha', newPassword);
+                formData.append('confirmar_senha', confirmPassword);
+
+                const response = await fetch('/redefinir-senha', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('resetPasswordMessage', 'Senha redefinida com sucesso! Redirecionando...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showMessage('resetPasswordMessage', data.error || 'Erro ao redefinir senha. Tente novamente.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('resetPasswordMessage', 'Erro de conexão. Tente novamente.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        // Função para validação de email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Função para mostrar mensagens
+        function showMessage(elementId, text, type) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = text;
+            messageDiv.className = `modal-message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideMessage(elementId) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.style.display = 'none';
+        }
+
+        // Verificar se há token na URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            if (token && token.length > 10) {
+                openResetPasswordModal(token);
+            }
+        });
+
+        // Tecla ESC para fechar modais
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeForgotPasswordModal();
+                closeResetPasswordModal();
+                closeSuccessModal();
+            }
+        });
+    </script>
 </body>
 </html>
