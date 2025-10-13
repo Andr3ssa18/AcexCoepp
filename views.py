@@ -7,7 +7,7 @@ import datetime # Adicionado para conversão de data
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate 
 from flask import request, jsonify, session
-from email_utils import enviar_email_confirmacao_consulta
+from email_utils import enviar_email_confirmacao_consulta, gerar_token_redefinicao, validar_token_redefinicao, marcar_token_como_usado, enviar_email_redefinicao_senha, verificar_email_existe
 
 
 
@@ -1115,3 +1115,83 @@ def teste_email():
         return jsonify({
             'error': f'❌ Erro: {str(e)}'
         }), 500
+
+# =============================================================================
+# ROTAS DE REDEFINIÇÃO DE SENHA - CORRIGIDAS
+# =============================================================================
+
+@app.route('/esqueci-senha', methods=['POST'])
+def esqueci_senha():
+    try:
+        email = request.form.get('email')
+        
+        if not email:
+            return jsonify({'success': False, 'error': 'Email é obrigatório.'}), 400
+
+        # Verificar se o email existe no sistema (paciente ou estagiário)
+        if not verificar_email_existe(email):
+            return jsonify({'success': False, 'error': 'Email não cadastrado no sistema.'}), 404
+
+        # Gerar token de redefinição
+        token = gerar_token_redefinicao(email)
+        
+        if not token:
+            return jsonify({'success': False, 'error': 'Erro ao gerar token de redefinição. Tente novamente.'}), 500
+
+        # Enviar email com link de redefinição
+        reset_url = url_for('login', token=token, _external=True)
+        
+        if enviar_email_redefinicao_senha(email, reset_url):
+            return jsonify({'success': True, 'message': 'Email enviado com sucesso!'})
+        else:
+            return jsonify({'success': False, 'error': 'Erro ao enviar email. Tente novamente.'}), 500
+            
+    except Exception as e:
+        print(f"Erro em esqueci_senha: {str(e)}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor.'}), 500
+
+@app.route('/redefinir-senha', methods=['POST'])
+def redefinir_senha():
+    try:
+        token = request.form.get('token')
+        nova_senha = request.form.get('nova_senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        
+        if not token or not nova_senha or not confirmar_senha:
+            return jsonify({'success': False, 'error': 'Todos os campos são obrigatórios.'}), 400
+
+        # Validar token
+        email = validar_token_redefinicao(token)
+        
+        if not email:
+            return jsonify({'success': False, 'error': 'Link inválido ou expirado. Solicite um novo link.'}), 400
+        
+        if nova_senha != confirmar_senha:
+            return jsonify({'success': False, 'error': 'As senhas não coincidem.'}), 400
+        
+        if len(nova_senha) < 8:
+            return jsonify({'success': False, 'error': 'A senha deve ter no mínimo 8 caracteres.'}), 400
+        
+        # Atualizar senha no banco de dados
+        paciente = Paciente.query.filter_by(email=email).first()
+        estagiario = Estagiario.query.filter_by(emailfsa=email).first()
+        
+        hashed_senha = generate_password_hash(nova_senha, method='pbkdf2:sha256')
+        
+        if paciente:
+            paciente.senha = hashed_senha
+        elif estagiario:
+            estagiario.senha = hashed_senha
+        else:
+            return jsonify({'success': False, 'error': 'Usuário não encontrado.'}), 404
+        
+        # Marcar token como usado
+        marcar_token_como_usado(token)
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Senha redefinida com sucesso!'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao redefinir senha: {str(e)}")
+        return jsonify({'success': False, 'error': 'Erro ao redefinir senha. Tente novamente.'}), 500
