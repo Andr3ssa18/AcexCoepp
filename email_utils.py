@@ -384,7 +384,7 @@ def gerar_token_redefinicao(email):
     """
     try:
         token = secrets.token_urlsafe(32)
-        expires_at = datetime.now() + timedelta(hours=1)  # ✅ 1 HORA DE DURAÇÃO
+        expires_at = datetime.now() + timedelta(minutes=30) 
         
         # Armazenar token temporariamente
         password_reset_tokens[token] = {
@@ -679,7 +679,7 @@ def enviar_email_redefinicao_senha(email, reset_url):
             <div class="security-note">
                 <strong>⚠️ Informações Importantes:</strong>
                 <ul>
-                    <li>Este link é válido por <strong>1 hora</strong></li>  <!-- ✅ 1 HORA -->
+                    <li>Este link é válido por <strong>30 minutos</strong></li> 
                     <li>Se você não solicitou esta redefinição, ignore este email</li>
                     <li>Nunca compartilhe seu link de redefinição com outras pessoas</li>
                     <li>Após redefinir, faça login com sua nova senha</li>
@@ -717,7 +717,7 @@ Para criar uma nova senha, acesse o link abaixo:
 {reset_url}
 
 INFORMAÇÕES IMPORTANTES:
-• Este link é válido por 1 hora  
+• Este link é válido por 30 minutos  
 • Se você não solicitou esta redefinição, ignore este email
 • Nunca compartilhe seu link de redefinição com outras pessoas
 • Após redefinir, faça login com sua nova senha
