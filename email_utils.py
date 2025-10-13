@@ -717,6 +717,7 @@ Para criar uma nova senha, acesse o link abaixo:
 {reset_url}
 
 INFORMAÇÕES IMPORTANTES:
+• Este link é válido por 1 hora  
 • Se você não solicitou esta redefinição, ignore este email
 • Nunca compartilhe seu link de redefinição com outras pessoas
 • Após redefinir, faça login com sua nova senha
