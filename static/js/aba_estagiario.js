@@ -73,6 +73,7 @@ async function carregarConsultas() {
     }
 }
 
+// Função corrigida para confirmar triagem
 async function confirmarTriagemAPI(solicitacaoId, dataAgendamento, observacoes) {
     try {
         const response = await fetch(`/api/estagiario/agendamentos/confirmar/${solicitacaoId}`, {
@@ -92,13 +93,105 @@ async function confirmarTriagemAPI(solicitacaoId, dataAgendamento, observacoes) 
             throw new Error(data.error || 'Erro ao confirmar triagem');
         }
 
-        mostrarToast('Triagem confirmada com sucesso!', 'success');
+        mostrarToast('Triagem confirmada com sucesso! A consulta agora aparece para o paciente.', 'success');
         await carregarSolicitacoes(); // Recarrega a lista de solicitações
         fecharModalConfirmacaoTriagem(); // Fecha o modal após a confirmação
+        
+        // Opcional: Recarregar também as consultas do estagiário
+        await carregarConsultas();
+        
     } catch (error) {
         console.error('Erro ao confirmar triagem:', error);
         mostrarToast(error.message || 'Erro ao confirmar triagem', 'error');
     }
+}
+
+// Função melhorada para carregar consultas do estagiário
+async function carregarConsultas() {
+    try {
+        const response = await fetch('/api/estagiario/consultas');
+        const consultas = await response.json();
+        
+        if (response.ok && consultas) {
+            atualizarListaConsultas(consultas);
+        } else {
+            console.error('Erro ao carregar consultas:', consultas.error || 'Erro desconhecido');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar consultas:', error);
+        mostrarToast('Erro ao carregar consultas', 'error');
+    }
+}
+
+// Função melhorada para atualizar a lista de consultas
+function atualizarListaConsultas(consultas) {
+    const consultasContainer = document.querySelector('.consultas-dia');
+    
+    if (!consultasContainer) {
+        console.error('Container de consultas não encontrado');
+        return;
+    }
+    
+    if (!consultas || consultas.length === 0) {
+        consultasContainer.innerHTML = `
+            <h3>Consultas do dia</h3>
+            <div class="info-message">
+                <p>Nenhuma consulta agendada para hoje.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Filtrar consultas confirmadas
+    const consultasConfirmadas = consultas.filter(consulta => 
+        consulta.status === 'confirmado' || consulta.status === 'agendado'
+    );
+    
+    if (consultasConfirmadas.length === 0) {
+        consultasContainer.innerHTML = `
+            <h3>Consultas do dia</h3>
+            <div class="info-message">
+                <p>Nenhuma consulta confirmada para hoje.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <h3>Consultas Confirmadas</h3>
+        <div class="consultas-lista">
+    `;
+    
+    consultasConfirmadas.forEach(consulta => {
+        const dataFormatada = consulta.data_agendamento ? 
+            new Date(consulta.data_agendamento).toLocaleDateString('pt-BR') : 'Data a definir';
+        const horarioFormatado = consulta.data_agendamento ? 
+            new Date(consulta.data_agendamento).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Horário a definir';
+        
+        html += `
+            <div class="consulta-item status-confirmado">
+                <div class="consulta-header">
+                    <h4>Consulta com ${consulta.paciente_nome || 'Paciente'}</h4>
+                    <span class="status-badge status-confirmado">Confirmada</span>
+                </div>
+                <div class="consulta-details">
+                    <p><strong>Data:</strong> ${dataFormatada}</p>
+                    <p><strong>Horário:</strong> ${horarioFormatado}</p>
+                    <p><strong>Paciente:</strong> ${consulta.paciente_nome || 'N/A'}</p>
+                    <p><strong>Tipo:</strong> ${consulta.tipo_atendimento}</p>
+                    ${consulta.observacoes_estagiario ? `<p><strong>Observações:</strong> ${consulta.observacoes_estagiario}</p>` : ''}
+                </div>
+                <div class="consulta-actions">
+                    <button class="btn btn-primary" onclick="finalizarConsulta(${consulta.id})">
+                        Finalizar Consulta
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    consultasContainer.innerHTML = html;
 }
 
 async function salvarDisponibilidadeAPI(disponibilidade) {
