@@ -55,7 +55,8 @@
             <div class="header-spacer"></div>
         </div>
         <div class="card-container" id="container-meus-agendamentos">
-            </div>
+            <!-- Consultas serão carregadas dinamicamente -->
+        </div>
         <div id="no-appointments-message" class="info-message">
             <div class="icon-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -262,49 +263,38 @@
                 <h3>Mudar Horário de Preferência</h3>
                 <p class="description">Selecione seus horários preferenciais para futuros agendamentos. Isso nos ajudará a oferecer opções que melhor se adequem à sua disponibilidade.</p>
 
-                <div class="selection-form-group">
-                    <label for="mudar-dia-semana">Dia da Semana Preferido*</label>
-                    <select id="mudar-dia-semana">
-                        <option value="">Selecione o Dia da Semana</option>
-                        <option value="Segunda-feira">Segunda-feira</option>
-                        <option value="Terça-feira">Terça-feira</option>
-                        <option value="Quarta-feira">Quarta-feira</option>
-                        <option value="Quinta-feira">Quinta-feira</option>
-                        <option value="Sexta-feira">Sexta-feira</option>
-                        <option value="Sábado">Sábado</option>
-                    </select>
-                    <span class="error-message" id="error-mudar-dia-semana"></span>
-                </div>
-
-                <div class="selection-form-group">
-                    <label for="mudar-periodo">Período Preferido*</label>
-                    <select id="mudar-periodo">
-                        <option value="">Selecione o Período</option>
-                        <option value="Manhã">Manhã (08:00 - 12:00)</option>
-                        <option value="Tarde">Tarde (13:00 - 17:00)</option>
-                        <option value="Noite">Noite (18:00 - 22:00)</option>
-                    </select>
-                    <span class="error-message" id="error-mudar-periodo"></span>
-                </div>
-
-                <div class="selection-form-group">
-                    <label>Horários Preferidos*</label>
-                    <div class="time-slots-grid" id="mudar-time-slots-grid">
-                        <!-- Horários serão gerados dinamicamente -->
+                <!-- Dias da Semana -->
+                <div class="selection-container">
+                    <h3>Dias da Semana Preferidos</h3>
+                    <div class="selection-buttons-grid" id="mudar-dias-semana-container">
+                        <!-- Botões serão gerados dinamicamente -->
                     </div>
-                    <span class="error-message" id="error-mudar-horario-especifico"></span>
+                    <span class="error-message" id="error-mudar-dias-semana" style="display: none;">Por favor, selecione pelo menos um dia</span>
                 </div>
 
-                <div class="preference-summary" id="mudar-preference-summary" style="display: none;">
-                    <h4>Preferência Selecionada:</h4>
-                    <p><strong>Dia da Semana:</strong> <span id="mudar-selected-weekday-display"></span></p>
-                    <p><strong>Período:</strong> <span id="mudar-selected-period-display"></span></p>
-                    <p><strong>Horário:</strong> <span id="mudar-selected-time-display"></span></p>
+                <!-- Períodos -->
+                <div class="selection-container">
+                    <h3>Períodos Preferidos</h3>
+                    <div class="selection-buttons-grid" id="mudar-periodos-container">
+                        <!-- Botões serão gerados dinamicamente -->
+                    </div>
+                    <span class="error-message" id="error-mudar-periodos" style="display: none;">Por favor, selecione pelo menos um período</span>
                 </div>
 
-                <div class="action-buttons">
-                    <button class="action-button secondary" onclick="limparPreferenciasHorario()">Limpar</button>
-                    <button class="action-button primary">Salvar Preferências</button>
+                <!-- Horários Específicos -->
+                <div class="selection-container" id="mudar-horarios-especificos-container" style="display: none;">
+                    <h3>Horários Específicos Preferidos</h3>
+                    <!-- Horários serão gerados dinamicamente baseado nas seleções anteriores -->
+                    <span class="error-message" id="error-mudar-horarios-especificos" style="display: none;">Por favor, selecione pelo menos um horário específico</span>
+                </div>
+
+                <!-- Resumo da Seleção -->
+                <div class="schedule-summary" id="mudar-schedule-summary" style="display: none;">
+                    <h3>Resumo das Preferências</h3>
+                    <div id="mudar-selected-preferences-display">
+                        <!-- Resumo será gerado dinamicamente -->
+                    </div>
+                    <button class="action-button primary" id="mudar-confirm-selection-button" onclick="salvarPreferenciasHorario()">Salvar Preferências</button>
                 </div>
             </div>
         </div>
@@ -438,11 +428,64 @@
         </div>
     </div>
 
+    <!-- Página de Horários de Triagem - NOVA VERSÃO COM SELEÇÃO MÚLTIPLA -->
+    <div id="pagina-horarios-triagem" class="page">
+        <div class="page-header">
+            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
+                </svg>
+                Voltar
+            </button>
+            <div class="main-title">Selecione sua Disponibilidade</div>
+            <div class="header-spacer"></div>
+        </div>
+        
+        <div class="horarios-triagem-container">
+            <p class="horarios-description">Selecione os dias, períodos e horários em que você está disponível para a triagem.</p>
+
+            <!-- Dias da Semana -->
+            <div class="selection-container">
+                <h3>Dias da Semana</h3>
+                <div class="selection-buttons-grid" id="dias-semana-container">
+                    <!-- Botões serão gerados dinamicamente -->
+                </div>
+                <span class="error-message" id="error-dias-semana" style="display: none;">Por favor, selecione pelo menos um dia</span>
+            </div>
+
+            <!-- Períodos -->
+            <div class="selection-container">
+                <h3>Períodos</h3>
+                <div class="selection-buttons-grid" id="periodos-container">
+                    <!-- Botões serão gerados dinamicamente -->
+                </div>
+                <span class="error-message" id="error-periodos" style="display: none;">Por favor, selecione pelo menos um período</span>
+            </div>
+
+            <!-- Horários Específicos -->
+            <div class="selection-container" id="horarios-especificos-container" style="display: none;">
+                <h3>Horários Específicos</h3>
+                <!-- Horários serão gerados dinamicamente baseado nas seleções anteriores -->
+                <span class="error-message" id="error-horarios-especificos" style="display: none;">Por favor, selecione pelo menos um horário específico</span>
+            </div>
+
+            <!-- Resumo da Seleção -->
+            <div class="schedule-summary" id="schedule-summary" style="display: none;">
+                <h3>Resumo da Disponibilidade</h3>
+                <div id="selected-preferences-display">
+                    <!-- Resumo será gerado dinamicamente -->
+                </div>
+                <button class="action-button primary" id="confirm-selection-button" onclick="validarEabrirModalTriagem()">Confirmar Horários</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-detalhes-consulta" class="modal-overlay">
         <div class="modal-content">
             <h2>Detalhes da Consulta</h2>
             <div id="detalhes-consulta-conteudo">
-                </div>
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
             <div class="modal-action-buttons">
                 <button class="action-button secondary" onclick="fecharModalDetalhes()">Fechar</button>
             </div>
@@ -451,11 +494,14 @@
 
     <div id="modal-triagem" class="modal-overlay">
         <div class="modal-content">
-            <h2>Confirmar Solicitação</h2>
-            <p>Deseja solicitar triagem para <span id="triagem-info-confirmacao"></span>?</p>
+            <h2>Confirmar Solicitação de Triagem</h2>
+            <p>Confirme sua disponibilidade para a triagem:</p>
+            <div id="triagem-info-confirmacao">
+                <!-- Informações serão preenchidas dinamicamente -->
+            </div>
             <div class="modal-action-buttons">
                 <button class="action-button secondary" onclick="fecharModalTriagem()">Cancelar</button>
-                <button class="action-button primary" id="btn-confirmar-envio-triagem" onclick="enviarSolicitacaoTriagem()">Confirmar</button>
+                <button class="action-button primary" id="btn-confirmar-envio-triagem" onclick="enviarSolicitacaoTriagem()">Confirmar Solicitação</button>
             </div>
         </div>
     </div>
@@ -475,61 +521,6 @@
         </div>
     </div>
 
-    <div id="pagina-horarios-triagem" class="page">
-        <div class="page-header">
-            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
-                </svg>
-                Voltar
-            </button>
-            <div class="main-title">Selecione um Horário</div>
-            <div class="header-spacer"></div>
-        </div>
-        <div class="horarios-triagem-container">
-            <p class="horarios-description">Escolha o melhor dia e período para o seu atendimento de triagem.</p>
-
-            <div class="selection-form-group">
-                <label for="select-dia-semana">Dia da Semana*</label>
-                <select id="select-dia-semana" onchange="atualizarHorariosDisponiveis()">
-                    <option value="">Selecione o Dia da Semana</option>
-                    <option value="Segunda-feira">Segunda-feira</option>
-                    <option value="Terça-feira">Terça-feira</option>
-                    <option value="Quarta-feira">Quarta-feira</option>
-                    <option value="Quinta-feira">Quinta-feira</option>
-                    <option value="Sexta-feira">Sexta-feira</option>
-                    <option value="Sábado">Sábado</option>
-                </select>
-                <span class="error-message" id="error-dia-semana"></span>
-            </div>
-
-            <div class="selection-form-group">
-                <label for="select-periodo">Período*</label>
-                <select id="select-periodo" onchange="atualizarHorariosDisponiveis()">
-                    <option value="">Selecione o Período</option>
-                    <option value="Manhã">Manhã (08:00 - 12:00)</option>
-                    <option value="Tarde">Tarde (13:00 - 17:00)</option>
-                    <option value="Noite">Noite (18:00 - 22:00)</option>
-                </select>
-                <span class="error-message" id="error-periodo"></span>
-            </div>
-
-            <div class="selection-form-group">
-                <label for="select-horario-especifico">Horário Específico*</label>
-                <div class="time-slots-grid" id="time-slots-grid">
-                    </div>
-                <span class="error-message" id="error-horario-especifico"></span>
-            </div>
-
-            <div class="schedule-summary" id="schedule-summary" style="display: none;">
-                <p><strong>Dia da Semana Selecionado:</strong> <span id="selected-weekday-display"></span></p>
-                <p><strong>Período Selecionado:</strong> <span id="selected-period-display"></span></p>
-                <p><strong>Horário Selecionado:</strong> <span id="selected-time-display"></span></p>
-                <button class="action-button primary" id="confirm-selection-button" onclick="validarEabrirModalTriagem()">Confirmar Horário</button>
-            </div>
-        </div>
-    </div>
-
     <div id="modal-confirmar-presenca" class="modal-overlay">
         <div class="modal-content">
             <h2>Confirmar Presença</h2>
@@ -541,7 +532,7 @@
         </div>
     </div>
 
-    <!-- Nova página de consulta confirmada -->
+    <!-- Página de consulta confirmada -->
     <div id="pagina-consulta-confirmada" class="page consulta-confirmada-page">
         <div class="consulta-confirmada-container">
             <h1 class="consulta-confirmada-titulo">Consulta Confirmada!</h1>
@@ -666,4 +657,3 @@
     <script src="{{ url_for('static', filename='js/aba_paciente.js') }}"></script>
 </body>
 </html>
-
