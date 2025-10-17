@@ -141,56 +141,29 @@
                     </svg></span>
                 <span>Aluno</span>
             </button>
-            <button class="user-button">
-                <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                        viewBox="0 0 16 16">
-                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-                    </svg></span>
-                <span>Mestre</span>
-            </button>
+            <button class="user-button back-button"><span>Voltar</span></button>
         </div>
-
-        <div class="next-button-container">
-            <button class="next-button"></button>
-        </div>
-    </div>
 
     <script>
-        let selectedUserType = null;
-
-        document.querySelectorAll('.user-button').forEach(button => {
+        // Clique direto: vai para a tela correspondente
+        document.querySelectorAll('.user-button:not(.back-button)').forEach(button => {
             button.addEventListener('click', function () {
-
-                document.querySelectorAll('.user-button').forEach(btn => {
-                    btn.style.backgroundColor = '#074276';
-                });
-
-                this.style.backgroundColor = '#053052';
-
-                selectedUserType = this.querySelector('span:last-child').textContent.trim();
+                const label = this.querySelector('span:last-child').textContent.trim();
+                if (label === 'Paciente') {
+                    window.location.href = '/cadastroPaciente';
+                } else if (label === 'Aluno') {
+                    window.location.href = '/cadastroaluno';
+                }
             });
         });
 
-        document.querySelector('.next-button').addEventListener('click', function () {
-            if (!selectedUserType) {
-                alert('Por favor, selecione um tipo de usuário antes de continuar');
-                return;
-            }
-
-            switch(selectedUserType) {
-                case 'Paciente':
-                    window.location.href = '/cadastroPaciente';
-                    break;
-                case 'Aluno':
-                    window.location.href = 'cadastroaluno';
-                    break;
-                case 'Mestre':
-                    window.location.href = '/cadastroMestre';
-                    break;
-                default:
-                    alert('Tipo de usuário não reconhecido');
-            }
-        });
+        // Ação do botão Voltar
+        const backButton = document.querySelector('.back-button');
+        if (backButton) {
+            backButton.addEventListener('click', function () {
+                window.history.back();
+            });
+        }
     </script>
 </body>
 </html>

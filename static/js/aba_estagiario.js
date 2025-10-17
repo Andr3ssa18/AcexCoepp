@@ -704,11 +704,6 @@ function buscarPaciente() {
     const searchInput = document.querySelector('.search-input');
     const prontuariosList = document.querySelector('.prontuarios-list');
     
-    if (!searchInput || !prontuariosList) {
-        console.error('Elementos de busca não encontrados');
-        return;
-    }
-    
     // Limpa o timeout anterior se existir
     if (searchTimeout) {
         clearTimeout(searchTimeout);
@@ -718,32 +713,17 @@ function buscarPaciente() {
     searchTimeout = setTimeout(async () => {
         const nome = searchInput.value.trim();
         
-        // Mostra mensagem informativa para busca mínima
-        if (nome.length === 0) {
-            prontuariosList.innerHTML = '<div class="info-message">Digite o nome do paciente para buscar.</div>';
-            return;
-        }
-        
         if (nome.length < 3) {
             prontuariosList.innerHTML = '<div class="info-message">Digite pelo menos 3 caracteres para buscar.</div>';
             return;
         }
         
         try {
-            // Mostra loading enquanto busca
-            prontuariosList.innerHTML = '<div class="loading">Buscando pacientes...</div>';
-            
             const response = await fetch(`/api/estagiario/buscar-paciente?nome=${encodeURIComponent(nome)}`);
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
-                throw new Error(errorData.error || `Erro ${response.status}: ${response.statusText}`);
-            }
-
             const data = await response.json();
             
-            if (!data || !Array.isArray(data)) {
-                throw new Error('Resposta inválida da API');
+            if (!response.ok) {
+                throw new Error(data.error || 'Erro ao buscar pacientes');
             }
             
             if (data.length === 0) {
@@ -751,134 +731,29 @@ function buscarPaciente() {
                 return;
             }
             
-            // Exibe os resultados com tratamento seguro para dados ausentes
-            prontuariosList.innerHTML = data.map(paciente => {
-                // Validação segura dos dados do paciente
-                const nomePaciente = paciente.nome || 'Nome não informado';
-                const emailPaciente = paciente.email || 'Email não informado';
-                const telefonePaciente = paciente.telefone || 'Telefone não informado';
-                const consultas = Array.isArray(paciente.consultas) ? paciente.consultas : [];
-
-                return `
-                    <div class="prontuario-item">
-                        <div class="prontuario-info">
-                            <h3>${nomePaciente}</h3>
-                            <p><strong>Email:</strong> ${emailPaciente}</p>
-                            <p><strong>Telefone:</strong> ${telefonePaciente}</p>
-                            ${consultas.length > 0 ? `
-                                <div class="consultas-previas">
-                                    <h4>Consultas Anteriores:</h4>
-                                    ${consultas.map(consulta => {
-                                        const dataConsulta = consulta.data || 'Data não informada';
-                                        const observacoesConsulta = consulta.observacoes || 'Sem observações';
-                                        return `
-                                            <div class="consulta-previa">
-                                                <p><strong>Data:</strong> ${dataConsulta}</p>
-                                                <p><strong>Observações:</strong> ${observacoesConsulta}</p>
-                                            </div>
-                                        `;
-                                    }).join('')}
+            // Exibe os resultados
+            prontuariosList.innerHTML = data.map(paciente => `
+                <div class="prontuario-item">
+                    <div class="prontuario-info">
+                        <h3>${paciente.nome}</h3>
+                        <p>Email: ${paciente.email}</p>
+                        <p>Telefone: ${paciente.telefone}</p>
+                        <div class="consultas-previas">
+                            <h4>Consultas Anteriores:</h4>
+                            ${paciente.consultas.map(consulta => `
+                                <div class="consulta-previa">
+                                    <p><strong>Data:</strong> ${consulta.data}</p>
+                                    <p><strong>Observações:</strong> ${consulta.observacoes || 'Sem observações'}</p>
                                 </div>
-                            ` : '<p class="no-consultas">Nenhuma consulta anterior registrada.</p>'}
+                            `).join('')}
                         </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
             
         } catch (error) {
             console.error('Erro ao buscar pacientes:', error);
-            prontuariosList.innerHTML = `
-                <div class="error-message">
-                    <p>Erro ao buscar pacientes: ${error.message}</p>
-                    <button class="btn btn-secondary" onclick="buscarPaciente()">Tentar Novamente</button>
-                </div>
-            `;
+            prontuariosList.innerHTML = `<div class="error-message">Erro ao buscar pacientes: ${error.message}</div>`;
         }
     }, 500);
-}
-
-// Função para abrir o modal de finalização de consulta
-function abrirModalFinalizarConsulta(consultaId) {
-    document.getElementById('modal-finalizar-consulta').style.display = 'flex';
-}
-
-function formatarTelefone(input) {
-    let valor = input.value.replace(/\D/g, "");
-    if (valor.length > 11) valor = valor.slice(0, 11);
-
-    if (valor.length >= 1) {
-        valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
-    }
-    if (valor.length > 10) {
-        valor = valor.slice(0, 10) + "-" + valor.slice(10);
-    }
-    input.value = valor;
-}
-
-// Função para fechar o modal de finalização de consulta
-function fecharModalFinalizarConsulta() {
-    document.getElementById('modal-finalizar-consulta').style.display = 'none';
-}
-
-// Função para confirmar a finalização da consulta
-function confirmarFinalizacaoConsulta() {
-    const observacoes = document.querySelector('#modal-finalizar-consulta textarea').value;
-    const proximaConsulta = document.querySelector('#modal-finalizar-consulta select').value;
-
-    // Aqui você pode adicionar a lógica para enviar os dados para o backend
-    // Por exemplo:
-    // fetch('/api/finalizar-consulta', {
-    //     method: 'POST',
-    //     body: JSON.stringify({
-    //         observacoes,
-    //         proximaConsulta
-    //     })
-    // });
-
-    // Mostrar mensagem de sucesso
-    mostrarToast('Consulta finalizada com sucesso!');
-    
-    // Fechar o modal
-    fecharModalFinalizarConsulta();
-    
-    // Atualizar a lista de consultas
-    // atualizarListaConsultas();
-}
-
-// Variável para armazenar o tipo de exclusão
-let tipoExclusao = '';
-
-// Função para confirmar exclusão de agendamentos
-function confirmarExclusaoAgendamentos() {
-    tipoExclusao = 'agendamentos';
-    document.getElementById('modal-exclusao-texto').textContent = 
-        'Tem certeza que deseja excluir todos os agendamentos?';
-    document.getElementById('modal-confirmacao-exclusao').style.display = 'flex';
-}
-
-// Função para confirmar exclusão de disponibilidade
-function confirmarExclusaoDisponibilidade() {
-    tipoExclusao = 'disponibilidade';
-    document.getElementById('modal-exclusao-texto').textContent = 
-        'Tem certeza que deseja excluir todas as disponibilidades?';
-    document.getElementById('modal-confirmacao-exclusao').style.display = 'flex';
-}
-
-// Função para fechar o modal de exclusão
-function fecharModalExclusao() {
-    document.getElementById('modal-confirmacao-exclusao').style.display = 'none';
-}
-
-// Função para confirmar a exclusão
-function confirmarExclusao() {
-    // Aqui você pode adicionar a lógica para enviar a requisição ao backend
-    // Por exemplo:
-    // fetch(`/api/excluir-${tipoExclusao}`, {
-    //     method: 'DELETE'
-    // });
-    // Mostrar mensagem de sucesso
-    mostrarToast(`${tipoExclusao === 'agendamentos' ? 'Agendamentos' : 'Disponibilidades'} excluídos com sucesso!`);
-    
-    // Fechar o modal
-    fecharModalExclusao();
 }

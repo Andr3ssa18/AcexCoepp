@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Consultas - Estagiários</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/consultas_estagiarios.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      .search-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .filter-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      
+      .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        font-size: 14px;
+        min-width: 150px;
+      }
+      
+      .clear-filters {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        transition: all 0.2s;
+      }
+      
+      .clear-filters:hover {
+        background: #f8f9fa;
+        color: #333;
+      }
+      
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
+      .table-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+      }
+      
+      .table-actions {
+        display: flex;
+        gap: 12px;
+      }
+      
+      .btn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      
+      .btn-primary:hover {
+        background: #0056b3;
+      }
+      
+      .btn-outline {
+        background: transparent;
+        border: 1px solid #ddd;
+        color: #666;
+      }
+      
+      .btn-outline:hover {
+        background: #f8f9fa;
+        border-color: #007bff;
+        color: #007bff;
+      }
+      
+      .estagiario-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      
+      .estagiario-nome {
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .estagiario-email {
+        font-size: 12px;
+        color: #666;
+      }
+      
+      .grupo-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      
+      .grupo-a {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      
+      .grupo-b {
+        background: #f3e5f5;
+        color: #7b1fa2;
+      }
+      
+      .grupo-c {
+        background: #e8f5e8;
+        color: #388e3c;
+      }
+      
+      .consultations {
+        text-align: center;
+        font-weight: 600;
+        color: #007bff;
+      }
+      
+      .consultations-today {
+        text-align: center;
+        font-weight: 600;
+        color: #28a745;
+      }
+      
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      
+      .action {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 14px;
+      }
+      
+      .action.view {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      
+      .action.view:hover {
+        background: #bbdefb;
+      }
+      
+      .action.file {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+      
+      .action.file:hover {
+        background: #ffe0b2;
+      }
+      
+      .action.edit {
+        background: #e8f5e8;
+        color: #388e3c;
+      }
+      
+      .action.edit:hover {
+        background: #c8e6c9;
+      }
+      
+      .action.block {
+        background: #ffebee;
+        color: #d32f2f;
+      }
+      
+      .action.block:hover {
+        background: #ffcdd2;
+      }
+      
+      .icon {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="header">
+        <div class="brand">
+          <div class="brand-logo">FSA</div>
+          <h1>Consultas - Estagiários</h1>
+        </div>
+        <div class="user-avatar">A</div>
+      </header>
+
+      <div class="container">
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-user">
+              <div class="user-avatar">A</div>
+              <div class="user-info">
+                <div class="user-name">Administrador</div>
+                <div class="user-role">Sistema de Consultas</div>
+              </div>
+            </div>
+          </div>
+          <nav class="sidebar-nav">
+            <a href="/aba_admin" class="nav-item">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M3 13h1v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h1c.6 0 1-.4 1-1s-.4-1-1-1h-1V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v7H3c-.6 0-1 .4-1 1s.4 1 1 1zM6 4h12v7H6V4z"/>
+              </svg>
+              <span>Painel Geral</span>
+            </a>
+            <a href="#" class="nav-item" onclick="mostrarPagina('pagina-pacientes')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63C19.68 7.55 18.92 7 18.06 7h-.12c-.86 0-1.63.55-1.9 1.37l-.86 2.58c1.08.6 1.82 1.73 1.82 3.05v8h3zm-7.5-10.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6h1.5v7h4zm6.5 0v-4h1v-4c0-.82-.68-1.5-1.5-1.5h-2c-.82 0-1.5.68-1.5 1.5v4h1v4h3z"/>
+              </svg>
+              <span>Pacientes</span>
+            </a>
+            <a href="#" class="nav-item" onclick="mostrarPagina('pagina-estagiarios')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+              <span>Estagiários</span>
+            </a>
+            <a href="#" class="nav-item" onclick="mostrarPagina('pagina-prontuarios')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+              </svg>
+              <span>Prontuários</span>
+            </a>
+            <a href="/admin/consultas" class="nav-item active">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>Consultas Estagiários</span>
+            </a>
+            <a href="#" class="nav-item" onclick="mostrarPagina('pagina-comunicados')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+              </svg>
+              <span>Comunicados</span>
+            </a>
+            <a href="#" class="nav-item" onclick="mostrarPagina('pagina-configuracoes')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.11-1.65c.19-.14.23-.41.12-.61l-2-3.46c-.09-.16-.26-.25-.44-.25-.06 0-.12.01-.17.03l-2.49 1c-.5-.38-1.03-.7-1.62-.94l-.38-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.38 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+              </svg>
+              <span>Configurações</span>
+            </a>
+            <a href="/logout" class="nav-item logout">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+              </svg>
+              <span>Deslogar</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="content">
+          <main class="dashboard">
+        <section class="summary" aria-label="Indicadores principais">
+          <article class="summary-card neutral">
+            <span class="summary-value">{{ total_estagiarios }}</span>
+            <span class="summary-label">Estagiários cadastrados</span>
+          </article>
+          <article class="summary-card success">
+            <span class="summary-value">{{ consultas_hoje }}</span>
+            <span class="summary-label">Consultas Hoje</span>
+          </article>
+          <article class="summary-card warning">
+            <span class="summary-value">{{ prontuarios_aguardando }}</span>
+            <span class="summary-label">Prontuários aguardando envio</span>
+          </article>
+          <article class="summary-card danger">
+            <span class="summary-value">{{ prontuarios_avaliar }}</span>
+            <span class="summary-label">Prontuários para Avaliar</span>
+          </article>
+        </section>
+
+        <section class="search-bar" aria-label="Busca e ações">
+          <form method="GET" class="search-form">
+            <div class="search-input">
+              <span class="icon icon-search" aria-hidden="true"></span>
+              <input
+                type="search"
+                name="busca"
+                placeholder="Buscar Estagiários, RA, Grupos, Semestre..."
+                aria-label="Buscar estagiários"
+                value="{{ filtros_ativos.busca if filtros_ativos.busca else '' }}"
+              />
+            </div>
+            <div class="filter-controls">
+              <select name="grupo" class="filter-select">
+                <option value="">Todos os Grupos</option>
+                {% for grupo in grupos_disponiveis %}
+                <option value="{{ grupo }}" {% if filtros_ativos.grupo == grupo %}selected{% endif %}>{{ grupo }}</option>
+                {% endfor %}
+              </select>
+              <select name="semestre" class="filter-select">
+                <option value="">Todos os Semestres</option>
+                {% for semestre in semestres_disponiveis %}
+                <option value="{{ semestre }}" {% if filtros_ativos.semestre == semestre %}selected{% endif %}>{{ semestre }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="filter-button" aria-label="Aplicar filtros">
+                <span class="icon icon-filter" aria-hidden="true"></span>
+                Filtrar
+              </button>
+              <a href="/admin/consultas" class="clear-filters" aria-label="Limpar filtros">Limpar</a>
+            </div>
+          </form>
+        </section>
+
+        <section class="table-card" aria-label="Tabela de estagiários">
+          <div class="table-header">
+            <h2>Estagiários Cadastrados</h2>
+            <div class="table-actions">
+              <button type="button" class="btn btn-outline" onclick="exportarDados()">
+                <span class="icon icon-download" aria-hidden="true"></span>
+                Exportar
+              </button>
+              <button type="button" class="btn btn-primary" onclick="adicionarEstagiario()">
+                <span class="icon icon-plus" aria-hidden="true"></span>
+                Adicionar Estagiário
+              </button>
+            </div>
+          </div>
+          
+          <!-- Seção de Filtros -->
+          <div class="filters-section">
+            <div class="filters-header">
+              <h3>Filtros</h3>
+              <button type="button" class="clear-all-filters" onclick="limparTodosFiltros()">
+                Limpar Todos
+              </button>
+            </div>
+            <div class="filters-grid">
+              <div class="filter-group">
+                <label for="filter-ra">RA:</label>
+                <input type="text" id="filter-ra" class="filter-input" placeholder="Digite o RA">
+              </div>
+              <div class="filter-group">
+                <label for="filter-grupo">Grupo:</label>
+                <select id="filter-grupo" class="filter-select">
+                  <option value="">Todos os Grupos</option>
+                  <option value="A">Grupo A</option>
+                  <option value="B">Grupo B</option>
+                  <option value="C">Grupo C</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filter-semestre">Semestre:</label>
+                <select id="filter-semestre" class="filter-select">
+                  <option value="">Todos os Semestres</option>
+                  <option value="1">1º Semestre</option>
+                  <option value="2">2º Semestre</option>
+                  <option value="3">3º Semestre</option>
+                  <option value="4">4º Semestre</option>
+                  <option value="5">5º Semestre</option>
+                  <option value="6">6º Semestre</option>
+                  <option value="7">7º Semestre</option>
+                  <option value="8">8º Semestre</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filter-status">Status:</label>
+                <select id="filter-status" class="filter-select">
+                  <option value="">Todos os Status</option>
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                  <option value="bloqueado">Bloqueado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Estagiário</th>
+                <th scope="col">RA</th>
+                <th scope="col">Grupo</th>
+                <th scope="col">Semestre</th>
+                <th scope="col">Total Consultas</th>
+                <th scope="col">Consultas Hoje</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for estagiario in estagiarios %}
+              <tr>
+                <td data-label="Estagiário">
+                  <div class="estagiario-info">
+                    <div class="estagiario-nome">{{ estagiario.nome }}</div>
+                    <div class="estagiario-email">{{ estagiario.email }}</div>
+                  </div>
+                </td>
+                <td data-label="RA">{{ estagiario.ra }}</td>
+                <td data-label="Grupo">
+                  <span class="grupo-badge grupo-{{ estagiario.grupo.lower() }}">{{ estagiario.grupo }}</span>
+                </td>
+                <td data-label="Semestre">{{ estagiario.semestre }}</td>
+                <td data-label="Total Consultas" class="consultations">{{ estagiario.consultas_count }}</td>
+                <td data-label="Consultas Hoje" class="consultations-today">{{ estagiario.consultas_hoje }}</td>
+                <td data-label="Ações">
+                  <div class="action-buttons">
+                    <button type="button" class="action view" aria-label="Visualizar" data-estagiario-id="{{ estagiario.id }}">
+                      <span class="icon icon-eye" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="action file" aria-label="Prontuário" data-estagiario-id="{{ estagiario.id }}">
+                      <span class="icon icon-file" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="action edit" aria-label="Editar" data-estagiario-id="{{ estagiario.id }}">
+                      <span class="icon icon-edit" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="action block" aria-label="Bloquear" data-estagiario-id="{{ estagiario.id }}">
+                      <span class="icon icon-block" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              {% if not estagiarios %}
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 20px; color: #666;">
+                  Nenhum estagiário cadastrado
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+
+          <footer class="table-footer">
+            <div class="page-size" role="group" aria-label="Quantidade por página">
+              <button type="button" class="size-option">10</button>
+              <button type="button" class="size-option">20</button>
+              <button type="button" class="size-option">30</button>
+            </div>
+            <span class="pagination-label">Página 1 de 6</span>
+            <nav class="pagination" aria-label="Paginação">
+              <button type="button" class="page prev" aria-label="Página anterior">
+                <span class="icon icon-prev" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="page number">1</button>
+              <button type="button" class="page number">2</button>
+              <button type="button" class="page number">3</button>
+              <button type="button" class="page number">4</button>
+              <button type="button" class="page next" aria-label="Próxima página">
+                <span class="icon icon-next" aria-hidden="true"></span>
+              </button>
+              <span class="ellipsis">...</span>
+            </nav>
+          </footer>
+        </section>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para dados do estagiário -->
+    <div id="estagiarioModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Dados do Estagiário</h2>
+          <span class="close" onclick="fecharModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="estagiario-details">
+            <div class="detail-section">
+              <h3>Informações Pessoais</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>Nome:</label>
+                  <span id="modal-nome">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Email:</label>
+                  <span id="modal-email">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>RA:</label>
+                  <span id="modal-ra">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Telefone:</label>
+                  <span id="modal-telefone">-</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <h3>Informações Acadêmicas</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>Grupo:</label>
+                  <span id="modal-grupo">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Semestre:</label>
+                  <span id="modal-semestre">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Status:</label>
+                  <span id="modal-status">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Data de Cadastro:</label>
+                  <span id="modal-data-cadastro">-</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <h3>Estatísticas de Consultas</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <label>Total de Consultas:</label>
+                  <span id="modal-total-consultas">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Consultas Hoje:</label>
+                  <span id="modal-consultas-hoje">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Consultas Esta Semana:</label>
+                  <span id="modal-consultas-semana">-</span>
+                </div>
+                <div class="detail-item">
+                  <label>Última Consulta:</label>
+                  <span id="modal-ultima-consulta">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="fecharModal()">Fechar</button>
+          <button type="button" class="btn btn-primary" onclick="editarEstagiarioModal()">Editar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/consulta_estagiario.js') }}" defer></script>
+    <script>
+      // Função para alternar entre páginas (compatibilidade com aba_admin)
+      function mostrarPagina(paginaId) {
+        // Redirecionar para aba_admin com a página específica
+        window.location.href = '/aba_admin#' + paginaId;
+      }
+    </script>
+    <script>
+      // Funções para as ações dos botões
+      function visualizarEstagiario(estagiarioId) {
+        // Buscar dados do estagiário e abrir modal
+        buscarDadosEstagiario(estagiarioId);
+      }
+
+      function verProntuarios(estagiarioId) {
+        // Mostrar prontuários do estagiário
+        alert(`Ver prontuários do estagiário ID: ${estagiarioId}`);
+      }
+
+      function editarEstagiario(estagiarioId) {
+        // Redirecionar para página de edição do estagiário (rota de admin)
+        window.location.href = `/admin/editar_estagiario/${estagiarioId}`;
+      }
+
+      function bloquearEstagiario(estagiarioId) {
+        if (confirm('Tem certeza que deseja bloquear este estagiário?')) {
+          // Fazer requisição para bloquear estagiário
+          fetch(`/api/admin/estagiario/${estagiarioId}/bloquear`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert('Estagiário bloqueado com sucesso!');
+              location.reload();
+            } else {
+              alert('Erro ao bloquear estagiário: ' + data.error);
+            }
+          })
+          .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao bloquear estagiário');
+          });
+        }
+      }
+
+      // Funcionalidade de busca em tempo real
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[type="search"]');
+        if (searchInput) {
+          let searchTimeout;
+          searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+              // Aplicar filtros automaticamente após 500ms de inatividade
+              const form = this.closest('form');
+              if (form) {
+                form.submit();
+              }
+            }, 500);
+          });
+        }
+
+        // Auto-submit quando filtros mudarem
+        const filterSelects = document.querySelectorAll('.filter-select');
+        filterSelects.forEach(select => {
+          select.addEventListener('change', function() {
+            const form = this.closest('form');
+            if (form) {
+              form.submit();
+            }
+          });
+        });
+
+        // Event listeners para botões de ação
+        document.querySelectorAll('.action.view').forEach(button => {
+          button.addEventListener('click', function() {
+            const estagiarioId = this.getAttribute('data-estagiario-id');
+            visualizarEstagiario(estagiarioId);
+          });
+        });
+
+        document.querySelectorAll('.action.file').forEach(button => {
+          button.addEventListener('click', function() {
+            const estagiarioId = this.getAttribute('data-estagiario-id');
+            verProntuarios(estagiarioId);
+          });
+        });
+
+        document.querySelectorAll('.action.edit').forEach(button => {
+          button.addEventListener('click', function() {
+            const estagiarioId = this.getAttribute('data-estagiario-id');
+            editarEstagiario(estagiarioId);
+          });
+        });
+
+        document.querySelectorAll('.action.block').forEach(button => {
+          button.addEventListener('click', function() {
+            const estagiarioId = this.getAttribute('data-estagiario-id');
+            bloquearEstagiario(estagiarioId);
+          });
+        });
+      });
+
+      // Função para exportar dados
+      function exportarDados() {
+        const params = new URLSearchParams(window.location.search);
+        const url = `/api/admin/estagiarios/export?${params.toString()}`;
+        window.open(url, '_blank');
+      }
+
+      // Função para adicionar novo estagiário
+      function adicionarEstagiario() {
+        window.location.href = '/admin/gerenciar';
+      }
+
+      // Funções do Modal
+      function buscarDadosEstagiario(estagiarioId) {
+        // Simular dados do estagiário (em produção, fazer requisição AJAX)
+        const dadosEstagiario = {
+          id: estagiarioId,
+          nome: 'João Silva',
+          email: 'joao.silva@email.com',
+          ra: '123456',
+          telefone: '(11) 99999-9999',
+          grupo: 'A',
+          semestre: '5',
+          status: 'Ativo',
+          dataCadastro: '15/03/2023',
+          totalConsultas: 25,
+          consultasHoje: 2,
+          consultasSemana: 5,
+          ultimaConsulta: 'Hoje às 14:30'
+        };
+
+        // Preencher modal com os dados
+        document.getElementById('modal-nome').textContent = dadosEstagiario.nome;
+        document.getElementById('modal-email').textContent = dadosEstagiario.email;
+        document.getElementById('modal-ra').textContent = dadosEstagiario.ra;
+        document.getElementById('modal-telefone').textContent = dadosEstagiario.telefone;
+        document.getElementById('modal-grupo').textContent = dadosEstagiario.grupo;
+        document.getElementById('modal-semestre').textContent = dadosEstagiario.semestre + 'º Semestre';
+        document.getElementById('modal-status').textContent = dadosEstagiario.status;
+        document.getElementById('modal-data-cadastro').textContent = dadosEstagiario.dataCadastro;
+        document.getElementById('modal-total-consultas').textContent = dadosEstagiario.totalConsultas;
+        document.getElementById('modal-consultas-hoje').textContent = dadosEstagiario.consultasHoje;
+        document.getElementById('modal-consultas-semana').textContent = dadosEstagiario.consultasSemana;
+        document.getElementById('modal-ultima-consulta').textContent = dadosEstagiario.ultimaConsulta;
+
+        // Abrir modal
+        document.getElementById('estagiarioModal').style.display = 'block';
+      }
+
+      function fecharModal() {
+        document.getElementById('estagiarioModal').style.display = 'none';
+      }
+
+      function editarEstagiarioModal() {
+        // Fechar modal e redirecionar para edição
+        fecharModal();
+        const estagiarioId = document.getElementById('modal-ra').textContent;
+        editarEstagiario(estagiarioId);
+      }
+
+      // Funções dos Filtros
+      function aplicarFiltros() {
+        const filtros = {
+          ra: document.getElementById('filter-ra').value,
+          grupo: document.getElementById('filter-grupo').value,
+          semestre: document.getElementById('filter-semestre').value,
+          status: document.getElementById('filter-status').value
+        };
+
+        // Filtrar linhas da tabela
+        const linhas = document.querySelectorAll('tbody tr');
+        linhas.forEach(linha => {
+          let mostrar = true;
+          
+          // Verificar filtro de RA
+          if (filtros.ra) {
+            const ra = linha.querySelector('td[data-label="RA"]').textContent;
+            if (!ra.toLowerCase().includes(filtros.ra.toLowerCase())) {
+              mostrar = false;
+            }
+          }
+          
+          // Verificar filtro de grupo
+          if (filtros.grupo) {
+            const grupo = linha.querySelector('.grupo-badge').textContent;
+            if (grupo !== filtros.grupo) {
+              mostrar = false;
+            }
+          }
+          
+          // Verificar filtro de semestre
+          if (filtros.semestre) {
+            const semestre = linha.querySelector('td[data-label="Semestre"]').textContent;
+            if (semestre !== filtros.semestre) {
+              mostrar = false;
+            }
+          }
+          
+          // Mostrar ou ocultar linha
+          linha.style.display = mostrar ? '' : 'none';
+        });
+      }
+
+      function limparTodosFiltros() {
+        document.getElementById('filter-ra').value = '';
+        document.getElementById('filter-grupo').value = '';
+        document.getElementById('filter-semestre').value = '';
+        document.getElementById('filter-status').value = '';
+        
+        // Mostrar todas as linhas
+        const linhas = document.querySelectorAll('tbody tr');
+        linhas.forEach(linha => {
+          linha.style.display = '';
+        });
+      }
+
+      // Event listeners para filtros
+      document.addEventListener('DOMContentLoaded', function() {
+        // Adicionar event listeners aos filtros
+        document.getElementById('filter-ra').addEventListener('input', aplicarFiltros);
+        document.getElementById('filter-grupo').addEventListener('change', aplicarFiltros);
+        document.getElementById('filter-semestre').addEventListener('change', aplicarFiltros);
+        document.getElementById('filter-status').addEventListener('change', aplicarFiltros);
+
+        // Fechar modal ao clicar fora dele
+        window.addEventListener('click', function(event) {
+          const modal = document.getElementById('estagiarioModal');
+          if (event.target === modal) {
+            fecharModal();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

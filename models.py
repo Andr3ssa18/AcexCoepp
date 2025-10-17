@@ -57,3 +57,15 @@ class Disponibilidade(db.Model):
 
     def __repr__(self):
         return f"<Disponibilidade id={self.id} estagiario_id={self.estagiario_id} data='{self.data}' horario='{self.hora_inicio}-{self.hora_fim}'>"
+
+class Mestre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    cpf = db.Column(db.String(14), unique=True, nullable=False)
+    telefone = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    registro_profissional = db.Column(db.String(50), nullable=False)
+    senha = db.Column(db.String(200), nullable=False)
+
+    def __repr__(self):
+        return f"Mestre ('{self.nome}', CPF: '{self.cpf}')"

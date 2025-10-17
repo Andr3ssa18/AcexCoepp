@@ -1,16 +1,151 @@
 # views.py
 from main import app, mail # Importa o aplicativo Flask principal e o objeto mail
 from db import db
-from models import Paciente,Estagiario,Agendamento
+from models import Paciente,Estagiario,Agendamento,Mestre
 from flask import render_template, request, redirect, url_for, flash, session,jsonify
 import datetime # Adicionado para conversão de data
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate 
 from flask import request, jsonify, session
-from email_utils import enviar_email_confirmacao_consulta, gerar_token_redefinicao, validar_token_redefinicao, marcar_token_como_usado, enviar_email_redefinicao_senha, verificar_email_existe
+from email_utils import enviar_email_confirmacao_consulta
 
 
 
+
+
+@app.route('/admin/consultas')
+def admin_consultas_estagiarios():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Por favor, faça login como administrador.', 'error')
+        return redirect(url_for('login'))
+
+    try:
+        # Parâmetros de filtro da URL
+        busca = request.args.get('busca', '').strip()
+        grupo_filtro = request.args.get('grupo', '').strip()
+        semestre_filtro = request.args.get('semestre', '').strip()
+        status_filtro = request.args.get('status', '').strip()
+        
+        # Buscar dados reais do banco
+        estagiarios_query = Estagiario.query
+        
+        # Aplicar filtro de busca
+        if busca:
+            estagiarios_query = estagiarios_query.filter(
+                db.or_(
+                    Estagiario.nome.ilike(f'%{busca}%'),
+                    Estagiario.RA.ilike(f'%{busca}%'),
+                    Estagiario.curso_periodo.ilike(f'%{busca}%')
+                )
+            )
+        
+        estagiarios = estagiarios_query.all()
+        
+        # Contar estagiários cadastrados
+        total_estagiarios = len(estagiarios)
+        
+        # Contar consultas de hoje
+        hoje = datetime.datetime.now().date()
+        consultas_hoje = Agendamento.query.filter(
+            db.func.date(Agendamento.data_agendamento) == hoje,
+            Agendamento.status.in_(['confirmado', 'concluido'])
+        ).count()
+        
+        # Contar prontuários aguardando envio (consultas concluídas sem observações)
+        prontuarios_aguardando = Agendamento.query.filter(
+            Agendamento.status == 'concluido',
+            Agendamento.observacoes_estagiario.is_(None)
+        ).count()
+        
+        # Contar prontuários para avaliar (consultas confirmadas)
+        prontuarios_avaliar = Agendamento.query.filter(
+            Agendamento.status == 'confirmado'
+        ).count()
+        
+        # Buscar estagiários com suas consultas
+        estagiarios_com_consultas = []
+        for estagiario in estagiarios:
+            # Contar consultas por status
+            consultas_total = Agendamento.query.filter_by(estagiario_id=estagiario.id).count()
+            consultas_hoje_estagiario = Agendamento.query.filter(
+                Agendamento.estagiario_id == estagiario.id,
+                db.func.date(Agendamento.data_agendamento) == hoje,
+                Agendamento.status.in_(['confirmado', 'concluido'])
+            ).count()
+            
+            # Extrair semestre do curso_periodo
+            semestre = "N/A"
+            if estagiario.curso_periodo and "º" in estagiario.curso_periodo:
+                try:
+                    semestre = estagiario.curso_periodo.split("º")[0].split()[-1] + "º"
+                except:
+                    semestre = "N/A"
+            
+            # Determinar grupo baseado no RA
+            grupo = "A"
+            if estagiario.RA and estagiario.RA.isdigit():
+                ultimo_digito = int(estagiario.RA[-1])
+                if ultimo_digito <= 3:
+                    grupo = "A"
+                elif ultimo_digito <= 6:
+                    grupo = "B"
+                else:
+                    grupo = "C"
+            
+            # Aplicar filtros adicionais
+            if grupo_filtro and grupo != grupo_filtro:
+                continue
+            if semestre_filtro and semestre != semestre_filtro:
+                continue
+            
+            estagiarios_com_consultas.append({
+                'id': estagiario.id,
+                'nome': estagiario.nome,
+                'ra': estagiario.RA,
+                'email': estagiario.emailfsa,
+                'telefone': estagiario.telefone_aluno,
+                'curso_periodo': estagiario.curso_periodo,
+                'grupo': grupo,
+                'semestre': semestre,
+                'consultas_count': consultas_total,
+                'consultas_hoje': consultas_hoje_estagiario
+            })
+        
+        # Ordenar por nome
+        estagiarios_com_consultas.sort(key=lambda x: x['nome'])
+        
+        # Buscar dados para filtros
+        grupos_disponiveis = list(set([e['grupo'] for e in estagiarios_com_consultas]))
+        semestres_disponiveis = list(set([e['semestre'] for e in estagiarios_com_consultas]))
+        
+        messages = session.pop('_flashes', [])
+        return render_template('consultas_estagiarios.html', 
+                             messages=messages,
+                             total_estagiarios=total_estagiarios,
+                             consultas_hoje=consultas_hoje,
+                             prontuarios_aguardando=prontuarios_aguardando,
+                             prontuarios_avaliar=prontuarios_avaliar,
+                             estagiarios=estagiarios_com_consultas,
+                             grupos_disponiveis=grupos_disponiveis,
+                             semestres_disponiveis=semestres_disponiveis,
+                             filtros_ativos={
+                                 'busca': busca,
+                                 'grupo': grupo_filtro,
+                                 'semestre': semestre_filtro,
+                                 'status': status_filtro
+                             })
+    
+    except Exception as e:
+        print(f"Erro ao carregar dados de consultas: {e}")
+        flash('Erro ao carregar dados. Tente novamente.', 'error')
+        messages = session.pop('_flashes', [])
+        return render_template('consultas_estagiarios.html', 
+                             messages=messages,
+                             total_estagiarios=0,
+                             consultas_hoje=0,
+                             prontuarios_aguardando=0,
+                             prontuarios_avaliar=0,
+                             estagiarios=[])
 
 
 @app.route('/')
@@ -57,8 +192,6 @@ def login():
                 print(f"DEBUG: Estagiário encontrado por RA: {estagiario.RA}") # DEBUG
             else:
                 print("DEBUG: Estagiário NÃO encontrado por RA.") # DEBUG
-                flash('E-mail/RA não encontrado. Por favor, verifique suas credenciais.', 'error')
-                return render_template('login.html')
         else:
             print(f"DEBUG: Estagiário encontrado por emailfsa: {estagiario.emailfsa}") # DEBUG
 
@@ -73,7 +206,27 @@ def login():
             return redirect(url_for('aba_estagiario'))
         else:
             print("DEBUG: Senha do estagiário INCORRETA ou estagiário não encontrado.") # DEBUG
-            flash('Senha incorreta. Por favor, tente novamente.', 'error')
+        
+        # Verificação para Mestre (usa email)
+        mestre = Mestre.query.filter_by(email=identificador).first()
+        if mestre:
+            print(f"DEBUG: Mestre encontrado: {mestre.email}") # DEBUG
+            if check_password_hash(mestre.senha, senha_digitada):
+                print("DEBUG: Senha do mestre CORRETA.") # DEBUG
+                session['logged_in'] = True
+                session['user_id'] = mestre.id
+                session['user_type'] = 'mestre'
+                session['nome_usuario'] = mestre.nome
+                flash('Login de mestre realizado com sucesso!', 'success')
+                print("DEBUG: Redirecionando para aba_admin...") # DEBUG
+                return redirect(url_for('aba_admin'))
+            else:
+                print("DEBUG: Senha do mestre INCORRETA.") # DEBUG
+                flash('Senha incorreta. Por favor, tente novamente.', 'error')
+                return render_template('login.html')
+        else:
+            print("DEBUG: Mestre não encontrado por email.") # DEBUG
+            flash('E-mail não encontrado. Por favor, verifique suas credenciais.', 'error')
             return render_template('login.html')
     
     # Se o método for GET, apenas renderiza a página de login
@@ -935,6 +1088,210 @@ def alterar_senha_estagiario():
         print(f"Erro ao alterar senha: {e}")
         return jsonify({'error': f'Erro ao alterar senha: {str(e)}'}), 500
 
+@app.route('/api/admin/estatisticas', methods=['GET'])
+def api_estatisticas_admin():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como administrador.'}), 403
+
+    try:
+        # Contar total de pacientes
+        total_pacientes = Paciente.query.count()
+        
+        # Contar consultas de hoje
+        hoje = datetime.datetime.now().date()
+        consultas_hoje = Agendamento.query.filter(
+            db.func.date(Agendamento.data_agendamento) == hoje,
+            Agendamento.status.in_(['confirmado', 'concluido'])
+        ).count()
+        
+        # Contar solicitações de triagem (consultas pendentes)
+        solicitacoes_triagem = Agendamento.query.filter(
+            Agendamento.status == 'pendente'
+        ).count()
+        
+        # Contar prontuários para avaliar (consultas confirmadas)
+        prontuarios_avaliar = Agendamento.query.filter(
+            Agendamento.status == 'confirmado'
+        ).count()
+        
+        # Contar consultas não confirmadas
+        consultas_nao_confirmadas = Agendamento.query.filter(
+            Agendamento.status == 'pendente'
+        ).count()
+        
+        # Contar consultas confirmadas
+        consultas_confirmadas = Agendamento.query.filter(
+            Agendamento.status == 'confirmado'
+        ).count()
+        
+        # Buscar próximas consultas (próximos 5 dias)
+        proximos_5_dias = hoje + datetime.timedelta(days=5)
+        proximas_consultas = Agendamento.query.filter(
+            db.func.date(Agendamento.data_agendamento).between(hoje, proximos_5_dias),
+            Agendamento.status.in_(['confirmado', 'concluido'])
+        ).join(Paciente).join(Estagiario).order_by(Agendamento.data_agendamento).limit(5).all()
+        
+        # Formatar próximas consultas
+        proximas_consultas_formatadas = []
+        for consulta in proximas_consultas:
+            proximas_consultas_formatadas.append({
+                'paciente_nome': consulta.paciente.nome,
+                'estagiario_nome': consulta.estagiario.nome,
+                'data_agendamento': consulta.data_agendamento.strftime('%d/%m/%Y %H:%M')
+            })
+        
+        return jsonify({
+            'total_pacientes': total_pacientes,
+            'consultas_hoje': consultas_hoje,
+            'solicitacoes_triagem': solicitacoes_triagem,
+            'prontuarios_avaliar': prontuarios_avaliar,
+            'consultas_nao_confirmadas': consultas_nao_confirmadas,
+            'consultas_confirmadas': consultas_confirmadas,
+            'proximas_consultas': proximas_consultas_formatadas
+        })
+        
+    except Exception as e:
+        print(f"Erro ao buscar estatísticas: {e}")
+        return jsonify({'error': f'Erro ao buscar estatísticas: {str(e)}'}), 500
+
+@app.route('/api/admin/estagiarios', methods=['GET'])
+def api_listar_estagiarios():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como administrador.'}), 403
+
+    ra_query = request.args.get('ra', '').strip()
+    try:
+        query = Estagiario.query
+        if ra_query:
+            query = query.filter(Estagiario.RA.ilike(f"%{ra_query}%"))
+        estagiarios = query.order_by(Estagiario.nome.asc()).all()
+
+        return jsonify([
+            {
+                'id': e.id,
+                'nome': e.nome,
+                'ra': e.RA,
+                'email': e.emailfsa,
+                'telefone': e.telefone_aluno,
+                'curso_periodo': e.curso_periodo
+            } for e in estagiarios
+        ]), 200
+    except Exception as e:
+        print(f"Erro ao listar estagiarios: {e}")
+        return jsonify({'error': f'Erro ao listar estagiários: {str(e)}'}), 500
+
+@app.route('/api/admin/pacientes', methods=['GET'])
+def api_listar_pacientes_admin():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como administrador.'}), 403
+
+    filtro = request.args.get('filtro', 'todos').strip()
+    busca = request.args.get('busca', '').strip()
+    
+    try:
+        # Buscar agendamentos baseado no filtro
+        query = Agendamento.query.join(Paciente).join(Estagiario)
+        
+        if filtro == 'todos':
+            # Todos os agendamentos
+            pass
+        elif filtro == 'andamento':
+            query = query.filter(Agendamento.status == 'confirmado')
+        elif filtro == 'aprovar':
+            query = query.filter(Agendamento.status == 'pendente')
+        elif filtro == 'finalizados':
+            query = query.filter(Agendamento.status == 'concluido')
+        
+        # Aplicar busca se fornecida
+        if busca:
+            query = query.filter(
+                db.or_(
+                    Paciente.nome.ilike(f'%{busca}%'),
+                    Estagiario.nome.ilike(f'%{busca}%'),
+                    Agendamento.tipo_consulta.ilike(f'%{busca}%')
+                )
+            )
+        
+        agendamentos = query.order_by(Agendamento.data_agendamento.desc()).limit(50).all()
+        
+        # Formatar dados
+        pacientes_formatados = []
+        for agendamento in agendamentos:
+            pacientes_formatados.append({
+                'id': agendamento.id,
+                'paciente_nome': agendamento.paciente.nome,
+                'estagiario_nome': agendamento.estagiario.nome,
+                'data_agendamento': agendamento.data_agendamento.strftime('%d/%m/%Y %H:%M'),
+                'tipo_consulta': agendamento.tipo_consulta,
+                'status': agendamento.status
+            })
+        
+        # Contar estatísticas por filtro
+        stats = {
+            'todos': Agendamento.query.count(),
+            'andamento': Agendamento.query.filter(Agendamento.status == 'confirmado').count(),
+            'aprovar': Agendamento.query.filter(Agendamento.status == 'pendente').count(),
+            'finalizados': Agendamento.query.filter(Agendamento.status == 'concluido').count()
+        }
+        
+        return jsonify({
+            'pacientes': pacientes_formatados,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        print(f"Erro ao buscar pacientes: {e}")
+        return jsonify({'error': f'Erro ao buscar pacientes: {str(e)}'}), 500
+
+@app.route('/api/admin/consultas', methods=['GET'])
+def api_listar_consultas_admin():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como administrador.'}), 403
+
+    status_filtro = request.args.get('status', '').strip()
+    ra_filtro = request.args.get('estagiario_ra', '').strip()
+
+    try:
+        query = Agendamento.query
+        if status_filtro:
+            query = query.filter(Agendamento.status == status_filtro)
+
+        if ra_filtro:
+            est = Estagiario.query.filter(Estagiario.RA == ra_filtro).first()
+            if est:
+                query = query.filter(Agendamento.estagiario_id == est.id)
+            else:
+                return jsonify([]), 200
+
+        consultas = query.order_by(Agendamento.data_agendamento.desc().nullslast(), Agendamento.data_solicitacao.desc()).all()
+
+        resultado = []
+        for cons in consultas:
+            paciente = Paciente.query.get(cons.paciente_id)
+            estagiario = Estagiario.query.get(cons.estagiario_id) if cons.estagiario_id else None
+            resultado.append({
+                'id': cons.id,
+                'status': cons.status,
+                'data_solicitacao': cons.data_solicitacao.strftime('%d/%m/%Y %H:%M') if cons.data_solicitacao else None,
+                'data_agendamento': cons.data_agendamento.strftime('%d/%m/%Y %H:%M') if cons.data_agendamento else None,
+                'paciente': {
+                    'id': paciente.id if paciente else None,
+                    'nome': paciente.nome if paciente else None
+                },
+                'estagiario': {
+                    'id': estagiario.id if estagiario else None,
+                    'nome': estagiario.nome if estagiario else None,
+                    'ra': estagiario.RA if estagiario else None
+                },
+                'observacoes_paciente': cons.observacoes_paciente,
+                'observacoes_estagiario': cons.observacoes_estagiario
+            })
+
+        return jsonify(resultado), 200
+    except Exception as e:
+        print(f"Erro ao listar consultas admin: {e}")
+        return jsonify({'error': f'Erro ao listar consultas: {str(e)}'}), 500
+
 @app.route('/api/estagiario/buscar-paciente', methods=['GET'])
 def buscar_paciente():
     if 'logged_in' not in session or session.get('user_type') != 'estagiario':
@@ -979,8 +1336,8 @@ def buscar_paciente():
 
 @app.route('/admin/gerenciar', methods=['GET'])
 def gerenciar_usuarios():
-    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
-        flash('Acesso negado. Por favor, faça login como estagiário.', 'error')
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Por favor, faça login como administrador.', 'error')
         return redirect(url_for('login'))
     
     pacientes = Paciente.query.all()
@@ -989,7 +1346,7 @@ def gerenciar_usuarios():
 
 @app.route('/admin/editar_paciente/<int:id>', methods=['GET', 'POST'])
 def editar_paciente(id):
-    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
         return jsonify({'error': 'Acesso negado'}), 403
     
     paciente = Paciente.query.get_or_404(id)
@@ -1026,7 +1383,7 @@ def editar_paciente(id):
 
 @app.route('/admin/editar_estagiario/<int:id>', methods=['GET', 'POST'])
 def editar_estagiario(id):
-    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
         return jsonify({'error': 'Acesso negado'}), 403
     
     estagiario = Estagiario.query.get_or_404(id)
@@ -1061,7 +1418,7 @@ def editar_estagiario(id):
 
 @app.route('/admin/deletar_paciente/<int:id>', methods=['DELETE'])
 def deletar_paciente(id):
-    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
         return jsonify({'error': 'Acesso negado'}), 403
     
     try:
@@ -1075,7 +1432,7 @@ def deletar_paciente(id):
 
 @app.route('/admin/deletar_estagiario/<int:id>', methods=['DELETE'])
 def deletar_estagiario(id):
-    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
         return jsonify({'error': 'Acesso negado'}), 403
     
     try:
@@ -1116,82 +1473,104 @@ def teste_email():
             'error': f'❌ Erro: {str(e)}'
         }), 500
 
-# =============================================================================
-# ROTAS DE REDEFINIÇÃO DE SENHA - CORRIGIDAS
-# =============================================================================
+# Rota para o formulário de cadastro do mestre (primeira etapa)
+@app.route('/cadastroMestre', methods=['GET', 'POST'])
+def tela_cadastro_mestre():
+    if request.method == 'POST':
+        print("DEBUG: Recebido POST para /cadastroMestre")
+        dados_mestre = {
+            'nome': request.form['nome'],
+            'cpf': request.form['cpf'],
+            'telefone': request.form['telefone'],
+            'email': request.form['email'],
+            'registro_profissional': request.form['registro_profissional']
+        }
+        session['dados_mestre'] = dados_mestre
+        flash('Dados do Mestre salvos temporariamente. Agora crie sua senha.', 'info')
+        print("DEBUG: Redirecionando para criar_senha_mestre.")
+        return redirect(url_for('criar_senha_mestre'))
+    
+    print("DEBUG: Acessando a rota /cadastroMestre (GET)")
+    messages = session.pop('_flashes', [])
+    return render_template("cadastroMestre.html", messages=messages)
 
-@app.route('/esqueci-senha', methods=['POST'])
-def esqueci_senha():
-    try:
-        email = request.form.get('email')
+@app.route('/criarSenha_mestre', methods=['GET', 'POST'])
+def criar_senha_mestre():
+    # Primeira verificação: se 'dados_mestre' não está na sessão (primeiro acesso ou acesso direto)
+    if 'dados_mestre' not in session:
+        flash('Acesso negado. Por favor, preencha os dados do mestre primeiro.', 'error')
+        return redirect(url_for('tela_cadastro_mestre'))
+    
+    if request.method == 'POST':
+        print("DEBUG: Recebido POST para /criarSenha_mestre")
         
-        if not email:
-            return jsonify({'success': False, 'error': 'Email é obrigatório.'}), 400
-
-        # Verificar se o email existe no sistema (paciente ou estagiário)
-        if not verificar_email_existe(email):
-            return jsonify({'success': False, 'error': 'Email não cadastrado no sistema.'}), 404
-
-        # Gerar token de redefinição
-        token = gerar_token_redefinicao(email)
+        senha = request.form['senha']
+        confirmar_senha = request.form['confirmar_senha']
         
-        if not token:
-            return jsonify({'success': False, 'error': 'Erro ao gerar token de redefinição. Tente novamente.'}), 500
-
-        # Enviar email com link de redefinição
-        reset_url = url_for('login', token=token, _external=True)
+        # Validações básicas
+        if not senha or not confirmar_senha:
+            flash('Por favor, preencha todos os campos.', 'error')
+            return render_template("criarSenha_mestre.html")
         
-        if enviar_email_redefinicao_senha(email, reset_url):
-            return jsonify({'success': True, 'message': 'Email enviado com sucesso!'})
-        else:
-            return jsonify({'success': False, 'error': 'Erro ao enviar email. Tente novamente.'}), 500
+        if senha != confirmar_senha:
+            flash('As senhas não coincidem.', 'error')
+            return render_template("criarSenha_mestre.html")
+        
+        if len(senha) < 6:
+            flash('A senha deve ter pelo menos 6 caracteres.', 'error')
+            return render_template("criarSenha_mestre.html")
+        
+        try:
+            # Recuperar dados da sessão
+            dados_mestre = session['dados_mestre']
             
-    except Exception as e:
-        print(f"Erro em esqueci_senha: {str(e)}")
-        return jsonify({'success': False, 'error': 'Erro interno do servidor.'}), 500
+            # Verificar se já existe um mestre com este CPF ou email
+            mestre_existente_cpf = Mestre.query.filter_by(cpf=dados_mestre['cpf']).first()
+            if mestre_existente_cpf:
+                flash('Já existe um mestre cadastrado com este CPF.', 'error')
+                return render_template("criarSenha_mestre.html")
+            
+            mestre_existente_email = Mestre.query.filter_by(email=dados_mestre['email']).first()
+            if mestre_existente_email:
+                flash('Já existe um mestre cadastrado com este email.', 'error')
+                return render_template("criarSenha_mestre.html")
+            
+            # Criar novo mestre
+            novo_mestre = Mestre(
+                nome=dados_mestre['nome'],
+                cpf=dados_mestre['cpf'],
+                telefone=dados_mestre['telefone'],
+                email=dados_mestre['email'],
+                registro_profissional=dados_mestre['registro_profissional'],
+                senha=generate_password_hash(senha, method='pbkdf2:sha256')
+            )
+            
+            # Adicionar ao banco de dados
+            db.session.add(novo_mestre)
+            db.session.commit()
+            
+            # Limpar dados da sessão
+            session.pop('dados_mestre', None)
+            
+            flash('Mestre cadastrado com sucesso! Agora você pode fazer login.', 'success')
+            print("DEBUG: Mestre cadastrado com sucesso")
+            return redirect(url_for('login'))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao cadastrar mestre: {e}")
+            flash(f'Erro ao cadastrar mestre: {str(e)}', 'error')
+            return render_template("criarSenha_mestre.html")
+    
+    print("DEBUG: Acessando a rota /criarSenha_mestre (GET)")
+    messages = session.pop('_flashes', [])
+    return render_template("criarSenha_mestre.html", messages=messages)
 
-@app.route('/redefinir-senha', methods=['POST'])
-def redefinir_senha():
-    try:
-        token = request.form.get('token')
-        nova_senha = request.form.get('nova_senha')
-        confirmar_senha = request.form.get('confirmar_senha')
-        
-        if not token or not nova_senha or not confirmar_senha:
-            return jsonify({'success': False, 'error': 'Todos os campos são obrigatórios.'}), 400
-
-        # Validar token
-        email = validar_token_redefinicao(token)
-        
-        if not email:
-            return jsonify({'success': False, 'error': 'Link inválido ou expirado. Solicite um novo link.'}), 400
-        
-        if nova_senha != confirmar_senha:
-            return jsonify({'success': False, 'error': 'As senhas não coincidem.'}), 400
-        
-        if len(nova_senha) < 8:
-            return jsonify({'success': False, 'error': 'A senha deve ter no mínimo 8 caracteres.'}), 400
-        
-        # Atualizar senha no banco de dados
-        paciente = Paciente.query.filter_by(email=email).first()
-        estagiario = Estagiario.query.filter_by(emailfsa=email).first()
-        
-        hashed_senha = generate_password_hash(nova_senha, method='pbkdf2:sha256')
-        
-        if paciente:
-            paciente.senha = hashed_senha
-        elif estagiario:
-            estagiario.senha = hashed_senha
-        else:
-            return jsonify({'success': False, 'error': 'Usuário não encontrado.'}), 404
-        
-        # Marcar token como usado
-        marcar_token_como_usado(token)
-        
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'Senha redefinida com sucesso!'}), 200
-        
-    except Exception as e:
-        db.session.rollback()
-        print(f"Erro ao redefinir senha: {str(e)}")
-        return jsonify({'success': False, 'error': 'Erro ao redefinir senha. Tente novamente.'}), 500
+@app.route('/aba_admin')
+def aba_admin():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Por favor, faça login como mestre.', 'error')
+        return redirect(url_for('login'))
+    
+    messages = session.pop('_flashes', [])
+    return render_template("aba_admin.html", messages=messages)

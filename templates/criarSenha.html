@@ -261,11 +261,25 @@
         const termsCheckbox = document.getElementById('terms');
         const termosModal = document.getElementById('termosModal');
         const politicaModal = document.getElementById('politicaModal');
-        const senhaForm = document.getElementById('senhaForm'); // Obter o formulário
+        const senhaForm = document.getElementById('senhaForm'); 
+
+        strengthBar.style.width = '0%';
+        strengthBar.style.backgroundColor = '#ccc';
+        strengthText.textContent = '';
+        passwordLengthError.style.display = 'none';
 
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             let strength = 0;
+            
+            if (password.length === 0) {
+                strengthBar.style.width = '0%';
+                strengthBar.style.backgroundColor = '#ccc';
+                strengthText.textContent = '';
+                passwordLengthError.style.display = 'none';
+                return;
+            }
+
             if (password.length >= 8) strength++;
             if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
             if (password.match(/[0-9]/)) strength++;

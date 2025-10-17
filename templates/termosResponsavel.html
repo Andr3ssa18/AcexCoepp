@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsável Legal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to top, #074276, #64a1d7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .cartao {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 560px;
+      padding: 40px 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      text-align: left;
+    }
+
+    .cartao h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .cartao p {
+      color: #777;
+      margin: 8px 0 20px;
+      font-weight: 500;
+    }
+
+    .cartao input,
+    .cartao select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .linha-inputs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .linha-inputs input {
+      flex: 1;
+    }
+
+    .botoes-navegacao {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .botao-navegacao {
+      background-color: #074276;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .indicador-etapa {
+      position: absolute;
+      bottom: 15px;
+      left: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .logo-img {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 100px;
+      height: auto;
+    }
+
+    .erro {
+      border-color: #ff0000 !important;
+    }
+
+    .mensagem-erro {
+      color: #ff0000;
+      font-size: 12px;
+      margin-top: -8px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .outro-parentesco {
+      display: none;
+      margin-top: -8px;
+    }
+
+    /* Tablets (768px para baixo) */
+    @media (max-width: 768px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .cartao {
+        width: 100%;
+        max-width: 500px;
+        padding: 30px 20px;
+      }
+
+      .cartao h2 {
+        font-size: 22px;
+      }
+
+      .logo-img {
+        width: 80px;
+        top: 15px;
+        right: 15px;
+      }
+    }
+
+    /* Celulares (576px para baixo) */
+    @media (max-width: 576px) {
+      .cartao {
+        padding: 25px 15px;
+        margin: 10px;
+      }
+
+      .cartao h2 {
+        font-size: 20px;
+        padding-right: 90px;
+      }
+
+      .cartao p {
+        font-size: 14px;
+      }
+
+      .logo-img {
+        width: 70px;
+        top: 10px;
+        right: 10px;
+      }
+
+      .linha-inputs {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .cartao input,
+      .cartao select {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .botoes-navegacao {
+        margin-top: 15px;
+      }
+
+      .botao-navegacao {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+      }
+    }
+
+    /* Celulares pequenos (400px para baixo) */
+    @media (max-width: 400px) {
+      .cartao {
+        padding: 20px 12px;
+      }
+
+      .cartao h2 {
+        font-size: 18px;
+        padding-right: 80px;
+      }
+
+      .cartao p {
+        font-size: 13px;
+      }
+
+      .logo-img {
+        width: 60px;
+      }
+
+      .cartao input,
+      .cartao select {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .botao-navegacao {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+    }
+
+    /* Telas grandes (1200px para cima) */
+    @media (min-width: 1200px) {
+      .cartao {
+        max-width: 600px;
+        padding: 50px 40px;
+      }
+
+      .cartao h2 {
+        font-size: 26px;
+      }
+
+      .cartao input,
+      .cartao select {
+        padding: 14px;
+        font-size: 15px;
+      }
+    }
+
+    /* Ajustes para orientação landscape em celulares */
+    @media (max-height: 600px) and (orientation: landscape) {
+      body {
+        align-items: flex-start;
+        padding: 10px;
+      }
+
+      .cartao {
+        margin: 10px 0;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .linha-inputs {
+        flex-direction: row;
+      }
+
+      .cartao input,
+      .cartao select {
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cartao">
+    <img src="https://www.fsa.br/wp-content/uploads/2024/04/logo-fsa-1.png" alt="Logo FSA" class="logo-img">
+
+    <h2>Responsável legal</h2>
+    <p>Preencha os dados do responsável para concluir o cadastro.</p>
+
+    <form id="formResponsavel">
+      <!-- Nome -->
+      <input type="text" id="nomeResponsavel" name="nomeResponsavel" placeholder="Nome completo do responsável" maxlength="100" required>
+      <span id="erroNome" class="mensagem-erro"></span>
+
+      <!-- Parentesco -->
+      <select id="parentesco" name="parentesco" required onchange="mostrarOutroParentesco()">
+        <option value="">Parentesco</option>
+        <option value="Pai">Pai</option>
+        <option value="Mãe">Mãe</option>
+        <option value="Responsável legal">Responsável legal</option>
+        <option value="Outro">Outro (especificar)</option>
+      </select>
+      <span id="erroParentesco" class="mensagem-erro"></span>
+
+      <!-- Outro Parentesco -->
+      <div id="outroParentescoContainer" class="outro-parentesco">
+        <input type="text" id="outroParentesco" name="outroParentesco" placeholder="Especifique o parentesco" maxlength="50">
+        <span id="erroOutroParentesco" class="mensagem-erro"></span>
+      </div>
+
+      <!-- CPF e Telefone -->
+      <div class="linha-inputs">
+        <div style="flex: 1;">
+          <input type="text" id="cpfResponsavel" name="cpfResponsavel" placeholder="CPF do responsável" maxlength="14" oninput="formatarCPF(this)" required>
+          <span id="erroCpf" class="mensagem-erro"></span>
+        </div>
+        <div style="flex: 1;">
+          <input type="text" id="telefoneResponsavel" name="telefoneResponsavel" placeholder="Telefone do responsável" maxlength="15" oninput="formatarTelefone(this)" required>
+          <span id="erroTelefone" class="mensagem-erro"></span>
+        </div>
+      </div>
+
+      <!-- E-mail -->
+      <input type="email" id="emailResponsavel" name="emailResponsavel" placeholder="E-mail do responsável" maxlength="100" required>
+      <span id="erroEmail" class="mensagem-erro"></span>
+
+      <div class="botoes-navegacao">
+        <button class="botao-navegacao" type="button" onclick="voltar()">&#8592;</button>
+        <button class="botao-navegacao" type="button" onclick="validarFormulario()">&#8594;</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function voltar() {
+      window.history.back(); 
+    }
+
+    function mostrarOutroParentesco() {
+      const parentescoSelect = document.getElementById('parentesco');
+      const outroContainer = document.getElementById('outroParentescoContainer');
+      const outroInput = document.getElementById('outroParentesco');
+      
+      if (parentescoSelect.value === 'Outro') {
+        outroContainer.style.display = 'block';
+        outroInput.required = true;
+      } else {
+        outroContainer.style.display = 'none';
+        outroInput.required = false;
+        outroInput.value = '';
+      }
+    }
+
+    function formatarCPF(input) {
+      let valor = input.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+
+      valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+      valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+      valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+      input.value = valor;
+    }
+
+    function formatarTelefone(input) {
+      let valor = input.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+
+      if (valor.length >= 1) {
+        valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+      }
+      if (valor.length > 10) {
+        valor = valor.slice(0, 10) + "-" + valor.slice(10);
+      }
+      input.value = valor;
+    }
+
+    function validarCPF(cpf) {
+      cpf = cpf.replace(/\D/g, '');
+      if (cpf.length !== 11 ||
+          cpf === "00000000000" ||
+          cpf === "11111111111" ||
+          cpf === "22222222222" ||
+          cpf === "33333333333" ||
+          cpf === "44444444444" ||
+          cpf === "55555555555" ||
+          cpf === "66666666666" ||
+          cpf === "77777777777" ||
+          cpf === "88888888888" ||
+          cpf === "99999999999") {
+          return false;
+      }
+      let soma = 0;
+      for (let i = 0; i < 9; i++) {
+          soma += parseInt(cpf.charAt(i)) * (10 - i);
+      }
+      let resto = 11 - (soma % 11);
+      if (resto === 10 || resto === 11) {
+          resto = 0;
+      }
+      if (resto !== parseInt(cpf.charAt(9))) {
+          return false;
+      }
+      soma = 0;
+      for (let i = 0; i < 10; i++) {
+          soma += parseInt(cpf.charAt(i)) * (11 - i);
+      }
+      resto = 11 - (soma % 11);
+      if (resto === 10 || resto === 11) {
+          resto = 0;
+      }
+      if (resto !== parseInt(cpf.charAt(10))) {
+          return false;
+      }
+      return true;
+    }
+
+    function validarEmail(email) {
+      const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      
+      if (!regex.test(email)) {
+        return false;
+      }
+      
+      if (email.length > 254) {
+        return false;
+      }
+      
+      const partes = email.split('@');
+      if (partes.length !== 2) {
+        return false;
+      }
+      
+      const [localPart, domainPart] = partes;
+      
+      if (localPart.length === 0 || localPart.length > 64) {
+        return false;
+      }
+      
+      if (domainPart.length === 0 || domainPart.length > 253) {
+        return false;
+      }
+      
+      if (domainPart.indexOf('.') === -1) {
+        return false;
+      }
+      
+      if (domainPart.startsWith('.') || domainPart.endsWith('.')) {
+        return false;
+      }
+      
+      if (domainPart.includes('..')) {
+        return false;
+      }
+      
+      const dominiosInvalidos = [
+        'example.com',
+        'test.com',
+        'localhost',
+        'email.com',
+        'mail.com',
+        'email.com.br',
+        'teste.com',
+        'fake.com'
+      ];
+      
+      if (dominiosInvalidos.includes(domainPart.toLowerCase())) {
+        return false;
+      }
+      
+      return true;
+    }
+
+    function validarTelefone(telefone) {
+      const numeroLimpo = telefone.replace(/\D/g, '');
+      return numeroLimpo.length === 10 || numeroLimpo.length === 11;
+    }
+
+    function limparErros() {
+      const erros = document.querySelectorAll('.mensagem-erro');
+      erros.forEach(erro => erro.textContent = '');
+      
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => input.classList.remove('erro'));
+    }
+
+    function exibirErro(campo, mensagem) {
+      const elementoErro = document.getElementById(`erro${campo}`);
+      if (elementoErro) {
+        elementoErro.textContent = mensagem;
+      }
+      const elementoInput = document.getElementById(campo.toLowerCase());
+      if (elementoInput) {
+        elementoInput.classList.add('erro');
+      }
+    }
+
+    function obterMensagemErroEmail(email) {
+      if (!email) {
+        return 'E-mail é obrigatório';
+      }
+      
+      if (!email.includes('@')) {
+        return 'E-mail deve conter @';
+      }
+      
+      const partes = email.split('@');
+      if (partes.length !== 2) {
+        return 'Formato de e-mail inválido';
+      }
+      
+      const [localPart, domainPart] = partes;
+      
+      if (localPart.length === 0) {
+        return 'Parte local do e-mail não pode estar vazia';
+      }
+      
+      if (localPart.length > 64) {
+        return 'Parte local do e-mail muito longa';
+      }
+      
+      if (domainPart.length === 0) {
+        return 'Domínio do e-mail não pode estar vazio';
+      }
+      
+      if (domainPart.length > 253) {
+        return 'Domínio do e-mail muito longo';
+      }
+      
+      if (!domainPart.includes('.')) {
+        return 'Domínio deve conter um ponto';
+      }
+      
+      if (domainPart.startsWith('.') || domainPart.endsWith('.')) {
+        return 'Domínio não pode começar ou terminar com ponto';
+      }
+      
+      if (domainPart.includes('..')) {
+        return 'Domínio não pode conter dois pontos consecutivos';
+      }
+      
+      if (email.length > 254) {
+        return 'E-mail muito longo (máximo 254 caracteres)';
+      }
+      
+      return 'E-mail inválido';
+    }
+
+    function validarFormulario() {
+      limparErros();
+      
+      // Obter valores dos campos
+      const nome = document.getElementById('nomeResponsavel').value.trim();
+      const parentesco = document.getElementById('parentesco').value;
+      const outroParentesco = document.getElementById('outroParentesco').value.trim();
+      const cpf = document.getElementById('cpfResponsavel').value;
+      const telefone = document.getElementById('telefoneResponsavel').value;
+      const email = document.getElementById('emailResponsavel').value.trim();
+      
+      let valido = true;
+      
+      // Validar nome (apenas se está preenchido)
+      if (!nome) {
+        exibirErro('Nome', 'Nome completo é obrigatório');
+        valido = false;
+      }
+      
+      // Validar parentesco
+      if (!parentesco) {
+        exibirErro('Parentesco', 'Parentesco é obrigatório');
+        valido = false;
+      } else if (parentesco === 'Outro' && !outroParentesco) {
+        exibirErro('OutroParentesco', 'Por favor, especifique o parentesco');
+        valido = false;
+      }
+      
+      // Validar CPF
+      if (!cpf) {
+        exibirErro('Cpf', 'CPF é obrigatório');
+        valido = false;
+      } else if (!validarCPF(cpf)) {
+        exibirErro('Cpf', 'CPF inválido');
+        valido = false;
+      }
+      
+      // Validar telefone
+      if (!telefone) {
+        exibirErro('Telefone', 'Telefone é obrigatório');
+        valido = false;
+      } else if (!validarTelefone(telefone)) {
+        exibirErro('Telefone', 'Telefone inválido');
+        valido = false;
+      }
+      
+      // Validar email
+      if (!email) {
+        exibirErro('Email', 'E-mail é obrigatório');
+        valido = false;
+      } else if (!validarEmail(email)) {
+        const mensagemErro = obterMensagemErroEmail(email);
+        exibirErro('Email', mensagemErro);
+        valido = false;
+      }
+      
+      // Se todas as validações passaram
+      if (valido) {
+        // Determinar o parentesco final
+        const parentescoFinal = parentesco === 'Outro' ? outroParentesco : parentesco;
+        
+        // Combinar dados do paciente com dados do responsável
+        const dadosPaciente = JSON.parse(sessionStorage.getItem('dadosPaciente') || '{}');
+        const dadosCompletos = {
+          ...dadosPaciente,
+          responsavel: {
+            nome,
+            parentesco: parentescoFinal,
+            cpf,
+            telefone,
+            email
+          }
+        };
+        
+        // Armazenar dados completos
+        sessionStorage.setItem('dadosCompletos', JSON.stringify(dadosCompletos));
+        
+        // Redirecionar para página de criar senha
+        window.location.href = '/criarSenha';
+      }
+    }
+
+    // Carregar dados do paciente se existirem
+    document.addEventListener('DOMContentLoaded', function() {
+      const dadosPaciente = sessionStorage.getItem('dadosPaciente');
+      if (!dadosPaciente) {
+        alert('Dados do paciente não encontrados. Redirecionando...');
+        window.location.href = '/cadastro-paciente';
+      }
+    });
+  </script>
+</body>
+</html>

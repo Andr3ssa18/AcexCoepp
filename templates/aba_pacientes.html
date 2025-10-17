@@ -10,9 +10,9 @@
 <body>
     <header>
        <div class="logo">
-            <span style="font-family: 'Times New Roman', Times, serif;">F</span>
-            <span style="font-family: 'Times New Roman', Times, serif;">S</span>
-            <span style="font-family: 'Times New Roman', Times, serif;">A</span>
+    <span style="font-family: 'Times New Roman', Times, serif;">F</span>
+    <span style="font-family: 'Times New Roman', Times, serif;">S</span>
+    <span style="font-family: 'Times New Roman', Times, serif;">A</span>
         </div>
         <div class="title">Agendamentos - Psicologia</div>
         <div class="profile">
@@ -20,7 +20,6 @@
             <span>P</span>
             <div class="dropdown" id="dropdownMenu">
                 <a href="#" data-page="pagina-consultas"><span>📅</span>Minhas Consultas</a>
-                <a href="#" data-page="pagina-comunicados"><span>📢</span>Comunicados</a>
                 <a href="#" data-page="pagina-meus-dados"><span>👤</span>Minha Conta</a>
                 <a href="#" data-page="pagina-ajuda"><span>❓</span>Ajuda</a>
                 <a href="{{ url_for('logout') }}"><span>↩️</span>Sair da Conta</a>
@@ -44,19 +43,18 @@
     </div>
 
     <div id="pagina-consultas" class="page">
-        <div class="page-header">
-            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
-                </svg>
-                Voltar
-            </button>
-            <div class="main-title">Minhas Consultas</div>
-            <div class="header-spacer"></div>
-        </div>
+      <div class="page-header">
+        <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
+            </svg>
+            VOLTAR
+        </button>
+         <div class="main-title">Minhas Consultas</div>
+         <div class="header-spacer"></div>
+      </div>
         <div class="card-container" id="container-meus-agendamentos">
-            <!-- Consultas serão carregadas dinamicamente -->
-        </div>
+            </div>
         <div id="no-appointments-message" class="info-message">
             <div class="icon-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -69,103 +67,22 @@
         </div>
     </div>
 
-    <!-- Página de Comunicados -->
-    <div id="pagina-comunicados" class="page">
-        <div class="page-header">
-            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
-                </svg>
-                Voltar
-            </button>
-            <div class="main-title">Comunicados</div>
-            <div class="header-spacer"></div>
-        </div>
-        <div class="comunicados-container">
-            <div class="info-message">
-                <p>Aqui você encontra comunicados importantes da clínica sobre horários, feriados, mudanças e outras informações relevantes.</p>
-            </div>
-            
-            <div class="comunicados-list">
-                <div class="comunicado-item">
-                    <div class="comunicado-header">
-                        <div class="comunicado-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
-                            </svg>
-                        </div>
-                        <div class="comunicado-info">
-                            <h3>Horário de Funcionamento - Feriado</h3>
-                            <p class="comunicado-date">15/05/2025</p>
-                        </div>
-                    </div>
-                    <div class="comunicado-content">
-                        <p>Informamos que no dia 20/05/2025 (feriado municipal) a clínica funcionará em horário reduzido, das 8h às 12h. Os atendimentos já agendados para a tarde serão remarcados.</p>
-                    </div>
-                    <div class="comunicado-actions">
-                        <button class="action-button secondary">Marcar como lido</button>
-                    </div>
-                </div>
-                
-                <div class="comunicado-item read">
-                    <div class="comunicado-header">
-                        <div class="comunicado-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
-                            </svg>
-                        </div>
-                        <div class="comunicado-info">
-                            <h3>Atualização do Sistema de Agendamento</h3>
-                            <p class="comunicado-date">10/05/2025</p>
-                        </div>
-                    </div>
-                    <div class="comunicado-content">
-                        <p>O sistema de agendamentos foi atualizado com novas funcionalidades. Agora é possível visualizar o histórico completo de consultas e receber lembretes por e-mail. Em caso de dúvidas, acesse a seção de Ajuda.</p>
-                    </div>
-                    <div class="comunicado-actions">
-                        <button class="action-button secondary">Arquivar</button>
-                    </div>
-                </div>
-
-                <div class="comunicado-item">
-                    <div class="comunicado-header">
-                        <div class="comunicado-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
-                            </svg>
-                        </div>
-                        <div class="comunicado-info">
-                            <h3>Novos Grupos de Apoio</h3>
-                            <p class="comunicado-date">05/05/2025</p>
-                        </div>
-                    </div>
-                    <div class="comunicado-content">
-                        <p>Estamos formando novos grupos de apoio para ansiedade e gerenciamento do estresse. Os encontros acontecerão às quartas-feiras, às 14h. Interessados devem procurar a recepção do COEPP para mais informações.</p>
-                    </div>
-                    <div class="comunicado-actions">
-                        <button class="action-button secondary">Marcar como lido</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="pagina-meus-dados" class="page">
         <div class="page-header">
             <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                     <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
                 </svg>
-                Voltar
+                VOLTAR
             </button>
             <div class="main-title">Minha Conta</div>
             <div class="header-spacer"></div>
         </div>
+
         <div class="tabs-navigation">
             <button class="tab-button active" onclick="mostrarSubAba('sub-aba-meus-dados', this)">Meus Dados</button>
             <button class="tab-button" onclick="mostrarSubAba('sub-aba-notificacoes', this)">Notificações</button>
             <button class="tab-button" onclick="mostrarSubAba('sub-aba-mudar-senha', this)">Mudar Senha</button>
-            <button class="tab-button" onclick="mostrarSubAba('sub-aba-mudar-horario', this)">Mudar Horário</button>
         </div>
 
         <div id="sub-aba-meus-dados" class="sub-tab-content active">
@@ -190,11 +107,11 @@
                 </div>
                 <div class="form-group">
                     <label for="cpf">CPF*</label>
-                    <input type="text" id="cpf" value="{{ paciente.cpf }}"  disabled>
+                    <input type="text" id="cpf" value="{{ paciente.cpf }}" disabled>
                 </div>
                 <div class="form-group">
                     <label for="telefone">Telefone*</label>
-                    <input type="text" id="telefone" value="{{ paciente.telefone }}" maxlength="15" oninput="formatarTelefone(this)" disabled>
+                    <input type="text" id="telefone" value="{{ paciente.telefone }}" maxlength="15" disabled>
                 </div>
                 <div class="form-group">
                     <label for="email">Email*</label>
@@ -205,7 +122,7 @@
                     <input type="text" id="endereco" value="{{ paciente.endereco }}, {{ paciente.numero_casa }}" maxlength="150" disabled>
                 </div>
                 <div class="action-buttons">
-                    <button class="action-button secondary" onclick="mostrarPagina('pagina-ajuda')">Ajuda?</button>
+                    <button class="action-button secondary">Ajuda?</button>
                     <button class="action-button primary" onclick="salvarDados()">Salvar</button>
                 </div>
             </div>
@@ -221,9 +138,18 @@
                     <label for="notif-email">Receber notificações por E-mail</label>
                 </div>
                 <div class="form-group notification-option">
+                    <input type="checkbox" id="notif-sms">
+                    <label for="notif-sms">Receber notificações por SMS</label>
+                </div>
+                <div class="form-group notification-option">
                     <input type="checkbox" id="notif-app" checked>
                     <label for="notif-app">Receber notificações pelo aplicativo</label>
                 </div>
+                <div class="form-group notification-option">
+                    <input type="checkbox" id="notif-ofertas">
+                    <label for="notif-ofertas">Receber ofertas e novidades</label>
+                </div>
+
                 <div class="action-buttons">
                     <button class="action-button primary" onclick="salvarNotificacoes()">Salvar Preferências</button>
                 </div>
@@ -237,17 +163,17 @@
 
                 <div class="form-group">
                     <label for="senha-atual">Senha Atual*</label>
-                    <input type="password" id="senha-atual" placeholder="Digite sua senha atual" maxlength="20">
+                    <input type="password" id="senha-atual" placeholder="Digite sua senha atual">
                     <span class="error-message" id="error-senha-atual"></span>
                 </div>
                 <div class="form-group">
                     <label for="nova-senha">Nova Senha*</label>
-                    <input type="password" id="nova-senha" placeholder="Digite sua nova senha" maxlength="20">
+                    <input type="password" id="nova-senha" placeholder="Digite sua nova senha">
                     <span class="error-message" id="error-nova-senha"></span>
                 </div>
                 <div class="form-group">
                     <label for="confirmar-nova-senha">Confirmar Nova Senha*</label>
-                    <input type="password" id="confirmar-nova-senha" placeholder="Confirme sua nova senha" maxlength="20">
+                    <input type="password" id="confirmar-nova-senha" placeholder="Confirme sua nova senha">
                     <span class="error-message" id="error-confirmar-nova-senha"></span>
                 </div>
 
@@ -256,49 +182,8 @@
                 </div>
             </div>
         </div>
-
-        <!-- Nova sub-aba para Mudar Horário -->
-        <div id="sub-aba-mudar-horario" class="sub-tab-content">
-            <div class="form-container">
-                <h3>Mudar Horário de Preferência</h3>
-                <p class="description">Selecione seus horários preferenciais para futuros agendamentos. Isso nos ajudará a oferecer opções que melhor se adequem à sua disponibilidade.</p>
-
-                <!-- Dias da Semana -->
-                <div class="selection-container">
-                    <h3>Dias da Semana Preferidos</h3>
-                    <div class="selection-buttons-grid" id="mudar-dias-semana-container">
-                        <!-- Botões serão gerados dinamicamente -->
-                    </div>
-                    <span class="error-message" id="error-mudar-dias-semana" style="display: none;">Por favor, selecione pelo menos um dia</span>
-                </div>
-
-                <!-- Períodos -->
-                <div class="selection-container">
-                    <h3>Períodos Preferidos</h3>
-                    <div class="selection-buttons-grid" id="mudar-periodos-container">
-                        <!-- Botões serão gerados dinamicamente -->
-                    </div>
-                    <span class="error-message" id="error-mudar-periodos" style="display: none;">Por favor, selecione pelo menos um período</span>
-                </div>
-
-                <!-- Horários Específicos -->
-                <div class="selection-container" id="mudar-horarios-especificos-container" style="display: none;">
-                    <h3>Horários Específicos Preferidos</h3>
-                    <!-- Horários serão gerados dinamicamente baseado nas seleções anteriores -->
-                    <span class="error-message" id="error-mudar-horarios-especificos" style="display: none;">Por favor, selecione pelo menos um horário específico</span>
-                </div>
-
-                <!-- Resumo da Seleção -->
-                <div class="schedule-summary" id="mudar-schedule-summary" style="display: none;">
-                    <h3>Resumo das Preferências</h3>
-                    <div id="mudar-selected-preferences-display">
-                        <!-- Resumo será gerado dinamicamente -->
-                    </div>
-                    <button class="action-button primary" id="mudar-confirm-selection-button" onclick="salvarPreferenciasHorario()">Salvar Preferências</button>
-                </div>
-            </div>
-        </div>
     </div>
+
 
     <div id="pagina-confirmacao-final" class="page">
         <div class="page-header">
@@ -306,7 +191,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                     <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
                 </svg>
-                Voltar
+                VOLTAR
             </button>
             <div class="main-title">Detalhes do Agendamento</div>
             <div class="header-spacer"></div>
@@ -324,7 +209,7 @@
             </svg>
         </div>
         <p class="confirmacao-info-adicional">Se precisar reagendar ou cancelar, acesse o menu Minhas Consultas.</p>
-        <button class="action-button primary" onclick="mostrarPagina('pagina-principal')">Voltar</button>
+        <button class="action-button primary" onclick="mostrarPagina('pagina-principal')">VOLTAR</button>
     </div>
 
     <div id="pagina-ajuda" class="page">
@@ -333,7 +218,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                     <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
                 </svg>
-                Voltar
+                VOLTAR
             </button>
             <div class="main-title">Ajuda</div>
             <div class="header-spacer"></div>
@@ -428,80 +313,24 @@
         </div>
     </div>
 
-    <!-- Página de Horários de Triagem - NOVA VERSÃO COM SELEÇÃO MÚLTIPLA -->
-    <div id="pagina-horarios-triagem" class="page">
-        <div class="page-header">
-            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
-                </svg>
-                Voltar
-            </button>
-            <div class="main-title">Selecione sua Disponibilidade</div>
-            <div class="header-spacer"></div>
-        </div>
-        
-        <div class="horarios-triagem-container">
-            <p class="horarios-description">Selecione os dias, períodos e horários em que você está disponível para a triagem.</p>
-
-            <!-- Dias da Semana -->
-            <div class="selection-container">
-                <h3>Dias da Semana</h3>
-                <div class="selection-buttons-grid" id="dias-semana-container">
-                    <!-- Botões serão gerados dinamicamente -->
-                </div>
-                <span class="error-message" id="error-dias-semana" style="display: none;">Por favor, selecione pelo menos um dia</span>
-            </div>
-
-            <!-- Períodos -->
-            <div class="selection-container">
-                <h3>Períodos</h3>
-                <div class="selection-buttons-grid" id="periodos-container">
-                    <!-- Botões serão gerados dinamicamente -->
-                </div>
-                <span class="error-message" id="error-periodos" style="display: none;">Por favor, selecione pelo menos um período</span>
-            </div>
-
-            <!-- Horários Específicos -->
-            <div class="selection-container" id="horarios-especificos-container" style="display: none;">
-                <h3>Horários Específicos</h3>
-                <!-- Horários serão gerados dinamicamente baseado nas seleções anteriores -->
-                <span class="error-message" id="error-horarios-especificos" style="display: none;">Por favor, selecione pelo menos um horário específico</span>
-            </div>
-
-            <!-- Resumo da Seleção -->
-            <div class="schedule-summary" id="schedule-summary" style="display: none;">
-                <h3>Resumo da Disponibilidade</h3>
-                <div id="selected-preferences-display">
-                    <!-- Resumo será gerado dinamicamente -->
-                </div>
-                <button class="action-button primary" id="confirm-selection-button" onclick="validarEabrirModalTriagem()">Confirmar Horários</button>
-            </div>
-        </div>
-    </div>
-
     <div id="modal-detalhes-consulta" class="modal-overlay">
         <div class="modal-content">
             <h2>Detalhes da Consulta</h2>
             <div id="detalhes-consulta-conteudo">
-                <!-- Conteúdo será preenchido dinamicamente -->
-            </div>
+                </div>
             <div class="modal-action-buttons">
-                <button class="action-button secondary" onclick="fecharModalDetalhes()">Fechar</button>
+                <button class="action-button secondary" onclick="fecharModalDetalhes()">FECHAR</button>
             </div>
         </div>
     </div>
 
     <div id="modal-triagem" class="modal-overlay">
         <div class="modal-content">
-            <h2>Confirmar Solicitação de Triagem</h2>
-            <p>Confirme sua disponibilidade para a triagem:</p>
-            <div id="triagem-info-confirmacao">
-                <!-- Informações serão preenchidas dinamicamente -->
-            </div>
+            <h2>Confirmar Solicitação</h2>
+            <p>Deseja solicitar triagem para <span id="triagem-info-confirmacao"></span>?</p>
             <div class="modal-action-buttons">
-                <button class="action-button secondary" onclick="fecharModalTriagem()">Cancelar</button>
-                <button class="action-button primary" id="btn-confirmar-envio-triagem" onclick="enviarSolicitacaoTriagem()">Confirmar Solicitação</button>
+                <button class="action-button secondary" onclick="fecharModalTriagem()">CANCELAR</button>
+                <button class="action-button primary" id="btn-confirmar-envio-triagem" onclick="enviarSolicitacaoTriagem()">CONFIRMAR</button>
             </div>
         </div>
     </div>
@@ -517,7 +346,62 @@
             <h2>Sua solicitação de triagem foi registrada com sucesso!</h2>
             <p>Entraremos em contato em breve para agendar seu primeiro atendimento.</p>
             <p>Aguarde mais informações em seu e-mail.</p>
-            <button class="action-button primary" onclick="mostrarPagina('pagina-principal')">Voltar à página principal</button>
+            <button class="action-button primary" onclick="mostrarPagina('pagina-principal')">VOLTAR À PÁGINA PRINCIPAL</button>
+        </div>
+    </div>
+
+    <div id="pagina-horarios-triagem" class="page">
+        <div class="page-header">
+            <button class="action-button back-button" onclick="mostrarPagina('pagina-principal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
+                </svg>
+                VOLTAR
+            </button>
+            <div class="main-title">Selecione um Horário</div>
+            <div class="header-spacer"></div>
+        </div>
+        <div class="horarios-triagem-container">
+            <p class="horarios-description">Escolha o melhor dia e período para o seu atendimento de triagem.</p>
+
+            <div class="selection-form-group">
+                <label for="select-dia-semana">Dia da Semana*</label>
+                <select id="select-dia-semana" onchange="atualizarHorariosDisponiveis()">
+                    <option value="">Selecione o Dia da Semana</option>
+                    <option value="Segunda-feira">Segunda-feira</option>
+                    <option value="Terça-feira">Terça-feira</option>
+                    <option value="Quarta-feira">Quarta-feira</option>
+                    <option value="Quinta-feira">Quinta-feira</option>
+                    <option value="Sexta-feira">Sexta-feira</option>
+                    <option value="Sábado">Sábado</option>
+                </select>
+                <span class="error-message" id="error-dia-semana"></span>
+            </div>
+
+            <div class="selection-form-group">
+                <label for="select-periodo">Período*</label>
+                <select id="select-periodo" onchange="atualizarHorariosDisponiveis()">
+                    <option value="">Selecione o Período</option>
+                    <option value="Manhã">Manhã (08:00 - 12:00)</option>
+                    <option value="Tarde">Tarde (13:00 - 17:00)</option>
+                    <option value="Noite">Noite (18:00 - 22:00)</option>
+                </select>
+                <span class="error-message" id="error-periodo"></span>
+            </div>
+
+            <div class="selection-form-group">
+                <label for="select-horario-especifico">Horário Específico*</label>
+                <div class="time-slots-grid" id="time-slots-grid">
+                    </div>
+                <span class="error-message" id="error-horario-especifico"></span>
+            </div>
+
+            <div class="schedule-summary" id="schedule-summary" style="display: none;">
+                <p><strong>Dia da Semana Selecionado:</strong> <span id="selected-weekday-display"></span></p>
+                <p><strong>Período Selecionado:</strong> <span id="selected-period-display"></span></p>
+                <p><strong>Horário Selecionado:</strong> <span id="selected-time-display"></span></p>
+                <button class="action-button primary" id="confirm-selection-button" onclick="validarEabrirModalTriagem()">Confirmar Horário</button>
+            </div>
         </div>
     </div>
 
@@ -526,13 +410,13 @@
             <h2>Confirmar Presença</h2>
             <p>Deseja confirmar sua presença nesta consulta?</p>
             <div class="modal-action-buttons">
-                <button class="action-button secondary" onclick="fecharModalConfirmarPresenca()">Voltar</button>
-                <button class="action-button primary" id="btn-confirmar-presenca-modal" onclick="confirmarPresencaConsulta()">Confirmar</button>
+                <button class="action-button secondary" onclick="fecharModalConfirmarPresenca()">VOLTAR</button>
+                <button class="action-button primary" id="btn-confirmar-presenca-modal" onclick="confirmarPresencaConsulta()">CONFIRMAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Página de consulta confirmada -->
+    <!-- Nova página de consulta confirmada -->
     <div id="pagina-consulta-confirmada" class="page consulta-confirmada-page">
         <div class="consulta-confirmada-container">
             <h1 class="consulta-confirmada-titulo">Consulta Confirmada!</h1>
@@ -582,7 +466,7 @@
             </button>
             
             <button class="consulta-confirmada-voltar" onclick="mostrarPagina('pagina-consultas')">
-                Voltar
+                VOLTAR
             </button>
         </div>
     </div>
@@ -593,7 +477,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                     <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
                 </svg>
-                Voltar
+                VOLTAR
             </button>
             <div class="main-title">Não Posso Comparecer</div>
             <div class="header-spacer"></div>
@@ -630,7 +514,7 @@
             <h2>Sua presença foi confirmada com sucesso!</h2>
             <p>Seu agendamento está garantido. Lembre-se de comparecer no dia e horário marcados.</p>
             <p>Em caso de dúvidas, consulte a seção "Minhas Consultas".</p>
-            <button class="action-button primary" onclick="mostrarPagina('pagina-consultas')">Voltar à minhas consultas</button>
+            <button class="action-button primary" onclick="mostrarPagina('pagina-consultas')">VOLTAR ÀS MINHAS CONSULTAS</button>
         </div>
     </div>
     
@@ -644,11 +528,12 @@
             <h2>Tem certeza que deseja cancelar esta solicitação?</h2>
             <p>Ao cancelar, você precisará fazer uma nova solicitação de triagem.</p>
             <div class="modal-action-buttons">
-                <button class="action-button secondary" onclick="fecharModalConfirmarCancelamento()">Voltar</button>
-                <button class="action-button danger" id="btn-confirmar-cancelamento-final">Cancelar solicitação</button>
+                <button class="action-button secondary" onclick="fecharModalConfirmarCancelamento()">VOLTAR</button>
+                <button class="action-button danger" id="btn-confirmar-cancelamento-final">CANCELAR SOLICITAÇÃO</button>
             </div>
         </div>
     </div>
+
 
     <div id="toast-notification" class="toast"></div>
 

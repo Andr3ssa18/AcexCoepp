@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Estagiário - COEPP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            gap: 5px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .profile:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .profile span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 220px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown a:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown a.active {
+            background: #e3f2fd;
+            color: #007bff;
+        }
+
+        /* Container Styles */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #f8f9fa;
+            color: #007bff;
+        }
+
+        .nav-item.active {
+            background: #e3f2fd;
+            color: #007bff;
+            border-left-color: #007bff;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .nav-item.logout {
+            margin-top: auto;
+            color: #dc3545;
+        }
+
+        .nav-item.logout:hover {
+            background: #f8d7da;
+        }
+
+        /* Content Styles */
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border-left: 4px solid #007bff;
+        }
+
+        .info-box p {
+            color: #0056b3;
+            font-weight: 500;
+        }
+
+        /* ===== ESTILOS DO PAINEL GERAL ===== */
+        .search-container {
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            font-size: 14px;
+        }
+
+        .search-btn {
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #007bff;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card .date-range {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .consultas-stats {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .consulta-stat {
+            text-align: center;
+        }
+
+        .consulta-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .consulta-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .consultas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .consulta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .consulta-item:last-child {
+            border-bottom: none;
+        }
+
+        .consulta-info {
+            flex: 1;
+        }
+
+        .paciente-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .estagiario-name {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .consulta-horario {
+            background: #e3f2fd;
+            color: #007bff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+        .quick-action-btn:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            transform: translateX(4px);
+        }
+
+        .action-icon {
+            font-size: 20px;
+        }
+
+        .action-text {
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* ===== ESTILOS DA PÁGINA DE PACIENTES ===== */
+        .filtros-container {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-btn {
+            padding: 12px 24px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filtro-btn:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .filtro-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .filtro-badge {
+            background: #6c757d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .filtro-btn.active .filtro-badge {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .pacientes-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Tabela de Pacientes */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .badge-tipo {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-triagem {
+            background: #e3f2fd;
+            color: #007bff;
+        }
+
+        .badge-psicodiagnostico {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-individual {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-grupal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Paginação */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+
+        .pagination-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .pagination-btn:disabled {
+            background: #f8f9fa;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .btn-lg {
+            padding: 14px 24px;
+            font-size: 16px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+            
+            .nav-item {
+                flex-direction: column;
+                min-width: 80px;
+                padding: 10px;
+                font-size: 12px;
+                text-align: center;
+            }
+            
+            .filtros-container {
+                flex-direction: column;
+            }
+            
+            .filtro-btn {
+                justify-content: space-between;
+            }
+            
+            .pacientes-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 800px;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pacientes-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span style="font-family: 'Times New Roman', Times, serif;">F</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">S</span>
+            <span style="font-family: 'Times New Roman', Times, serif;">A</span>
+        </div>
+        <div class="title" id="page-title">Portal do Estagiário</div>
+        <div class="profile" onclick="toggleDropdown()">
+            <div>Olá, Administrador</div>
+            <span>A</span>
+            <div class="dropdown" id="dropdownMenu">
+                <a href="#" onclick="mostrarPagina('pagina-painel-geral')" class="active"><span>📊</span>Painel Geral</a>
+                <a href="#" onclick="mostrarPagina('pagina-meus-dados')"><span>👤</span>Minha Conta</a>
+                <a href="#" onclick="mostrarPagina('pagina-pacientes')"><span>👥</span>Pacientes</a>
+                <a href="#" onclick="mostrarPagina('pagina-estagiarios')"><span>🎓</span>Estagiários</a>
+                <a href="#" onclick="mostrarPagina('pagina-configuracoes')"><span>⚙️</span>Configurações</a>
+                <a href="#" onclick="mostrarPagina('pagina-comunicados')"><span>📢</span>Comunicados</a>
+                <a href="#" onclick="mostrarPagina('pagina-prontuarios')"><span>📋</span>Prontuários</a>
+                <a href="#" onclick="logout()"><span>🚪</span>Sair da Conta</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-user">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">Administrador COEPP</div>
+                        <div class="user-role">Coordenador</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="mostrarPagina('pagina-painel-geral')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M3 13h1v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h1c.6 0 1-.4 1-1s-.4-1-1-1h-1V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v7H3c-.6 0-1 .4-1 1s.4 1 1 1zM6 4h12v7H6V4z"/>
+                    </svg>
+                    <span>Painel Geral</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-pacientes')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63C19.68 7.55 18.92 7 18.06 7h-.12c-.86 0-1.63.55-1.9 1.37l-.86 2.58c1.08.6 1.82 1.73 1.82 3.05v8h3zm-7.5-10.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6h1.5v7h4zm6.5 0v-4h1v-4c0-.82-.68-1.5-1.5-1.5h-2c-.82 0-1.5.68-1.5 1.5v4h1v4h3z"/>
+                    </svg>
+                    <span>Pacientes</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-estagiarios')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                    </svg>
+                    <span>Estagiários</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-prontuarios')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+                    </svg>
+                    <span>Prontuários</span>
+                </a>
+                <a href="#" class="nav-item" onclick="abrirConsultasEstagiarios()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Consultas Estagiários</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-comunicados')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    </svg>
+                    <span>Comunicados</span>
+                </a>
+                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-configuracoes')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                    <span>Configurações</span>
+                </a>
+                <a href="#" class="nav-item logout" onclick="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
+                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                    </svg>
+                    <span>Deslogar</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="content">
+            <!-- ===== PÁGINA PAINEL GERAL ===== -->
+            <div id="pagina-painel-geral" class="page active">
+                <div class="page-header">
+                    <h1>Painel Geral - COEPP</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Visão consolidada dos pacientes, estagiários e atendimentos em andamento.</p>
+                    </div>
+                    
+                    <!-- Barra de Busca -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Buscar pacientes, estagiários..." class="search-input">
+                            <button class="btn btn-primary search-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cards de Estatísticas -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">120</div>
+                            <div class="stat-label">Pacientes cadastrados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">30</div>
+                            <div class="stat-label">Consultas Hoje</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">80</div>
+                            <div class="stat-label">Solicitações de Triagem</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Prontuários para Avaliar</div>
+                        </div>
+                    </div>
+
+                    <div class="content-grid">
+                        <!-- Seção de Consultas -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Consultas</h2>
+                                <span class="date-range">01/03/2025 - 11/08/2025</span>
+                            </div>
+                            <div class="card-content">
+                                <div class="consultas-stats">
+                                    <div class="consulta-stat">
+                                        <div class="consulta-number">40</div>
+                                        <div class="consulta-label">Não confirmadas</div>
+                                    </div>
+                                    <div class="consulta-stat">
+                                        <div class="consulta-number">80</div>
+                                        <div class="consulta-label">Consultas confirmadas</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Próximas Consultas -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Próximas Consultas</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="consultas-list">
+                                    <div class="consulta-item">
+                                        <div class="consulta-info">
+                                            <div class="paciente-name">Caio Silveira - 756790</div>
+                                            <div class="estagiario-name">Leandro Silva</div>
+                                        </div>
+                                        <div class="consulta-horario">QUA-10:00</div>
+                                    </div>
+                                    <div class="consulta-item">
+                                        <div class="consulta-info">
+                                            <div class="paciente-name">Maria Santos - 756791</div>
+                                            <div class="estagiario-name">Leandro Silva</div>
+                                        </div>
+                                        <div class="consulta-horario">QUA-10:00</div>
+                                    </div>
+                                    <div class="consulta-item">
+                                        <div class="consulta-info">
+                                            <div class="paciente-name">Felipe Costa - 796875</div>
+                                            <div class="estagiario-name">Letícia Almeida</div>
+                                        </div>
+                                        <div class="consulta-horario">QUA-16:00</div>
+                                    </div>
+                                    <div class="consulta-item">
+                                        <div class="consulta-info">
+                                            <div class="paciente-name">Ana Anjos - 796877</div>
+                                            <div class="estagiario-name">Alan Cabral</div>
+                                        </div>
+                                        <div class="consulta-horario">QUI-08:00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Atalhos Rápidos -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Atalhos Rápidos</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="mostrarPagina('pagina-adicionar-paciente')">
+                                        <span class="action-icon">➕</span>
+                                        <span class="action-text">Adicionar pacientes</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="mostrarPagina('pagina-prontuarios')">
+                                        <span class="action-icon">📋</span>
+                                        <span class="action-text">Acessar Prontuários</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="mostrarPagina('pagina-criar-comunicado')">
+                                        <span class="action-icon">📢</span>
+                                        <span class="action-text">Criar comunicado</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PÁGINA DE PACIENTES ===== -->
+            <div id="pagina-pacientes" class="page">
+                <div class="page-header">
+                    <h1>Pacientes</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Listagem de pacientes e solicitações de atendimento</p>
+                    </div>
+                    
+                    <!-- Filtros -->
+                    <div class="filtros-container">
+                        <button class="filtro-btn active" onclick="filtrarPacientes('todos')">
+                            <span>Solicitações</span>
+                            <span class="filtro-badge" id="badge-todos">0</span>
+                        </button>
+                        <button class="filtro-btn" onclick="filtrarPacientes('andamento')">
+                            <span>Andamento</span>
+                            <span class="filtro-badge" id="badge-andamento">0</span>
+                        </button>
+                        <button class="filtro-btn" onclick="filtrarPacientes('aprovar')">
+                            <span>Aprovar</span>
+                            <span class="filtro-badge" id="badge-aprovar">0</span>
+                        </button>
+                        <button class="filtro-btn" onclick="filtrarPacientes('finalizados')">
+                            <span>Finalizados</span>
+                            <span class="filtro-badge" id="badge-finalizados">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Estatísticas -->
+                    <div class="pacientes-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-todos">0</div>
+                            <div class="stat-label">Solicitações</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-andamento">0</div>
+                            <div class="stat-label">Andamento</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-aprovar">0</div>
+                            <div class="stat-label">Aprovar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-finalizados">0</div>
+                            <div class="stat-label">Finalizados</div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de Busca -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Buscar pacientes, estagiários..." class="search-input" id="buscarPacientes">
+                            <button class="btn btn-primary search-btn" onclick="buscarPacientes()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Pacientes -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2 id="titulo-tabela">Listagem - Solicitações</h2>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportarDados()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Exportar
+                                </button>
+                                <button class="btn btn-primary" onclick="adicionarPaciente()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Adicionar
+                                </button>
+                            </div>
+                        </div>
+                        <table id="tabela-pacientes">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">Ações</th>
+                                    <th>Paciente</th>
+                                    <th>Estagiário</th>
+                                    <th>Data Consulta</th>
+                                    <th>Tipo de Consulta</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
+                                        Carregando dados...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination">
+                        <div class="pagination-info" id="pagination-info">
+                            Carregando...
+                        </div>
+                        <div class="pagination-controls" id="pagination-controls">
+                            <!-- Controles serão gerados dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outras páginas (exemplo) -->
+            <div id="pagina-meus-dados" class="page">
+                <div class="page-header">
+                    <h1>Minha Conta</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Esta página está em desenvolvimento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pagina-estagiarios" class="page">
+                <div class="page-header">
+                    <h1>Estagiários</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Listagem de estagiários cadastrados no sistema</p>
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div class="pacientes-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-total-estagiarios">0</div>
+                            <div class="stat-label">Total Estagiários</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-consultas-hoje-estagiarios">0</div>
+                            <div class="stat-label">Consultas Hoje</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-prontuarios-aguardando">0</div>
+                            <div class="stat-label">Prontuários Aguardando</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-prontuarios-avaliar">0</div>
+                            <div class="stat-label">Prontuários para Avaliar</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de Busca -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Buscar estagiários..." class="search-input" id="buscarEstagiarios">
+                            <button class="btn btn-primary search-btn" onclick="buscarEstagiarios()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Estagiários -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2>Listagem - Estagiários</h2>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportarDados()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Exportar
+                                </button>
+                                <button class="btn btn-primary" onclick="adicionarEstagiario()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Adicionar
+                                </button>
+                            </div>
+                        </div>
+                        <table id="tabela-estagiarios">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">Ações</th>
+                                    <th>Nome</th>
+                                    <th>RA</th>
+                                    <th>Curso/Período</th>
+                                    <th>Email</th>
+                                    <th>Total Consultas</th>
+                                    <th>Consultas Hoje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-estagiarios">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 20px; color: #666;">
+                                        Carregando dados...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination">
+                        <div class="pagination-info" id="pagination-info-estagiarios">
+                            Carregando...
+                        </div>
+                        <div class="pagination-controls" id="pagination-controls-estagiarios">
+                            <!-- Controles serão gerados dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pagina-configuracoes" class="page">
+                <div class="page-header">
+                    <h1>Configurações</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Esta página está em desenvolvimento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pagina-comunicados" class="page">
+                <div class="page-header">
+                    <h1>Comunicados</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Esta página está em desenvolvimento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pagina-prontuarios" class="page">
+                <div class="page-header">
+                    <h1>Prontuários</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Gerenciamento de prontuários e documentos dos pacientes</p>
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div class="pacientes-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-prontuarios-total">0</div>
+                            <div class="stat-label">Total Prontuários</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-prontuarios-pendentes">0</div>
+                            <div class="stat-label">Pendentes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-prontuarios-aprovados">0</div>
+                            <div class="stat-label">Aprovados</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-prontuarios-revisao">0</div>
+                            <div class="stat-label">Em Revisão</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de Busca -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Buscar prontuários..." class="search-input" id="buscarProntuarios">
+                            <button class="btn btn-primary search-btn" onclick="buscarProntuarios()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Prontuários -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2>Listagem - Prontuários</h2>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportarDados()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Exportar
+                                </button>
+                                <button class="btn btn-primary" onclick="criarProntuario()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Novo Prontuário
+                                </button>
+                            </div>
+                        </div>
+                        <table id="tabela-prontuarios">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">Ações</th>
+                                    <th>Paciente</th>
+                                    <th>Estagiário</th>
+                                    <th>Data Criação</th>
+                                    <th>Status</th>
+                                    <th>Última Atualização</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-prontuarios">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
+                                        Carregando dados...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pagina-comunicados" class="page">
+                <div class="page-header">
+                    <h1>Comunicados</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Gerenciamento de comunicados e notificações do sistema</p>
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div class="pacientes-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-comunicados-total">0</div>
+                            <div class="stat-label">Total Comunicados</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-comunicados-ativos">0</div>
+                            <div class="stat-label">Ativos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-comunicados-urgentes">0</div>
+                            <div class="stat-label">Urgentes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="stat-comunicados-hoje">0</div>
+                            <div class="stat-label">Criados Hoje</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de Busca -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Buscar comunicados..." class="search-input" id="buscarComunicados">
+                            <button class="btn btn-primary search-btn" onclick="buscarComunicados()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Comunicados -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2>Listagem - Comunicados</h2>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportarDados()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Exportar
+                                </button>
+                                <button class="btn btn-primary" onclick="criarComunicado()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Novo Comunicado
+                                </button>
+                            </div>
+                        </div>
+                        <table id="tabela-comunicados">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell">Ações</th>
+                                    <th>Título</th>
+                                    <th>Autor</th>
+                                    <th>Data Criação</th>
+                                    <th>Prioridade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-comunicados">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
+                                        Carregando dados...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pagina-configuracoes" class="page">
+                <div class="page-header">
+                    <h1>Configurações</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Configurações gerais do sistema e preferências</p>
+                    </div>
+                    
+                    <!-- Seções de Configuração -->
+                    <div class="content-grid">
+                        <!-- Configurações do Sistema -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Configurações do Sistema</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="configurarHorarios()">
+                                        <span class="action-icon">🕒</span>
+                                        <span class="action-text">Configurar Horários</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="configurarGrupos()">
+                                        <span class="action-icon">👥</span>
+                                        <span class="action-text">Gerenciar Grupos</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="configurarSemestres()">
+                                        <span class="action-icon">📅</span>
+                                        <span class="action-text">Gerenciar Semestres</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configurações de Usuários -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Configurações de Usuários</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="configurarPermissoes()">
+                                        <span class="action-icon">🔐</span>
+                                        <span class="action-text">Permissões</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="configurarNotificacoes()">
+                                        <span class="action-icon">🔔</span>
+                                        <span class="action-text">Notificações</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="configurarBackup()">
+                                        <span class="action-icon">💾</span>
+                                        <span class="action-text">Backup</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configurações de Email -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Configurações de Email</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="configurarSMTP()">
+                                        <span class="action-icon">📧</span>
+                                        <span class="action-text">Configurar SMTP</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="configurarTemplates()">
+                                        <span class="action-icon">📝</span>
+                                        <span class="action-text">Templates de Email</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configurações de Relatórios -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Configurações de Relatórios</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="configurarRelatorios()">
+                                        <span class="action-icon">📊</span>
+                                        <span class="action-text">Configurar Relatórios</span>
+                                    </button>
+                                    <button class="quick-action-btn" onclick="configurarExportacao()">
+                                        <span class="action-icon">📤</span>
+                                        <span class="action-text">Configurar Exportação</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let dadosPacientes = {};
+        let dadosEstatisticas = {};
+        let filtroAtual = 'todos';
+
+        // Função para mostrar/ocultar dropdown do perfil
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('show');
+        }
+
+        // Fechar dropdown ao clicar fora
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile') && !event.target.closest('.profile')) {
+                const dropdown = document.getElementById('dropdownMenu');
+                dropdown.classList.remove('show');
+            }
+        }
+
+        // Função para alternar entre páginas
+        function mostrarPagina(paginaId) {
+            // Esconder todas as páginas
+            const paginas = document.querySelectorAll('.page');
+            paginas.forEach(pagina => {
+                pagina.classList.remove('active');
+            });
+
+            // Mostrar a página selecionada
+            document.getElementById(paginaId).classList.add('active');
+
+            // Atualizar item ativo no menu lateral
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Atualizar item ativo no dropdown
+            const dropdownItems = document.querySelectorAll('.dropdown a');
+            dropdownItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Ativar item correspondente no menu lateral
+            const navItem = document.querySelector(`.nav-item[onclick="mostrarPagina('${paginaId}')"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+
+            // Ativar item correspondente no dropdown
+            const dropdownItem = document.querySelector(`.dropdown a[onclick="mostrarPagina('${paginaId}')"]`);
+            if (dropdownItem) {
+                dropdownItem.classList.add('active');
+            }
+
+            // Atualizar título da página
+            const tituloPagina = document.getElementById(paginaId).querySelector('h1');
+            if (tituloPagina) {
+                document.getElementById('page-title').textContent = tituloPagina.textContent;
+            }
+
+            // Fechar dropdown se estiver aberto
+            document.getElementById('dropdownMenu').classList.remove('show');
+
+            // Se for a página de pacientes, carregar os dados
+            if (paginaId === 'pagina-pacientes') {
+                carregarDadosPacientes('todos');
+            }
+            
+            // Se for a página de estagiários, carregar os dados
+            if (paginaId === 'pagina-estagiarios') {
+                carregarDadosEstagiarios();
+            }
+        }
+
+        // Função de logout
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        // Função para abrir consultas de estagiários na mesma página
+        function abrirConsultasEstagiarios() {
+            window.location.href = '/admin/consultas';
+        }
+
+        // Função para filtrar pacientes
+        function filtrarPacientes(tipo) {
+            filtroAtual = tipo;
+            
+            // Atualizar botões de filtro
+            const filtros = document.querySelectorAll('.filtro-btn');
+            filtros.forEach(filtro => {
+                filtro.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Atualizar título da tabela
+            const titulos = {
+                'todos': 'Listagem - Solicitações',
+                'andamento': 'Listagem - Andamento',
+                'aprovar': 'Listagem - Aprovar',
+                'finalizados': 'Listagem - Finalizados'
+            };
+            document.getElementById('titulo-tabela').textContent = titulos[tipo];
+            
+            // Carregar dados da API
+            carregarDadosPacientes(tipo);
+        }
+
+        // Função para carregar dados na tabela
+        function carregarTabela(tipo) {
+            const corpoTabela = document.getElementById('corpo-tabela');
+            corpoTabela.innerHTML = '';
+            
+            const dados = dadosPacientes[tipo] || [];
+            
+            dados.forEach(paciente => {
+                const linha = document.createElement('tr');
+                
+                // Determinar a classe do badge baseado no tipo de consulta
+                let classeBadge = 'badge-triagem';
+                if (paciente.tipo_consulta === 'Psicodiagnóstico') classeBadge = 'badge-psicodiagnostico';
+                if (paciente.tipo_consulta === 'Psicoterapia Individual') classeBadge = 'badge-individual';
+                if (paciente.tipo_consulta === 'Psicoterapia Grupal') classeBadge = 'badge-grupal';
+                
+                linha.innerHTML = `
+                    <td class="checkbox-cell">
+                        <div class="checkbox-container">
+                            <input type="checkbox">
+                        </div>
+                    </td>
+                    <td>${paciente.paciente_nome}</td>
+                    <td>${paciente.estagiario_nome}</td>
+                    <td>${paciente.data_agendamento}</td>
+                    <td>
+                        <span class="badge-tipo ${classeBadge}">${paciente.tipo_consulta}</span>
+                    </td>
+                `;
+                
+                corpoTabela.appendChild(linha);
+            });
+        }
+
+        // Função para buscar pacientes
+        function buscarPacientes() {
+            const termo = document.getElementById('buscarPacientes').value;
+            
+            // Fazer requisição para a API com o termo de busca
+            fetch(`/api/admin/pacientes?filtro=${filtroAtual}&busca=${encodeURIComponent(termo)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao buscar pacientes:', data.error);
+                        return;
+                    }
+                    
+                    dadosPacientes[filtroAtual] = data.pacientes;
+                    carregarTabela(filtroAtual);
+                })
+                .catch(error => {
+                    console.error('Erro na requisição:', error);
+                });
+        }
+
+        // Função para exportar dados
+        function exportarDados() {
+            alert('Funcionalidade de exportação em desenvolvimento!');
+        }
+
+        // Função para adicionar paciente
+        function adicionarPaciente() {
+            window.location.href = '/cadastroPaciente';
+        }
+
+        // Função para adicionar estagiário
+        function adicionarEstagiario() {
+            window.location.href = '/cadastroaluno';
+        }
+
+        // Função para criar prontuário
+        function criarProntuario() {
+            alert('Funcionalidade de criar prontuário em desenvolvimento!');
+        }
+
+        // Função para criar comunicado
+        function criarComunicado() {
+            alert('Funcionalidade de criar comunicado em desenvolvimento!');
+        }
+
+        // Funções de configuração
+        function configurarHorarios() {
+            alert('Configuração de horários em desenvolvimento!');
+        }
+
+        function configurarGrupos() {
+            alert('Configuração de grupos em desenvolvimento!');
+        }
+
+        function configurarSemestres() {
+            alert('Configuração de semestres em desenvolvimento!');
+        }
+
+        function configurarPermissoes() {
+            alert('Configuração de permissões em desenvolvimento!');
+        }
+
+        function configurarNotificacoes() {
+            alert('Configuração de notificações em desenvolvimento!');
+        }
+
+        function configurarBackup() {
+            alert('Configuração de backup em desenvolvimento!');
+        }
+
+        function configurarSMTP() {
+            alert('Configuração de SMTP em desenvolvimento!');
+        }
+
+        function configurarTemplates() {
+            alert('Configuração de templates em desenvolvimento!');
+        }
+
+        function configurarRelatorios() {
+            alert('Configuração de relatórios em desenvolvimento!');
+        }
+
+        function configurarExportacao() {
+            alert('Configuração de exportação em desenvolvimento!');
+        }
+
+        // Função para buscar prontuários
+        function buscarProntuarios() {
+            const termo = document.getElementById('buscarProntuarios').value;
+            alert(`Buscando prontuários: ${termo}`);
+        }
+
+        // Função para buscar comunicados
+        function buscarComunicados() {
+            const termo = document.getElementById('buscarComunicados').value;
+            alert(`Buscando comunicados: ${termo}`);
+        }
+
+        // Função para carregar dados dos estagiários da API
+        function carregarDadosEstagiarios() {
+            fetch('/api/admin/estagiarios')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao carregar estagiários:', data.error);
+                        return;
+                    }
+                    
+                    carregarTabelaEstagiarios(data.estagiarios);
+                })
+                .catch(error => {
+                    console.error('Erro na requisição:', error);
+                });
+        }
+
+        // Função para carregar dados na tabela de estagiários
+        function carregarTabelaEstagiarios(estagiarios) {
+            const corpoTabela = document.getElementById('corpo-tabela-estagiarios');
+            corpoTabela.innerHTML = '';
+            
+            estagiarios.forEach(estagiario => {
+                const linha = document.createElement('tr');
+                
+                linha.innerHTML = `
+                    <td>${estagiario.nome}</td>
+                    <td>${estagiario.ra}</td>
+                    <td>${estagiario.curso_periodo}</td>
+                    <td>${estagiario.email}</td>
+                    <td>${estagiario.total_consultas}</td>
+                    <td>${estagiario.consultas_hoje}</td>
+                `;
+                
+                corpoTabela.appendChild(linha);
+            });
+        }
+
+        // Função para buscar estagiários
+        function buscarEstagiarios() {
+            const termo = document.getElementById('buscarEstagiarios').value;
+            
+            fetch(`/api/admin/estagiarios?busca=${encodeURIComponent(termo)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao buscar estagiários:', data.error);
+                        return;
+                    }
+                    
+                    carregarTabelaEstagiarios(data.estagiarios);
+                })
+                .catch(error => {
+                    console.error('Erro na requisição:', error);
+                });
+        }
+
+        // Função para carregar dados dos pacientes da API
+        function carregarDadosPacientes(tipo) {
+            fetch(`/api/admin/pacientes?filtro=${tipo}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao carregar pacientes:', data.error);
+                        return;
+                    }
+                    
+                    dadosPacientes[tipo] = data.pacientes;
+                    carregarTabela(tipo);
+                    
+                    // Atualizar estatísticas dos filtros
+                    if (data.stats) {
+                        atualizarEstatisticasFiltros(data.stats);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na requisição:', error);
+                });
+        }
+
+        // Função para carregar estatísticas do painel geral
+        function carregarEstatisticas() {
+            fetch('/api/admin/estatisticas')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao carregar estatísticas:', data.error);
+                        return;
+                    }
+                    
+                    dadosEstatisticas = data;
+                    atualizarPainelGeral();
+                })
+                .catch(error => {
+                    console.error('Erro na requisição:', error);
+                });
+        }
+
+        // Função para atualizar o painel geral com dados reais
+        function atualizarPainelGeral() {
+            // Atualizar cards de estatísticas
+            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = dadosEstatisticas.total_pacientes || 0;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = dadosEstatisticas.consultas_hoje || 0;
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = dadosEstatisticas.solicitacoes_triagem || 0;
+            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = dadosEstatisticas.prontuarios_avaliar || 0;
+
+            // Atualizar estatísticas de consultas
+            document.querySelector('.consulta-stat:nth-child(1) .consulta-number').textContent = dadosEstatisticas.consultas_nao_confirmadas || 0;
+            document.querySelector('.consulta-stat:nth-child(2) .consulta-number').textContent = dadosEstatisticas.consultas_confirmadas || 0;
+
+            // Atualizar próximas consultas
+            const proximasConsultas = document.querySelector('.consultas-list');
+            proximasConsultas.innerHTML = '';
+
+            if (dadosEstatisticas.proximas_consultas && dadosEstatisticas.proximas_consultas.length > 0) {
+                dadosEstatisticas.proximas_consultas.forEach(consulta => {
+                    const consultaItem = document.createElement('div');
+                    consultaItem.className = 'consulta-item';
+                    
+                    const dataFormatada = consulta.data_agendamento ? 
+                        new Date(consulta.data_agendamento).toLocaleDateString('pt-BR') : 
+                        'Data não definida';
+                    
+                    consultaItem.innerHTML = `
+                        <div class="consulta-info">
+                            <div class="paciente-name">${consulta.paciente_nome}</div>
+                            <div class="estagiario-name">${consulta.estagiario_nome}</div>
+                        </div>
+                        <div class="consulta-horario">${dataFormatada}</div>
+                    `;
+                    
+                    proximasConsultas.appendChild(consultaItem);
+                });
+            } else {
+                proximasConsultas.innerHTML = '<div class="consulta-item"><div class="consulta-info">Nenhuma consulta próxima</div></div>';
+            }
+        }
+
+        // Função para atualizar estatísticas dos filtros
+        function atualizarEstatisticasFiltros(stats) {
+            const filtros = document.querySelectorAll('.filtro-btn');
+            filtros.forEach(filtro => {
+                const badge = filtro.querySelector('.filtro-badge');
+                if (badge) {
+                    const tipo = filtro.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    badge.textContent = stats[tipo] || 0;
+                }
+            });
+
+            // Atualizar estatísticas da seção de pacientes
+            const statItems = document.querySelectorAll('.stat-item');
+            if (statItems.length >= 4) {
+                statItems[0].querySelector('.stat-number').textContent = stats.todos || 0;
+                statItems[1].querySelector('.stat-number').textContent = stats.andamento || 0;
+                statItems[2].querySelector('.stat-number').textContent = stats.aprovar || 0;
+                statItems[3].querySelector('.stat-number').textContent = stats.finalizados || 0;
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Definir página inicial como ativa
+            mostrarPagina('pagina-painel-geral');
+            
+            // Carregar dados iniciais
+            carregarEstatisticas();
+            carregarDadosPacientes('todos');
+            
+            // Adicionar evento de enter na busca
+            document.getElementById('buscarPacientes').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    buscarPacientes();
+                }
+            });
+            
+            // Adicionar evento de enter na busca de estagiários
+            document.getElementById('buscarEstagiarios').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    buscarEstagiarios();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -94,15 +94,17 @@
 
         <h2>Mestre</h2>
 
-        <input type="text" id="nome" placeholder="Nome Completo">
+        <form method="POST">
+            <input type="text" id="nome" name="nome" placeholder="Nome Completo" required>
 
-        <div class="linha-inputs">
-            <input type="text" id="cpf" placeholder="CPF" maxlength="14" oninput="formatarCPF(this)">
-            <input type="text" id="telefone" placeholder="Telefone" maxlength="15" oninput="formatarTelefone(this)">
-        </div>
+            <div class="linha-inputs">
+                <input type="text" id="cpf" name="cpf" placeholder="CPF" maxlength="14" oninput="formatarCPF(this)" required>
+                <input type="text" id="telefone" name="telefone" placeholder="Telefone" maxlength="15" oninput="formatarTelefone(this)" required>
+            </div>
 
-        <input type="email" id="email" placeholder="E-mail institucional">
-        <input type="text" id="registro_profissional" placeholder="Registro profissional">
+            <input type="email" id="email" name="email" placeholder="E-mail institucional" required>
+            <input type="text" id="registro_profissional" name="registro_profissional" placeholder="Registro profissional" required>
+        </form>
 
         <div class="botoes-navegacao">
             <button class="botao-navegacao" onclick="voltar()">&#8592;</button>
@@ -144,7 +146,8 @@
                 return;
             }
 
-            window.location.href = "/senha";
+            // Submeter o formulário
+            document.querySelector('form').submit();
         }
 
         function formatarTelefone(input) {
