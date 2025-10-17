@@ -1213,18 +1213,41 @@ def api_listar_pacientes_admin():
             )
         
         agendamentos = query.order_by(Agendamento.data_agendamento.desc()).limit(50).all()
-        
-        # Formatar dados
+
+        # Formatar dados a partir de agendamentos
         pacientes_formatados = []
+        pacientes_ids_com_agendamento = set()
         for agendamento in agendamentos:
+            if agendamento.paciente:
+                pacientes_ids_com_agendamento.add(agendamento.paciente.id)
             pacientes_formatados.append({
                 'id': agendamento.id,
-                'paciente_nome': agendamento.paciente.nome,
-                'estagiario_nome': agendamento.estagiario.nome,
-                'data_agendamento': agendamento.data_agendamento.strftime('%d/%m/%Y %H:%M'),
+                'paciente_nome': agendamento.paciente.nome if agendamento.paciente else None,
+                'estagiario_nome': agendamento.estagiario.nome if agendamento.estagiario else None,
+                'data_agendamento': agendamento.data_agendamento.strftime('%d/%m/%Y %H:%M') if agendamento.data_agendamento else None,
                 'tipo_consulta': agendamento.tipo_consulta,
                 'status': agendamento.status
             })
+
+        # Complementar com pacientes cadastrados (sem agendamento) quando houver termo de busca
+        if busca:
+            pacientes_sem_agendamento = (
+                Paciente.query
+                .filter(Paciente.nome.ilike(f'%{busca}%'))
+                .filter(~Paciente.id.in_(pacientes_ids_com_agendamento))
+                .limit(50)
+                .all()
+            )
+
+            for paciente in pacientes_sem_agendamento:
+                pacientes_formatados.append({
+                    'id': paciente.id,
+                    'paciente_nome': paciente.nome,
+                    'estagiario_nome': None,
+                    'data_agendamento': None,
+                    'tipo_consulta': None,
+                    'status': 'cadastrado'
+                })
         
         # Contar estatísticas por filtro
         stats = {

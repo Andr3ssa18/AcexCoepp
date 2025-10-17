@@ -800,7 +800,6 @@
                 <a href="#" onclick="mostrarPagina('pagina-painel-geral')" class="active"><span>📊</span>Painel Geral</a>
                 <a href="#" onclick="mostrarPagina('pagina-meus-dados')"><span>👤</span>Minha Conta</a>
                 <a href="#" onclick="mostrarPagina('pagina-pacientes')"><span>👥</span>Pacientes</a>
-                <a href="#" onclick="mostrarPagina('pagina-estagiarios')"><span>🎓</span>Estagiários</a>
                 <a href="#" onclick="mostrarPagina('pagina-configuracoes')"><span>⚙️</span>Configurações</a>
                 <a href="#" onclick="mostrarPagina('pagina-comunicados')"><span>📢</span>Comunicados</a>
                 <a href="#" onclick="mostrarPagina('pagina-prontuarios')"><span>📋</span>Prontuários</a>
@@ -832,12 +831,6 @@
                         <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63C19.68 7.55 18.92 7 18.06 7h-.12c-.86 0-1.63.55-1.9 1.37l-.86 2.58c1.08.6 1.82 1.73 1.82 3.05v8h3zm-7.5-10.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6h1.5v7h4zm6.5 0v-4h1v-4c0-.82-.68-1.5-1.5-1.5h-2c-.82 0-1.5.68-1.5 1.5v4h1v4h3z"/>
                     </svg>
                     <span>Pacientes</span>
-                </a>
-                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-estagiarios')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
-                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                    </svg>
-                    <span>Estagiários</span>
                 </a>
                 <a href="#" class="nav-item" onclick="mostrarPagina('pagina-prontuarios')">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
@@ -886,8 +879,8 @@
                     <!-- Barra de Busca -->
                     <div class="search-container">
                         <div class="search-box">
-                            <input type="text" placeholder="Buscar pacientes, estagiários..." class="search-input">
-                            <button class="btn btn-primary search-btn">
+                            <input type="text" placeholder="Buscar pacientes, estagiários..." class="search-input" id="buscarGeral">
+                            <button class="btn btn-primary search-btn" onclick="buscarNoPainelGeral()">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
                                     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                                 </svg>
@@ -1013,19 +1006,19 @@
                     
                     <!-- Filtros -->
                     <div class="filtros-container">
-                        <button class="filtro-btn active" onclick="filtrarPacientes('todos')">
+                        <button class="filtro-btn active" onclick="filtrarPacientes('todos', this)">
                             <span>Solicitações</span>
                             <span class="filtro-badge" id="badge-todos">0</span>
                         </button>
-                        <button class="filtro-btn" onclick="filtrarPacientes('andamento')">
+                        <button class="filtro-btn" onclick="filtrarPacientes('andamento', this)">
                             <span>Andamento</span>
                             <span class="filtro-badge" id="badge-andamento">0</span>
                         </button>
-                        <button class="filtro-btn" onclick="filtrarPacientes('aprovar')">
+                        <button class="filtro-btn" onclick="filtrarPacientes('aprovar', this)">
                             <span>Aprovar</span>
                             <span class="filtro-badge" id="badge-aprovar">0</span>
                         </button>
-                        <button class="filtro-btn" onclick="filtrarPacientes('finalizados')">
+                        <button class="filtro-btn" onclick="filtrarPacientes('finalizados', this)">
                             <span>Finalizados</span>
                             <span class="filtro-badge" id="badge-finalizados">0</span>
                         </button>
@@ -1127,99 +1120,6 @@
                 </div>
             </div>
 
-            <div id="pagina-estagiarios" class="page">
-                <div class="page-header">
-                    <h1>Estagiários</h1>
-                </div>
-                <div class="page-content">
-                    <div class="info-box">
-                        <p>Listagem de estagiários cadastrados no sistema</p>
-                    </div>
-                    
-                    <!-- Estatísticas -->
-                    <div class="pacientes-stats">
-                        <div class="stat-item">
-                            <div class="stat-number" id="stat-total-estagiarios">0</div>
-                            <div class="stat-label">Total Estagiários</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="stat-consultas-hoje-estagiarios">0</div>
-                            <div class="stat-label">Consultas Hoje</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="stat-prontuarios-aguardando">0</div>
-                            <div class="stat-label">Prontuários Aguardando</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" id="stat-prontuarios-avaliar">0</div>
-                            <div class="stat-label">Prontuários para Avaliar</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Barra de Busca -->
-                    <div class="search-container">
-                        <div class="search-box">
-                            <input type="text" placeholder="Buscar estagiários..." class="search-input" id="buscarEstagiarios">
-                            <button class="btn btn-primary search-btn" onclick="buscarEstagiarios()">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tabela de Estagiários -->
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h2>Listagem - Estagiários</h2>
-                            <div class="table-actions">
-                                <button class="btn btn-outline" onclick="exportarDados()">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                                    </svg>
-                                    Exportar
-                                </button>
-                                <button class="btn btn-primary" onclick="adicionarEstagiario()">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                                    </svg>
-                                    Adicionar
-                                </button>
-                            </div>
-                        </div>
-                        <table id="tabela-estagiarios">
-                            <thead>
-                                <tr>
-                                    <th class="checkbox-cell">Ações</th>
-                                    <th>Nome</th>
-                                    <th>RA</th>
-                                    <th>Curso/Período</th>
-                                    <th>Email</th>
-                                    <th>Total Consultas</th>
-                                    <th>Consultas Hoje</th>
-                                </tr>
-                            </thead>
-                            <tbody id="corpo-tabela-estagiarios">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; padding: 20px; color: #666;">
-                                        Carregando dados...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Paginação -->
-                    <div class="pagination">
-                        <div class="pagination-info" id="pagination-info-estagiarios">
-                            Carregando...
-                        </div>
-                        <div class="pagination-controls" id="pagination-controls-estagiarios">
-                            <!-- Controles serão gerados dinamicamente -->
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div id="pagina-configuracoes" class="page">
                 <div class="page-header">
@@ -1578,10 +1478,6 @@
                 carregarDadosPacientes('todos');
             }
             
-            // Se for a página de estagiários, carregar os dados
-            if (paginaId === 'pagina-estagiarios') {
-                carregarDadosEstagiarios();
-            }
         }
 
         // Função de logout
@@ -1597,7 +1493,7 @@
         }
 
         // Função para filtrar pacientes
-        function filtrarPacientes(tipo) {
+        function filtrarPacientes(tipo, el) {
             filtroAtual = tipo;
             
             // Atualizar botões de filtro
@@ -1605,7 +1501,9 @@
             filtros.forEach(filtro => {
                 filtro.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (el) {
+                el.classList.add('active');
+            }
             
             // Atualizar título da tabela
             const titulos = {
@@ -1627,6 +1525,17 @@
             
             const dados = dadosPacientes[tipo] || [];
             
+            if (!dados.length) {
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
+                        Nenhum registro encontrado.
+                    </td>
+                `;
+                corpoTabela.appendChild(linha);
+                return;
+            }
+
             dados.forEach(paciente => {
                 const linha = document.createElement('tr');
                 
@@ -1642,12 +1551,13 @@
                             <input type="checkbox">
                         </div>
                     </td>
-                    <td>${paciente.paciente_nome}</td>
-                    <td>${paciente.estagiario_nome}</td>
-                    <td>${paciente.data_agendamento}</td>
+                    <td>${paciente.paciente_nome || '-'}</td>
+                    <td>${paciente.estagiario_nome || '-'}</td>
+                    <td>${paciente.data_agendamento || '-'}</td>
                     <td>
-                        <span class="badge-tipo ${classeBadge}">${paciente.tipo_consulta}</span>
+                        <span class="badge-tipo ${classeBadge}">${paciente.tipo_consulta || '-'}</span>
                     </td>
+                    <td>${paciente.status || '-'}</td>
                 `;
                 
                 corpoTabela.appendChild(linha);
@@ -1672,7 +1582,39 @@
                 })
                 .catch(error => {
                     console.error('Erro na requisição:', error);
+                    const corpoTabela = document.getElementById('corpo-tabela');
+                    corpoTabela.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 20px; color: #c00;">
+                                Erro ao carregar pacientes.
+                            </td>
+                        </tr>
+                    `;
                 });
+        }
+
+        // Busca no Painel Geral
+        function buscarNoPainelGeral() {
+            const termo = (document.getElementById('buscarGeral') || {}).value || '';
+            // Reutiliza a listagem de pacientes com filtro 'todos'
+            fetch(`/api/admin/pacientes?filtro=todos&busca=${encodeURIComponent(termo)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao buscar no painel geral:', data.error);
+                        return;
+                    }
+                    // Alterna para página de pacientes para exibir resultados
+                    mostrarPagina('pagina-pacientes');
+                    filtroAtual = 'todos';
+                    dadosPacientes['todos'] = data.pacientes;
+                    carregarTabela('todos');
+                    // Atualiza badges/estatísticas se retornadas
+                    if (data.stats) {
+                        atualizarEstatisticasFiltros(data.stats);
+                    }
+                })
+                .catch(error => console.error('Erro na requisição:', error));
         }
 
         // Função para exportar dados
@@ -1685,10 +1627,6 @@
             window.location.href = '/cadastroPaciente';
         }
 
-        // Função para adicionar estagiário
-        function adicionarEstagiario() {
-            window.location.href = '/cadastroaluno';
-        }
 
         // Função para criar prontuário
         function criarProntuario() {
@@ -1753,62 +1691,6 @@
             alert(`Buscando comunicados: ${termo}`);
         }
 
-        // Função para carregar dados dos estagiários da API
-        function carregarDadosEstagiarios() {
-            fetch('/api/admin/estagiarios')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Erro ao carregar estagiários:', data.error);
-                        return;
-                    }
-                    
-                    carregarTabelaEstagiarios(data.estagiarios);
-                })
-                .catch(error => {
-                    console.error('Erro na requisição:', error);
-                });
-        }
-
-        // Função para carregar dados na tabela de estagiários
-        function carregarTabelaEstagiarios(estagiarios) {
-            const corpoTabela = document.getElementById('corpo-tabela-estagiarios');
-            corpoTabela.innerHTML = '';
-            
-            estagiarios.forEach(estagiario => {
-                const linha = document.createElement('tr');
-                
-                linha.innerHTML = `
-                    <td>${estagiario.nome}</td>
-                    <td>${estagiario.ra}</td>
-                    <td>${estagiario.curso_periodo}</td>
-                    <td>${estagiario.email}</td>
-                    <td>${estagiario.total_consultas}</td>
-                    <td>${estagiario.consultas_hoje}</td>
-                `;
-                
-                corpoTabela.appendChild(linha);
-            });
-        }
-
-        // Função para buscar estagiários
-        function buscarEstagiarios() {
-            const termo = document.getElementById('buscarEstagiarios').value;
-            
-            fetch(`/api/admin/estagiarios?busca=${encodeURIComponent(termo)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Erro ao buscar estagiários:', data.error);
-                        return;
-                    }
-                    
-                    carregarTabelaEstagiarios(data.estagiarios);
-                })
-                .catch(error => {
-                    console.error('Erro na requisição:', error);
-                });
-        }
 
         // Função para carregar dados dos pacientes da API
         function carregarDadosPacientes(tipo) {
@@ -1922,18 +1804,25 @@
             carregarDadosPacientes('todos');
             
             // Adicionar evento de enter na busca
-            document.getElementById('buscarPacientes').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    buscarPacientes();
-                }
-            });
+            const buscarPacEl = document.getElementById('buscarPacientes');
+            if (buscarPacEl) {
+                buscarPacEl.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        buscarPacientes();
+                    }
+                });
+            }
             
-            // Adicionar evento de enter na busca de estagiários
-            document.getElementById('buscarEstagiarios').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    buscarEstagiarios();
-                }
-            });
+            // Enter na busca do Painel Geral
+            const buscarGeralEl = document.getElementById('buscarGeral');
+            if (buscarGeralEl) {
+                buscarGeralEl.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        buscarNoPainelGeral();
+                    }
+                });
+            }
+
         });
     </script>
 </body>
