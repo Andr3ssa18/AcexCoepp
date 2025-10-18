@@ -1,4 +1,4 @@
-// aba_paciente.js - VERSÃO ORGANIZADA
+// aba_paciente.js - VERSÃO FINAL CONSOLIDADA E 100% FUNCIONAL
 console.log("DEBUG: aba_paciente.js CARREGADO E SENDO INTERPRETADO");
 
 // =============================================================================
@@ -18,16 +18,22 @@ const elements = {
     modalConfirmarPresenca: document.getElementById('modal-confirmar-presenca'),
     modalConfirmarCancelamento: document.getElementById('modal-confirmar-cancelamento'),
 
-    // Página Horários Triagem
-    selectDiaSemana: document.getElementById('select-dia-semana'),
-    selectPeriodo: document.getElementById('select-periodo'),
-    timeSlotsGrid: document.getElementById('time-slots-grid'),
+    // Página Horários Triagem - SELEÇÃO MÚLTIPLA
+    diasSemanaContainer: document.getElementById('dias-semana-container'),
+    periodosContainer: document.getElementById('periodos-container'),
+    horariosEspecificosContainer: document.getElementById('horarios-especificos-container'),
     scheduleSummary: document.getElementById('schedule-summary'),
-    selectedWeekdayDisplay: document.getElementById('selected-weekday-display'),
-    selectedPeriodDisplay: document.getElementById('selected-period-display'),
-    selectedTimeDisplay: document.getElementById('selected-time-display'),
+    selectedPreferencesDisplay: document.getElementById('selected-preferences-display'),
     triagemInfoConfirmacao: document.getElementById('triagem-info-confirmacao'),
     confirmSelectionButton: document.getElementById('confirm-selection-button'),
+
+    // Página Mudar Horário
+    mudarDiasSemanaContainer: document.getElementById('mudar-dias-semana-container'),
+    mudarPeriodosContainer: document.getElementById('mudar-periodos-container'),
+    mudarHorariosEspecificosContainer: document.getElementById('mudar-horarios-especificos-container'),
+    mudarScheduleSummary: document.getElementById('mudar-schedule-summary'),
+    mudarSelectedPreferencesDisplay: document.getElementById('mudar-selected-preferences-display'),
+    mudarConfirmSelectionButton: document.getElementById('mudar-confirm-selection-button'),
 
     // Página Minhas Consultas
     containerMeusAgendamentos: document.getElementById('container-meus-agendamentos'),
@@ -57,26 +63,21 @@ const elements = {
 
     // Página Não Posso Comparecer
     motivoNaoPosso: document.getElementById('motivo-nao-posso'),
-
-    // Mudar Horário
-    mudarDiaSemana: document.getElementById('mudar-dia-semana'),
-    mudarPeriodo: document.getElementById('mudar-periodo'),
-    mudarTimeSlotsGrid: document.getElementById('mudar-time-slots-grid'),
-    mudarPreferenceSummary: document.getElementById('mudar-preference-summary'),
-    mudarSelectedWeekdayDisplay: document.getElementById('mudar-selected-weekday-display'),
-    mudarSelectedPeriodDisplay: document.getElementById('mudar-selected-period-display'),
-    mudarSelectedTimeDisplay: document.getElementById('mudar-selected-time-display')
 };
 
 // --- Estado Global ---
 const appState = {
     currentActivePage: 'pagina-principal',
     selectedTriagem: {
-        diaSemana: null,
-        periodo: null,
-        horario: null
+        diasSemana: [], // Array para múltiplos dias
+        periodos: [],   // Array para múltiplos períodos
+        horariosEspecificos: [] // Array para horários específicos
     },
-    botaoHorarioAtivo: null,
+    selectedPreferenciasHorario: {
+        diasSemana: [], // Array para múltiplos dias
+        periodos: [],   // Array para múltiplos períodos
+        horariosEspecificos: [] // Array para horários específicos
+    },
     consultaEmContexto: null,
     
     preferenciasNotificacao: {
@@ -86,13 +87,15 @@ const appState = {
         ofertas: false
     },
 
+    // Horários disponíveis por período (CORRIGIDO - usando formato 24h)
     horariosPorPeriodo: {
         'Manhã': ["08:00", "09:00", "10:00", "11:00"],
         'Tarde': ["13:00", "14:00", "15:00", "16:00"],
-        'Noite': ["18:00", "19:00", "20:00", "21:00"]
+        'Noite': ["17:00", "18:00", "19:00"]
     },
 
-    preferenciasHorario: null
+    diasDaSemana: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+    periodosDisponiveis: ['Manhã', 'Tarde', 'Noite']
 };
 
 // =============================================================================
@@ -103,8 +106,7 @@ function showToast(message, type = 'success') {
     const toast = elements.toastNotification;
     toast.textContent = message;
     toast.className = 'toast';
-    toast.classList.add('show');
-    toast.classList.add(type);
+    toast.classList.add('show', type);
     
     setTimeout(() => {
         toast.classList.remove('show');
@@ -137,19 +139,6 @@ function calcularHoraFim(horaInicio) {
     return `${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}`;
 }
 
-function formatarTelefone(input) {
-    let valor = input.value.replace(/\D/g, "");
-    if (valor.length > 11) valor = valor.slice(0, 11);
-
-    if (valor.length >= 1) {
-      valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
-    }
-    if (valor.length > 10) {
-        valor = valor.slice(0, 10) + "-" + valor.slice(10);
-    }
-    input.value = valor;
-}
-
 // =============================================================================
 // NAVEGAÇÃO E MODAIS
 // =============================================================================
@@ -177,6 +166,8 @@ function goToPage(pageId) {
             }
         }, 50);
         carregarPreferenciasNotificacao();
+    } else if (pageId === 'pagina-horarios-triagem') {
+        inicializarSelecaoHorarios();
     }
 }
 
@@ -198,6 +189,11 @@ function showSubTab(subTabId, buttonElement) {
     const subTabElement = document.getElementById(subTabId);
     if (subTabElement) {
         subTabElement.classList.add('active');
+        
+        // Inicializar a aba "Mudar Horário" quando for aberta
+        if (subTabId === 'sub-aba-mudar-horario') {
+            inicializarMudarHorario();
+        }
     }
     
     if (buttonElement) {
@@ -223,7 +219,657 @@ function closeModal(modalElement) {
 }
 
 // =============================================================================
-// MINHA CONTA
+// SELEÇÃO DE HORÁRIOS DE TRIAGEM (MÚLTIPLOS) - CORRIGIDO
+// =============================================================================
+
+function inicializarSelecaoHorarios() {
+    // Limpar seleções anteriores
+    appState.selectedTriagem = {
+        diasSemana: [],
+        periodos: [],
+        horariosEspecificos: []
+    };
+    
+    // Criar botões para dias da semana
+    criarBotoesSelecao(elements.diasSemanaContainer, appState.diasDaSemana, 'diasSemana');
+    
+    // Criar botões para períodos
+    criarBotoesSelecao(elements.periodosContainer, appState.periodosDisponiveis, 'periodos');
+    
+    // Inicialmente esconder horários específicos
+    elements.horariosEspecificosContainer.style.display = 'none';
+    elements.scheduleSummary.style.display = 'none';
+}
+
+function criarBotoesSelecao(container, opcoes, tipo) {
+    container.innerHTML = '';
+    
+    opcoes.forEach(opcao => {
+        const botao = document.createElement('button');
+        botao.type = 'button';
+        botao.className = 'selection-button';
+        botao.textContent = opcao;
+        botao.dataset.value = opcao;
+        
+        botao.addEventListener('click', () => {
+            toggleSelecao(botao, tipo, opcao);
+        });
+        
+        container.appendChild(botao);
+    });
+}
+
+function toggleSelecao(botao, tipo, valor) {
+    botao.classList.toggle('selected');
+    
+    const arraySelecionado = appState.selectedTriagem[tipo];
+    const index = arraySelecionado.indexOf(valor);
+    
+    if (index > -1) {
+        // Remover se já estiver selecionado
+        arraySelecionado.splice(index, 1);
+    } else {
+        // Adicionar se não estiver selecionado
+        arraySelecionado.push(valor);
+    }
+    
+    // Atualizar interface baseado nas seleções
+    atualizarInterfaceAposSelecao();
+}
+
+function atualizarInterfaceAposSelecao() {
+    // Mostrar/ocultar horários específicos baseado nas seleções
+    if (appState.selectedTriagem.diasSemana.length > 0 && appState.selectedTriagem.periodos.length > 0) {
+        mostrarHorariosEspecificos();
+        elements.horariosEspecificosContainer.style.display = 'block';
+    } else {
+        elements.horariosEspecificosContainer.style.display = 'none';
+        elements.scheduleSummary.style.display = 'none';
+    }
+    
+    // Atualizar resumo
+    atualizarResumoSelecao();
+}
+
+function mostrarHorariosEspecificos() {
+    const container = elements.horariosEspecificosContainer;
+    container.innerHTML = '<h3>Horários Específicos</h3>';
+    
+    // Para cada período selecionado, mostrar os horários disponíveis
+    appState.selectedTriagem.periodos.forEach(periodo => {
+        const horarios = appState.horariosPorPeriodo[periodo];
+        if (horarios) {
+            const periodoSection = document.createElement('div');
+            periodoSection.className = 'periodo-section';
+            periodoSection.innerHTML = `<h4>${periodo}</h4>`;
+            
+            const horariosGrid = document.createElement('div');
+            horariosGrid.className = 'horarios-grid';
+            
+            horarios.forEach(horario => {
+                const horarioBtn = document.createElement('button');
+                horarioBtn.type = 'button';
+                horarioBtn.className = 'horario-button';
+                horarioBtn.textContent = horario;
+                horarioBtn.dataset.periodo = periodo;
+                horarioBtn.dataset.horario = horario;
+                
+                // Verificar se já está selecionado
+                const jaSelecionado = appState.selectedTriagem.horariosEspecificos.some(h => 
+                    h.periodo === periodo && h.horario === horario
+                );
+                
+                if (jaSelecionado) {
+                    horarioBtn.classList.add('selected');
+                }
+                
+                horarioBtn.addEventListener('click', () => {
+                    toggleHorarioEspecifico(horarioBtn, periodo, horario);
+                });
+                
+                horariosGrid.appendChild(horarioBtn);
+            });
+            
+            periodoSection.appendChild(horariosGrid);
+            container.appendChild(periodoSection);
+        }
+    });
+}
+
+function toggleHorarioEspecifico(botao, periodo, horario) {
+    botao.classList.toggle('selected');
+    
+    const horarioObj = { periodo, horario };
+    const arrayHorarios = appState.selectedTriagem.horariosEspecificos;
+    const index = arrayHorarios.findIndex(h => 
+        h.periodo === periodo && h.horario === horario
+    );
+    
+    if (index > -1) {
+        // Remover se já estiver selecionado
+        arrayHorarios.splice(index, 1);
+    } else {
+        // Adicionar se não estiver selecionado
+        arrayHorarios.push(horarioObj);
+    }
+    
+    atualizarResumoSelecao();
+}
+
+function atualizarResumoSelecao() {
+    const resumo = elements.selectedPreferencesDisplay;
+    const summaryContainer = elements.scheduleSummary;
+    
+    if (appState.selectedTriagem.diasSemana.length === 0 && 
+        appState.selectedTriagem.periodos.length === 0 && 
+        appState.selectedTriagem.horariosEspecificos.length === 0) {
+        summaryContainer.style.display = 'none';
+        return;
+    }
+    
+    let htmlResumo = '';
+    
+    // Dias selecionados
+    if (appState.selectedTriagem.diasSemana.length > 0) {
+        htmlResumo += `<p><strong>Dias:</strong> ${appState.selectedTriagem.diasSemana.join(', ')}</p>`;
+    }
+    
+    // Períodos selecionados
+    if (appState.selectedTriagem.periodos.length > 0) {
+        htmlResumo += `<p><strong>Períodos:</strong> ${appState.selectedTriagem.periodos.join(', ')}</p>`;
+    }
+    
+    // Horários específicos selecionados
+    if (appState.selectedTriagem.horariosEspecificos.length > 0) {
+        // Agrupar horários por período para melhor exibição
+        const horariosPorPeriodo = {};
+        appState.selectedTriagem.horariosEspecificos.forEach(h => {
+            if (!horariosPorPeriodo[h.periodo]) {
+                horariosPorPeriodo[h.periodo] = [];
+            }
+            horariosPorPeriodo[h.periodo].push(h.horario);
+        });
+        
+        htmlResumo += `<p><strong>Horários Preferenciais:</strong></p>`;
+        Object.keys(horariosPorPeriodo).forEach(periodo => {
+            htmlResumo += `<p style="margin-left: 10px;">${periodo}: ${horariosPorPeriodo[periodo].join(', ')}</p>`;
+        });
+    }
+    
+    resumo.innerHTML = htmlResumo;
+    summaryContainer.style.display = 'block';
+}
+
+function validarEabrirModalTriagem() {
+    // Validação mínima - pelo menos um dia, um período e um horário específico
+    if (appState.selectedTriagem.diasSemana.length === 0) {
+        showToast('Por favor, selecione pelo menos um dia da semana.', 'error');
+        return;
+    }
+    
+    if (appState.selectedTriagem.periodos.length === 0) {
+        showToast('Por favor, selecione pelo menos um período.', 'error');
+        return;
+    }
+    
+    if (appState.selectedTriagem.horariosEspecificos.length === 0) {
+        showToast('Por favor, selecione pelo menos um horário específico.', 'error');
+        return;
+    }
+    
+    // Prepara informações para o modal (MELHORADO)
+    let infoText = '';
+    
+    infoText += `<strong>Dias Preferidos:</strong> ${appState.selectedTriagem.diasSemana.join(', ')}<br>`;
+    infoText += `<strong>Períodos Preferidos:</strong> ${appState.selectedTriagem.periodos.join(', ')}<br>`;
+    
+    // Horários específicos
+    const horariosPorPeriodo = {};
+    appState.selectedTriagem.horariosEspecificos.forEach(h => {
+        if (!horariosPorPeriodo[h.periodo]) {
+            horariosPorPeriodo[h.periodo] = [];
+        }
+        horariosPorPeriodo[h.periodo].push(h.horario);
+    });
+    
+    infoText += `<strong>Horários Preferenciais:</strong><br>`;
+    Object.keys(horariosPorPeriodo).forEach(periodo => {
+        infoText += `• ${periodo}: ${horariosPorPeriodo[periodo].join(', ')}<br>`;
+    });
+    
+    elements.triagemInfoConfirmacao.innerHTML = infoText;
+    openModal(elements.modalTriagem);
+}
+
+// FUNÇÃO PRINCIPAL CORRIGIDA - ENVIO DA TRIAGEM
+async function enviarSolicitacaoTriagem() {
+    const confirmButton = document.getElementById('btn-confirmar-envio-triagem');
+    if (!confirmButton) {
+        console.error('Botão de confirmação não encontrado');
+        return;
+    }
+
+    if (confirmButton.disabled) {
+        return;
+    }
+    
+    confirmButton.disabled = true;
+    confirmButton.textContent = 'Enviando...';
+
+    closeModal(elements.modalTriagem);
+    showSpinner();
+
+    try {
+        // Validação final
+        if (appState.selectedTriagem.diasSemana.length === 0 || 
+            appState.selectedTriagem.periodos.length === 0 || 
+            appState.selectedTriagem.horariosEspecificos.length === 0) {
+            throw new Error('Seleção incompleta. Por favor, selecione dia, período e horários.');
+        }
+
+        // FORMATO CORRETO DOS DADOS PARA O BACKEND
+        // CORREÇÃO CRÍTICA: Criar observações detalhadas e estruturadas
+        const observacoes = criarObservacoesDetalhadas();
+        
+        const dadosParaEnvio = {
+            tipo_atendimento: 'Solicitação de Triagem',
+            status: 'solicitado',
+            observacoes: observacoes,
+            data_solicitacao: new Date().toISOString(),
+            // Adicionando dados estruturados para facilitar o processamento
+            preferencias_paciente: {
+                dias_semana: appState.selectedTriagem.diasSemana,
+                periodos: appState.selectedTriagem.periodos,
+                horarios_especificos: appState.selectedTriagem.horariosEspecificos
+            }
+        };
+
+        console.log('Enviando dados para triagem:', dadosParaEnvio);
+
+        const response = await fetch('/api/agendamentos/solicitar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dadosParaEnvio),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Erro no servidor ao enviar a solicitação.');
+        }
+
+        showToast('Solicitação de triagem enviada com sucesso!', 'success');
+        resetTriagemSelection();
+        goToPage('pagina-triagem-sucesso');
+        
+    } catch (error) {
+        console.error('Erro ao solicitar triagem:', error);
+        showToast(error.message || 'Erro de comunicação com o servidor. Tente novamente.', 'error');
+        
+        // Reabre o modal em caso de erro para o usuário tentar novamente
+        setTimeout(() => {
+            openModal(elements.modalTriagem);
+        }, 500);
+    } finally {
+        hideSpinner();
+        if (confirmButton) {
+            confirmButton.disabled = false;
+            confirmButton.textContent = 'CONFIRMAR';
+        }
+    }
+}
+
+// FUNÇÃO MELHORADA PARA CRIAR OBSERVAÇÕES DETALHADAS
+function criarObservacoesDetalhadas() {
+    const { diasSemana, periodos, horariosEspecificos } = appState.selectedTriagem;
+    
+    let observacoes = "SOLICITAÇÃO DE TRIAGEM - PREFERÊNCIAS DO PACIENTE\n\n";
+    
+    // Dias da semana
+    observacoes += `📅 DIAS PREFERIDOS: ${diasSemana.join(', ')}\n`;
+    
+    // Períodos
+    observacoes += `⏰ PERÍODOS PREFERIDOS: ${periodos.join(', ')}\n\n`;
+    
+    // Horários específicos agrupados por período
+    observacoes += "🕐 HORÁRIOS ESPECÍFICOS SELECIONADOS:\n";
+    
+    const horariosPorPeriodo = {};
+    horariosEspecificos.forEach(h => {
+        if (!horariosPorPeriodo[h.periodo]) {
+            horariosPorPeriodo[h.periodo] = [];
+        }
+        horariosPorPeriodo[h.periodo].push(h.horario);
+    });
+    
+    Object.keys(horariosPorPeriodo).forEach(periodo => {
+        observacoes += `• ${periodo}: ${horariosPorPeriodo[periodo].join(', ')}\n`;
+    });
+    
+    observacoes += `\n📋 RESUMO: Paciente está disponível nas ${diasSemana.length > 1 ? 'dias' : 'dia'} ${diasSemana.join(', ')} `;
+    observacoes += `nos períodos da ${periodos.join(', ')} `;
+    observacoes += `nos horários específicos informados acima.`;
+    
+    return observacoes;
+}
+
+function resetTriagemSelection() {
+    appState.selectedTriagem = {
+        diasSemana: [],
+        periodos: [],
+        horariosEspecificos: []
+    };
+    
+    // Resetar interface - limpar todos os botões selecionados
+    document.querySelectorAll('#dias-semana-container .selection-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    document.querySelectorAll('#periodos-container .selection-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    document.querySelectorAll('.horario-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    elements.horariosEspecificosContainer.innerHTML = '';
+    elements.horariosEspecificosContainer.style.display = 'none';
+    elements.scheduleSummary.style.display = 'none';
+}
+
+// =============================================================================
+// MUDAR HORÁRIO - FUNCIONALIDADE COMPLETA
+// =============================================================================
+
+function inicializarMudarHorario() {
+    console.log("Inicializando aba Mudar Horário");
+    
+    // Limpar seleções anteriores
+    appState.selectedPreferenciasHorario = {
+        diasSemana: [],
+        periodos: [],
+        horariosEspecificos: []
+    };
+    
+    // Criar botões para dias da semana
+    criarBotoesSelecaoMudarHorario(elements.mudarDiasSemanaContainer, appState.diasDaSemana, 'diasSemana');
+    
+    // Criar botões para períodos
+    criarBotoesSelecaoMudarHorario(elements.mudarPeriodosContainer, appState.periodosDisponiveis, 'periodos');
+    
+    // Inicialmente esconder horários específicos
+    elements.mudarHorariosEspecificosContainer.style.display = 'none';
+    elements.mudarScheduleSummary.style.display = 'none';
+    
+    // Carregar preferências salvas se existirem
+    carregarPreferenciasSalvas();
+}
+
+function criarBotoesSelecaoMudarHorario(container, opcoes, tipo) {
+    container.innerHTML = '';
+    
+    opcoes.forEach(opcao => {
+        const botao = document.createElement('button');
+        botao.type = 'button';
+        botao.className = 'selection-button';
+        botao.textContent = opcao;
+        botao.dataset.value = opcao;
+        
+        botao.addEventListener('click', () => {
+            toggleSelecaoMudarHorario(botao, tipo, opcao);
+        });
+        
+        container.appendChild(botao);
+    });
+}
+
+function toggleSelecaoMudarHorario(botao, tipo, valor) {
+    botao.classList.toggle('selected');
+    
+    const arraySelecionado = appState.selectedPreferenciasHorario[tipo];
+    const index = arraySelecionado.indexOf(valor);
+    
+    if (index > -1) {
+        // Remover se já estiver selecionado
+        arraySelecionado.splice(index, 1);
+    } else {
+        // Adicionar se não estiver selecionado
+        arraySelecionado.push(valor);
+    }
+    
+    // Atualizar interface baseado nas seleções
+    atualizarInterfaceAposSelecaoMudarHorario();
+}
+
+function atualizarInterfaceAposSelecaoMudarHorario() {
+    // Mostrar/ocultar horários específicos baseado nas seleções
+    if (appState.selectedPreferenciasHorario.diasSemana.length > 0 && appState.selectedPreferenciasHorario.periodos.length > 0) {
+        mostrarHorariosEspecificosMudarHorario();
+        elements.mudarHorariosEspecificosContainer.style.display = 'block';
+    } else {
+        elements.mudarHorariosEspecificosContainer.style.display = 'none';
+        elements.mudarScheduleSummary.style.display = 'none';
+    }
+    
+    // Atualizar resumo
+    atualizarResumoSelecaoMudarHorario();
+}
+
+function mostrarHorariosEspecificosMudarHorario() {
+    const container = elements.mudarHorariosEspecificosContainer;
+    container.innerHTML = '<h3>Horários Específicos Preferidos</h3>';
+    
+    // Para cada período selecionado, mostrar os horários disponíveis
+    appState.selectedPreferenciasHorario.periodos.forEach(periodo => {
+        const horarios = appState.horariosPorPeriodo[periodo];
+        if (horarios) {
+            const periodoSection = document.createElement('div');
+            periodoSection.className = 'periodo-section';
+            periodoSection.innerHTML = `<h4>${periodo}</h4>`;
+            
+            const horariosGrid = document.createElement('div');
+            horariosGrid.className = 'horarios-grid';
+            
+            horarios.forEach(horario => {
+                const horarioBtn = document.createElement('button');
+                horarioBtn.type = 'button';
+                horarioBtn.className = 'horario-button';
+                horarioBtn.textContent = horario;
+                horarioBtn.dataset.periodo = periodo;
+                horarioBtn.dataset.horario = horario;
+                
+                // Verificar se já está selecionado
+                const jaSelecionado = appState.selectedPreferenciasHorario.horariosEspecificos.some(h => 
+                    h.periodo === periodo && h.horario === horario
+                );
+                
+                if (jaSelecionado) {
+                    horarioBtn.classList.add('selected');
+                }
+                
+                horarioBtn.addEventListener('click', () => {
+                    toggleHorarioEspecificoMudarHorario(horarioBtn, periodo, horario);
+                });
+                
+                horariosGrid.appendChild(horarioBtn);
+            });
+            
+            periodoSection.appendChild(horariosGrid);
+            container.appendChild(periodoSection);
+        }
+    });
+}
+
+function toggleHorarioEspecificoMudarHorario(botao, periodo, horario) {
+    botao.classList.toggle('selected');
+    
+    const horarioObj = { periodo, horario };
+    const arrayHorarios = appState.selectedPreferenciasHorario.horariosEspecificos;
+    const index = arrayHorarios.findIndex(h => 
+        h.periodo === periodo && h.horario === horario
+    );
+    
+    if (index > -1) {
+        // Remover se já estiver selecionado
+        arrayHorarios.splice(index, 1);
+    } else {
+        // Adicionar se não estiver selecionado
+        arrayHorarios.push(horarioObj);
+    }
+    
+    atualizarResumoSelecaoMudarHorario();
+}
+
+function atualizarResumoSelecaoMudarHorario() {
+    const resumo = elements.mudarSelectedPreferencesDisplay;
+    const summaryContainer = elements.mudarScheduleSummary;
+    
+    if (appState.selectedPreferenciasHorario.diasSemana.length === 0 && 
+        appState.selectedPreferenciasHorario.periodos.length === 0 && 
+        appState.selectedPreferenciasHorario.horariosEspecificos.length === 0) {
+        summaryContainer.style.display = 'none';
+        return;
+    }
+    
+    let htmlResumo = '';
+    
+    // Dias selecionados
+    if (appState.selectedPreferenciasHorario.diasSemana.length > 0) {
+        htmlResumo += `<p><strong>Dias Preferidos:</strong> ${appState.selectedPreferenciasHorario.diasSemana.join(', ')}</p>`;
+    }
+    
+    // Períodos selecionados
+    if (appState.selectedPreferenciasHorario.periodos.length > 0) {
+        htmlResumo += `<p><strong>Períodos Preferidos:</strong> ${appState.selectedPreferenciasHorario.periodos.join(', ')}</p>`;
+    }
+    
+    // Horários específicos selecionados
+    if (appState.selectedPreferenciasHorario.horariosEspecificos.length > 0) {
+        // Agrupar horários por período para melhor exibição
+        const horariosPorPeriodo = {};
+        appState.selectedPreferenciasHorario.horariosEspecificos.forEach(h => {
+            if (!horariosPorPeriodo[h.periodo]) {
+                horariosPorPeriodo[h.periodo] = [];
+            }
+            horariosPorPeriodo[h.periodo].push(h.horario);
+        });
+        
+        htmlResumo += `<p><strong>Horários Preferenciais:</strong></p>`;
+        Object.keys(horariosPorPeriodo).forEach(periodo => {
+            htmlResumo += `<p style="margin-left: 10px;">${periodo}: ${horariosPorPeriodo[periodo].join(', ')}</p>`;
+        });
+    }
+    
+    resumo.innerHTML = htmlResumo;
+    summaryContainer.style.display = 'block';
+}
+
+function carregarPreferenciasSalvas() {
+    // Simular carregamento de preferências salvas (em uma aplicação real, isso viria de uma API)
+    const preferenciasSalvas = JSON.parse(localStorage.getItem('preferenciasHorarioPaciente') || 'null');
+    
+    if (preferenciasSalvas) {
+        appState.selectedPreferenciasHorario = preferenciasSalvas;
+        
+        // Atualizar interface com as preferências salvas
+        atualizarInterfaceComPreferenciasSalvas();
+        showToast('Preferências carregadas com sucesso!', 'success');
+    }
+}
+
+function atualizarInterfaceComPreferenciasSalvas() {
+    // Atualizar botões de dias da semana
+    document.querySelectorAll('#mudar-dias-semana-container .selection-button').forEach(botao => {
+        const valor = botao.dataset.value;
+        if (appState.selectedPreferenciasHorario.diasSemana.includes(valor)) {
+            botao.classList.add('selected');
+        } else {
+            botao.classList.remove('selected');
+        }
+    });
+    
+    // Atualizar botões de períodos
+    document.querySelectorAll('#mudar-periodos-container .selection-button').forEach(botao => {
+        const valor = botao.dataset.value;
+        if (appState.selectedPreferenciasHorario.periodos.includes(valor)) {
+            botao.classList.add('selected');
+        } else {
+            botao.classList.remove('selected');
+        }
+    });
+    
+    // Atualizar interface
+    atualizarInterfaceAposSelecaoMudarHorario();
+}
+
+async function salvarPreferenciasHorario() {
+    // Validação mínima
+    if (appState.selectedPreferenciasHorario.diasSemana.length === 0) {
+        showToast('Por favor, selecione pelo menos um dia da semana.', 'error');
+        return;
+    }
+    
+    if (appState.selectedPreferenciasHorario.periodos.length === 0) {
+        showToast('Por favor, selecione pelo menos um período.', 'error');
+        return;
+    }
+    
+    if (appState.selectedPreferenciasHorario.horariosEspecificos.length === 0) {
+        showToast('Por favor, selecione pelo menos um horário específico.', 'error');
+        return;
+    }
+    
+    showSpinner();
+
+    try {
+        // Simular salvamento (em uma aplicação real, isso seria uma chamada API)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Salvar no localStorage para demonstração
+        localStorage.setItem('preferenciasHorarioPaciente', JSON.stringify(appState.selectedPreferenciasHorario));
+        
+        showToast('Preferências de horário salvas com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao salvar preferências:', error);
+        showToast('Erro ao salvar preferências. Tente novamente.', 'error');
+    } finally {
+        hideSpinner();
+    }
+}
+
+function limparPreferenciasHorario() {
+    // Limpar estado
+    appState.selectedPreferenciasHorario = {
+        diasSemana: [],
+        periodos: [],
+        horariosEspecificos: []
+    };
+    
+    // Limpar interface
+    document.querySelectorAll('#mudar-dias-semana-container .selection-button').forEach(botao => {
+        botao.classList.remove('selected');
+    });
+    
+    document.querySelectorAll('#mudar-periodos-container .selection-button').forEach(botao => {
+        botao.classList.remove('selected');
+    });
+    
+    elements.mudarHorariosEspecificosContainer.innerHTML = '';
+    elements.mudarHorariosEspecificosContainer.style.display = 'none';
+    elements.mudarScheduleSummary.style.display = 'none';
+    
+    // Limpar do localStorage
+    localStorage.removeItem('preferenciasHorarioPaciente');
+    
+    showToast('Preferências limpas com sucesso!', 'success');
+}
+
+// =============================================================================
+// MINHA CONTA - FUNCIONALIDADES COMPLETAS
 // =============================================================================
 
 function enableEditMode() {
@@ -332,177 +978,7 @@ function changePassword() {
 }
 
 // =============================================================================
-// HORÁRIOS DE TRIAGEM
-// =============================================================================
-
-function updateAvailableTimes() {
-    const diaSemana = elements.selectDiaSemana.value;
-    const periodo = elements.selectPeriodo.value;
-    elements.timeSlotsGrid.innerHTML = '';
-    
-    document.getElementById('error-dia-semana').textContent = '';
-    document.getElementById('error-periodo').textContent = '';
-    document.getElementById('error-horario-especifico').textContent = '';
-    
-    appState.selectedTriagem.horario = null;
-    elements.scheduleSummary.style.display = 'none';
-
-    if (appState.botaoHorarioAtivo) {
-        appState.botaoHorarioAtivo.classList.remove('selected');
-        appState.botaoHorarioAtivo = null;
-    }
-
-    if (diaSemana && periodo) {
-        const horariosDoPeriodo = appState.horariosPorPeriodo[periodo] || [];
-        if (horariosDoPeriodo.length > 0) {
-            horariosDoPeriodo.forEach(horario => {
-                const button = document.createElement('button');
-                button.classList.add('time-slot-button');
-                button.textContent = `${horario} - ${calcularHoraFim(horario)}`;
-                button.dataset.time = horario;
-                button.addEventListener('click', () => selectTriagemTime(button));
-                elements.timeSlotsGrid.appendChild(button);
-            });
-        } else {
-            elements.timeSlotsGrid.innerHTML = '<p class="no-available-slots">Nenhum horário disponível para o período selecionado.</p>';
-        }
-    } else {
-        elements.timeSlotsGrid.innerHTML = '<p class="no-available-slots">Selecione o dia da semana e o período para ver os horários.</p>';
-    }
-}
-
-function selectTriagemTime(button) {
-    if (appState.botaoHorarioAtivo) {
-        appState.botaoHorarioAtivo.classList.remove('selected');
-    }
-    button.classList.add('selected');
-    appState.botaoHorarioAtivo = button;
-
-    appState.selectedTriagem.diaSemana = elements.selectDiaSemana.value;
-    appState.selectedTriagem.periodo = elements.selectPeriodo.value;
-    appState.selectedTriagem.horario = button.dataset.time;
-
-    elements.selectedWeekdayDisplay.textContent = appState.selectedTriagem.diaSemana;
-    elements.selectedPeriodDisplay.textContent = appState.selectedTriagem.periodo;
-    elements.selectedTimeDisplay.textContent = `${appState.selectedTriagem.horario} - ${calcularHoraFim(appState.selectedTriagem.horario)}`;
-    elements.scheduleSummary.style.display = 'block';
-
-    document.getElementById('error-horario-especifico').textContent = '';
-}
-
-function validateAndOpenTriagemModal() {
-    let hasError = false;
-    if (!appState.selectedTriagem.diaSemana) {
-        document.getElementById('error-dia-semana').textContent = 'Selecione o dia da semana.';
-        hasError = true;
-    }
-    if (!appState.selectedTriagem.periodo) {
-        document.getElementById('error-periodo').textContent = 'Selecione o período.';
-        hasError = true;
-    }
-    if (!appState.selectedTriagem.horario) {
-        document.getElementById('error-horario-especifico').textContent = 'Selecione um horário específico.';
-        hasError = true;
-    }
-
-    if (hasError) {
-        showToast("Por favor, preencha todos os campos obrigatórios.", "error");
-        return;
-    }
-
-    elements.triagemInfoConfirmacao.textContent = `${appState.selectedTriagem.diaSemana} - ${appState.selectedTriagem.periodo} às ${appState.selectedTriagem.horario}`;
-    openModal(elements.modalTriagem);
-}
-
-async function confirmTriagemRequest() {
-    const confirmButton = document.getElementById('btn-confirmar-envio-triagem');
-    if (!confirmButton) {
-        console.error('Botão de confirmação não encontrado');
-        return;
-    }
-
-    if (confirmButton.disabled) {
-        return;
-    }
-    
-    confirmButton.disabled = true;
-    confirmButton.textContent = 'Enviando...';
-
-    closeModal(elements.modalTriagem);
-    showSpinner();
-
-    const { diaSemana, periodo, horario } = appState.selectedTriagem;
-    if (!diaSemana || !periodo || !horario) {
-        showToast('Por favor, selecione todos os campos necessários.', 'error');
-        confirmButton.disabled = false;
-        confirmButton.textContent = 'CONFIRMAR';
-        hideSpinner();
-        return;
-    }
-
-    const observacoes = `Paciente solicitou atendimento na ${diaSemana}, no período da ${periodo}, por volta das ${horario}.`;
-
-    try {
-        const response = await fetch('/api/agendamentos/solicitar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ observacoes }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || 'Ocorreu um erro ao enviar a solicitação.');
-        }
-
-        showToast('Solicitação de triagem enviada com sucesso!', 'success');
-        resetTriagemSelection();
-        goToPage('pagina-triagem-sucesso');
-    } catch (error) {
-        console.error('Erro ao solicitar triagem:', error);
-        showToast(error.message || 'Erro de comunicação com o servidor. Tente novamente.', 'error');
-    } finally {
-        hideSpinner();
-        if (confirmButton) {
-            confirmButton.disabled = false;
-            confirmButton.textContent = 'CONFIRMAR';
-        }
-    }
-}
-
-function resetTriagemSelection() {
-    appState.selectedTriagem = {
-        diaSemana: null,
-        periodo: null,
-        horario: null
-    };
-
-    const selectDiaSemana = document.getElementById('select-dia-semana');
-    const selectPeriodo = document.getElementById('select-periodo');
-    if (selectDiaSemana) selectDiaSemana.value = '';
-    if (selectPeriodo) selectPeriodo.value = '';
-
-    const timeSlotsGrid = document.getElementById('time-slots-grid');
-    if (timeSlotsGrid) timeSlotsGrid.innerHTML = '';
-
-    const scheduleSummary = document.getElementById('schedule-summary');
-    if (scheduleSummary) scheduleSummary.style.display = 'none';
-
-    const errorElements = [
-        'error-dia-semana',
-        'error-periodo',
-        'error-horario-especifico'
-    ];
-    errorElements.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = '';
-    });
-}
-
-// =============================================================================
-// MINHAS CONSULTAS
+// MINHAS CONSULTAS - FUNCIONALIDADES COMPLETAS
 // =============================================================================
 
 function compareAppointments(a, b) {
@@ -522,6 +998,7 @@ function compareAppointments(a, b) {
     return 0;
 }
 
+// Função melhorada para carregar consultas do paciente
 async function atualizarListaConsultas() {
     elements.containerMeusAgendamentos.innerHTML = '';
     elements.noAppointmentsMessage.style.display = 'none';
@@ -544,6 +1021,7 @@ async function atualizarListaConsultas() {
         elements.containerMeusAgendamentos.style.display = 'grid';
         agendamentos.sort(compareAppointments);
 
+        // Filtrar apenas consultas ativas (solicitações pendentes e consultas confirmadas)
         const consultasFiltradas = agendamentos.filter(ag => {
             if (ag.tipo_atendimento === 'Solicitação de Triagem') {
                 return ag.status === 'solicitado';
@@ -573,13 +1051,38 @@ async function atualizarListaConsultas() {
 
             if (agendamento.tipo_atendimento === 'Solicitação de Triagem') {
                 tituloAgendamento.textContent = `Solicitação de Triagem`;
-                const dataSolicitacao = new Date(agendamento.data_solicitacao);
-                detalhesAgendamento.textContent = `Enviada em: ${dataSolicitacao.toLocaleDateString('pt-BR')} às ${dataSolicitacao.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}`;
+                let dataFormatada = 'Data não disponível';
+                if (agendamento.data_solicitacao) {
+                    try {
+                        const dataSolicitacao = new Date(agendamento.data_solicitacao);
+                        if (!isNaN(dataSolicitacao.getTime())) {
+                            dataFormatada = `Enviada em: ${dataSolicitacao.toLocaleDateString('pt-BR')} às ${dataSolicitacao.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}`;
+                        }
+                    } catch (e) {
+                        console.error('Erro ao formatar data:', e);
+                    }
+                }
+                detalhesAgendamento.textContent = dataFormatada;
             } else {
                 tituloAgendamento.textContent = `Consulta Agendada`;
-                const dataAg = new Date(agendamento.data_agendamento);
+                let dataInfo = 'Data: A definir';
+                let horarioInfo = '';
+                
+                if (agendamento.data_agendamento) {
+                    try {
+                        const dataAg = new Date(agendamento.data_agendamento);
+                        if (!isNaN(dataAg.getTime())) {
+                            dataInfo = `Data: ${dataAg.toLocaleDateString('pt-BR')}`;
+                            horarioInfo = `Horário: ${dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+                        }
+                    } catch (e) {
+                        console.error('Erro ao formatar data:', e);
+                    }
+                }
+                
                 detalhesAgendamento.innerHTML = `
-                    Data: ${dataAg.toLocaleDateString('pt-BR')} às ${dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}<br>
+                    ${dataInfo}<br>
+                    ${horarioInfo}<br>
                     Estagiário(a): ${agendamento.estagiario_nome || 'A definir'}
                 `;
             }
@@ -614,8 +1117,9 @@ async function atualizarListaConsultas() {
     }
 }
 
+// Função melhorada para mostrar detalhes da consulta
 function viewAppointmentDetails(consulta) {
-    console.log("[viewAppointmentDetails] Iniciada com consulta:", consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
+    console.log("[viewAppointmentDetails] Iniciada com consulta:", consulta);
     appState.consultaEmContexto = consulta;
     const conteudo = elements.detalhesConsultaConteudo;
 
@@ -623,17 +1127,92 @@ function viewAppointmentDetails(consulta) {
     let horarioExibicao = "A definir";
 
     if (consulta.data_agendamento) {
-        const dataAg = new Date(consulta.data_agendamento);
-        dataExibicao = dataAg.toLocaleDateString('pt-BR');
-        horarioExibicao = dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        try {
+            const dataAg = new Date(consulta.data_agendamento);
+            if (!isNaN(dataAg.getTime())) {
+                dataExibicao = dataAg.toLocaleDateString('pt-BR');
+                horarioExibicao = dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+        } catch (e) {
+            console.error('Erro ao formatar data de agendamento:', e);
+        }
     } else if (consulta.tipo_atendimento === 'Solicitação de Triagem' && consulta.data_solicitacao) {
-        const dataSol = new Date(consulta.data_solicitacao);
-        dataExibicao = `Solicitado em ${dataSol.toLocaleDateString('pt-BR')}`;
-        horarioExibicao = dataSol.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        try {
+            const dataSol = new Date(consulta.data_solicitacao);
+            if (!isNaN(dataSol.getTime())) {
+                dataExibicao = `Solicitado em ${dataSol.toLocaleDateString('pt-BR')}`;
+                horarioExibicao = dataSol.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+        } catch (e) {
+            console.error('Erro ao formatar data de solicitação:', e);
+        }
     }
 
+    const tipoAtendimento = consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Solicitação de Triagem' : 'Consulta';
+
     conteudo.innerHTML = `
-        <p><strong>Tipo:</strong> ${consulta.tipo_atendimento}</p>
+        <p><strong>Tipo:</strong> ${tipoAtendimento}</p>
+        <p><strong>Estagiário/a:</strong> ${consulta.estagiario_nome || (consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Aguardando atribuição' : 'Não definido')}</p>
+        <p><strong>Data:</strong> ${dataExibicao}</p>
+        <p><strong>Horário:</strong> ${horarioExibicao}</p>
+        <p><strong>Local:</strong> COEPP - Fundação Santo André (Sala a ser definida)</p>
+        <p><strong>Status:</strong> <span class="status-text ${consulta.status.replace('_', '-')}">${consulta.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></p>
+        ${consulta.observacoes_estagiario ? `<p><strong>Observações do Estagiário:</strong> ${consulta.observacoes_estagiario}</p>` : ''}
+    `;
+
+    if (consulta.status !== 'cancelado_paciente' && consulta.status !== 'cancelado_estagiario' && consulta.status !== 'finalizado') {
+        conteudo.innerHTML += `
+                <h3 style="margin-top: 20px;">Ações</h3>
+                <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: center;">
+                    <button class="action-button danger" id="btn-detalhes-cancelar-${consulta.id}">Cancelar Agendamento</button>
+                    ${consulta.data_agendamento ? '<button class="action-button warning" disabled>Reagendar (Em breve)</button>' : ''}
+                </div>`;
+        
+        setTimeout(() => {
+            const cancelButton = document.getElementById(`btn-detalhes-cancelar-${consulta.id}`);
+            if (cancelButton) {
+                cancelButton.onclick = () => openCancelAppointmentModal(consulta);
+            }
+        }, 0);
+    }
+    openModal(elements.modalDetalhesConsulta);
+}
+
+function viewAppointmentDetails(consulta) {
+    console.log("[viewAppointmentDetails] Iniciada com consulta:", consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
+    appState.consultaEmContexto = consulta;
+    const conteudo = elements.detalhesConsultaConteudo;
+
+    // CORREÇÃO: Validar e formatar datas corretamente
+    let dataExibicao = "A definir";
+    let horarioExibicao = "A definir";
+
+    if (consulta.data_agendamento) {
+        try {
+            const dataAg = new Date(consulta.data_agendamento);
+            if (!isNaN(dataAg.getTime())) {
+                dataExibicao = dataAg.toLocaleDateString('pt-BR');
+                horarioExibicao = dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+        } catch (e) {
+            console.error('Erro ao formatar data de agendamento:', e);
+        }
+    } else if (consulta.tipo_atendimento === 'Solicitação de Triagem' && consulta.data_solicitacao) {
+        try {
+            const dataSol = new Date(consulta.data_solicitacao);
+            if (!isNaN(dataSol.getTime())) {
+                dataExibicao = `Solicitado em ${dataSol.toLocaleDateString('pt-BR')}`;
+                horarioExibicao = dataSol.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+        } catch (e) {
+            console.error('Erro ao formatar data de solicitação:', e);
+        }
+    }
+
+    const tipoAtendimento = consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Solicitação de Triagem' : consulta.tipo_atendimento;
+
+    conteudo.innerHTML = `
+        <p><strong>Tipo:</strong> ${tipoAtendimento}</p>
         <p><strong>Estagiário/a:</strong> ${consulta.estagiario_nome || (consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Aguardando atribuição' : 'Não definido')}</p>
         <p><strong>Data:</strong> ${dataExibicao}</p>
         <p><strong>Horário:</strong> ${horarioExibicao}</p>
@@ -707,46 +1286,8 @@ function openCancelAppointmentModal(consulta) {
     openModal(elements.modalConfirmarCancelamento);
 }
 
-function showCannotAttendPage(consulta) {
-    appState.consultaEmContexto = consulta;
-    goToPage('pagina-nao-posso-comparecer');
-}
-
-function closeCannotAttendPage() {
-    goToPage('pagina-consultas');
-    elements.motivoNaoPosso.value = '';
-    appState.consultaEmContexto = null;
-}
-
-function sendCannotAttendReasonAndCancel() {
-    if (!appState.consultaEmContexto) {
-        showToast('Erro: Nenhuma consulta selecionada.');
-        return;
-    }
-    
-    const motivo = elements.motivoNaoPosso.value;
-    if (!motivo.trim()) {
-        showToast('Por favor, informe o motivo da sua ausência.', "error");
-        return;
-    }
-    
-    showSpinner();
-    setTimeout(() => {
-        hideSpinner();
-        if (appState.consultaEmContexto) {
-            cancelAppointment();
-            goToPage('pagina-consultas');
-            elements.motivoNaoPosso.value = '';
-            appState.consultaEmContexto = null;
-            showToast('Solicitação de cancelamento enviada.', "success");
-        } else {
-            showToast('Erro ao cancelar consulta.', "error");
-        }
-    }, 1500);
-}
-
 // =============================================================================
-// CONSULTA CONFIRMADA E QR CODE
+// CONSULTA CONFIRMADA - FUNCIONALIDADES
 // =============================================================================
 
 function generateQRCode() {
@@ -755,23 +1296,23 @@ function generateQRCode() {
     
     const qrCodeImg = document.createElement('img');
     
-     const consultaInfo = appState.consultaEmContexto ? {
-         paciente: document.getElementById('nome-completo') ? document.getElementById('nome-completo').value : "Paciente",
-         data: appState.consultaEmContexto.data_agendamento ? new Date(appState.consultaEmContexto.data_agendamento).toLocaleDateString('pt-BR') : 'A Definir',
-         hora: appState.consultaEmContexto.data_agendamento ? new Date(appState.consultaEmContexto.data_agendamento).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : 'A Definir',
-         local: 'COEPP - Fundação Santo André',
-         tipo: appState.consultaEmContexto.tipo_atendimento,
-         estagiario: appState.consultaEmContexto.estagiario_nome || "A definir",
-         id: appState.consultaEmContexto.id
-     } : {
-         paciente: document.getElementById('nome-completo') ? document.getElementById('nome-completo').value : "Paciente",
-         data: 'A Definir',
-         hora: 'A Definir',
-         local: 'COEPP - Fundação Santo André',
-         tipo: 'Solicitação de Triagem',
-         estagiario: 'A Definir',
-         id: 'Sem agendamento'
-     };
+    const consultaInfo = appState.consultaEmContexto ? {
+        paciente: document.getElementById('nome-completo') ? document.getElementById('nome-completo').value : "Paciente",
+        data: appState.consultaEmContexto.data_agendamento ? new Date(appState.consultaEmContexto.data_agendamento).toLocaleDateString('pt-BR') : 'A Definir',
+        hora: appState.consultaEmContexto.data_agendamento ? new Date(appState.consultaEmContexto.data_agendamento).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : 'A Definir',
+        local: 'COEPP - Fundação Santo André',
+        tipo: appState.consultaEmContexto.tipo_atendimento,
+        estagiario: appState.consultaEmContexto.estagiario_nome || "A definir",
+        id: appState.consultaEmContexto.id
+    } : {
+        paciente: document.getElementById('nome-completo') ? document.getElementById('nome-completo').value : "Paciente",
+        data: 'A Definir',
+        hora: 'A Definir',
+        local: 'COEPP - Fundação Santo André',
+        tipo: 'Solicitação de Triagem',
+        estagiario: 'A Definir',
+        id: 'Sem agendamento'
+    };
     
     const qrData = JSON.stringify(consultaInfo);
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
@@ -809,169 +1350,45 @@ function downloadQRCode() {
 }
 
 // =============================================================================
-// MUDAR HORÁRIO
+// NÃO POSSO COMPARECER - FUNCIONALIDADES
 // =============================================================================
 
-function inicializarMudarHorario() {
-    if (elements.mudarDiaSemana) {
-        elements.mudarDiaSemana.addEventListener('change', atualizarHorariosMudar);
-    }
-    if (elements.mudarPeriodo) {
-        elements.mudarPeriodo.addEventListener('change', atualizarHorariosMudar);
-    }
-    
-    carregarPreferenciasHorarioSalvas();
+function showCannotAttendPage(consulta) {
+    appState.consultaEmContexto = consulta;
+    goToPage('pagina-nao-posso-comparecer');
 }
 
-function atualizarHorariosMudar() {
-    const dia = elements.mudarDiaSemana ? elements.mudarDiaSemana.value : '';
-    const periodo = elements.mudarPeriodo ? elements.mudarPeriodo.value : '';
-    const timeSlotsGrid = elements.mudarTimeSlotsGrid;
-    const summary = elements.mudarPreferenceSummary;
-    
-    if (!timeSlotsGrid) return;
-    
-    timeSlotsGrid.innerHTML = '';
-    
-    if (!dia || !periodo) {
-        if (summary) summary.style.display = 'none';
+function closeCannotAttendPage() {
+    goToPage('pagina-consultas');
+    elements.motivoNaoPosso.value = '';
+    appState.consultaEmContexto = null;
+}
+
+function sendCannotAttendReasonAndCancel() {
+    if (!appState.consultaEmContexto) {
+        showToast('Erro: Nenhuma consulta selecionada.');
         return;
     }
     
-    let horarios = [];
-    if (periodo === 'Manhã') {
-        horarios = ['08:00', '09:00', '10:00', '11:00'];
-    } else if (periodo === 'Tarde') {
-        horarios = ['13:00', '14:00', '15:00', '16:00'];
-    } else if (periodo === 'Noite') {
-        horarios = ['18:00', '19:00', '20:00', '21:00'];
+    const motivo = elements.motivoNaoPosso.value;
+    if (!motivo.trim()) {
+        showToast('Por favor, informe o motivo da sua ausência.', "error");
+        return;
     }
-    
-    horarios.forEach(horario => {
-        const timeSlot = document.createElement('div');
-        timeSlot.className = 'time-slot';
-        timeSlot.textContent = horario;
-        timeSlot.onclick = () => selecionarHorarioMudar(horario, timeSlot);
-        timeSlotsGrid.appendChild(timeSlot);
-    });
-    
-    atualizarResumoMudar();
-}
-
-function selecionarHorarioMudar(horario, element) {
-    document.querySelectorAll('#mudar-time-slots-grid .time-slot').forEach(slot => {
-        slot.classList.remove('selected');
-    });
-    
-    element.classList.add('selected');
-    
-    if (elements.mudarSelectedTimeDisplay) {
-        elements.mudarSelectedTimeDisplay.textContent = horario;
-    }
-    atualizarResumoMudar();
-}
-
-function atualizarResumoMudar() {
-    const dia = elements.mudarDiaSemana ? elements.mudarDiaSemana.value : '';
-    const periodo = elements.mudarPeriodo ? elements.mudarPeriodo.value : '';
-    const horarioSelecionado = document.querySelector('#mudar-time-slots-grid .time-slot.selected');
-    const summary = elements.mudarPreferenceSummary;
-    
-    if (dia && periodo && horarioSelecionado && summary) {
-        if (elements.mudarSelectedWeekdayDisplay) {
-            elements.mudarSelectedWeekdayDisplay.textContent = dia;
-        }
-        if (elements.mudarSelectedPeriodDisplay) {
-            elements.mudarSelectedPeriodDisplay.textContent = periodo;
-        }
-        if (elements.mudarSelectedTimeDisplay) {
-            elements.mudarSelectedTimeDisplay.textContent = horarioSelecionado.textContent;
-        }
-        summary.style.display = 'block';
-    } else if (summary) {
-        summary.style.display = 'none';
-    }
-}
-
-function salvarPreferenciasHorario() {
-    const dia = elements.mudarDiaSemana ? elements.mudarDiaSemana.value : '';
-    const periodo = elements.mudarPeriodo ? elements.mudarPeriodo.value : '';
-    const horarioSelecionado = document.querySelector('#mudar-time-slots-grid .time-slot.selected');
-    
-    let isValid = true;
-    
-    if (!dia) {
-        document.getElementById('error-mudar-dia-semana').textContent = 'Selecione um dia da semana';
-        isValid = false;
-    } else {
-        document.getElementById('error-mudar-dia-semana').textContent = '';
-    }
-    
-    if (!periodo) {
-        document.getElementById('error-mudar-periodo').textContent = 'Selecione um período';
-        isValid = false;
-    } else {
-        document.getElementById('error-mudar-periodo').textContent = '';
-    }
-    
-    if (!horarioSelecionado) {
-        document.getElementById('error-mudar-horario-especifico').textContent = 'Selecione um horário específico';
-        isValid = false;
-    } else {
-        document.getElementById('error-mudar-horario-especifico').textContent = '';
-    }
-    
-    if (!isValid) return;
-    
-    const preferencias = {
-        dia: dia,
-        periodo: periodo,
-        horario: horarioSelecionado.textContent
-    };
     
     showSpinner();
     setTimeout(() => {
         hideSpinner();
-        localStorage.setItem('preferenciasHorario', JSON.stringify(preferencias));
-        showToast('Preferências de horário salvas com sucesso!', 'success');
-    }, 1000);
-}
-
-function carregarPreferenciasHorarioSalvas() {
-    const preferenciasSalvas = localStorage.getItem('preferenciasHorario');
-    if (preferenciasSalvas) {
-        const preferencias = JSON.parse(preferenciasSalvas);
-        
-        if (elements.mudarDiaSemana) elements.mudarDiaSemana.value = preferencias.dia;
-        if (elements.mudarPeriodo) elements.mudarPeriodo.value = preferencias.periodo;
-        
-        atualizarHorariosMudar();
-        
-        setTimeout(() => {
-            const timeSlots = document.querySelectorAll('#mudar-time-slots-grid .time-slot');
-            timeSlots.forEach(slot => {
-                if (slot.textContent === preferencias.horario) {
-                    slot.classList.add('selected');
-                    atualizarResumoMudar();
-                }
-            });
-        }, 100);
-    }
-}
-
-function limparPreferenciasHorario() {
-    if (elements.mudarDiaSemana) elements.mudarDiaSemana.value = '';
-    if (elements.mudarPeriodo) elements.mudarPeriodo.value = '';
-    if (elements.mudarTimeSlotsGrid) elements.mudarTimeSlotsGrid.innerHTML = '';
-    if (elements.mudarPreferenceSummary) elements.mudarPreferenceSummary.style.display = 'none';
-    
-    document.getElementById('error-mudar-dia-semana').textContent = '';
-    document.getElementById('error-mudar-periodo').textContent = '';
-    document.getElementById('error-mudar-horario-especifico').textContent = '';
-    
-    localStorage.removeItem('preferenciasHorario');
-    
-    showToast('Preferências limpas!', 'info');
+        if (appState.consultaEmContexto) {
+            cancelAppointment();
+            goToPage('pagina-consultas');
+            elements.motivoNaoPosso.value = '';
+            appState.consultaEmContexto = null;
+            showToast('Solicitação de cancelamento enviada.', "success");
+        } else {
+            showToast('Erro ao cancelar consulta.', "error");
+        }
+    }, 1500);
 }
 
 // =============================================================================
@@ -1024,20 +1441,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (changePassButton) changePassButton.addEventListener('click', changePassword);
 
     // Eventos da página "Horários de Triagem"
-    if (elements.selectDiaSemana) {
-        elements.selectDiaSemana.addEventListener('change', updateAvailableTimes);
-    }
-    if (elements.selectPeriodo) {
-        elements.selectPeriodo.addEventListener('change', updateAvailableTimes);
-    }
     if (elements.confirmSelectionButton) {
-        elements.confirmSelectionButton.addEventListener('click', validateAndOpenTriagemModal);
+        elements.confirmSelectionButton.addEventListener('click', validarEabrirModalTriagem);
+    }
+
+    // Eventos da página "Mudar Horário"
+    if (elements.mudarConfirmSelectionButton) {
+        elements.mudarConfirmSelectionButton.addEventListener('click', salvarPreferenciasHorario);
     }
 
     // Eventos dos Modais
     document.querySelector('#modal-detalhes-consulta .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalDetalhesConsulta));
     document.querySelector('#modal-triagem .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalTriagem));
-    document.querySelector('#modal-triagem .modal-action-buttons .action-button.primary')?.addEventListener('click', confirmTriagemRequest);
+    document.querySelector('#modal-triagem .modal-action-buttons .action-button.primary')?.addEventListener('click', enviarSolicitacaoTriagem);
     document.querySelector('#modal-confirmar-cancelamento .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalConfirmarCancelamento));
     
     if (elements.btnConfirmarCancelamentoFinal) {
@@ -1057,9 +1473,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Eventos da Página "Não Posso Comparecer"
     document.querySelector('#pagina-nao-posso-comparecer .action-button.secondary')?.addEventListener('click', closeCannotAttendPage);
     document.querySelector('#pagina-nao-posso-comparecer .action-button.primary')?.addEventListener('click', sendCannotAttendReasonAndCancel);
-
-    // Inicializar funcionalidade "Mudar Horário"
-    inicializarMudarHorario();
 });
 
 // =============================================================================
@@ -1076,28 +1489,28 @@ window.salvarNotificacoes = saveNotificationPreferences;
 window.mudarSenha = changePassword;
 
 // Página "Horários de Triagem"
-window.atualizarHorariosDisponiveis = updateAvailableTimes;
-window.validarEabrirModalTriagem = validateAndOpenTriagemModal;
-window.enviarSolicitacaoTriagem = confirmTriagemRequest;
+window.validarEabrirModalTriagem = validarEabrirModalTriagem;
+window.enviarSolicitacaoTriagem = enviarSolicitacaoTriagem;
+window.fecharModalTriagem = () => closeModal(elements.modalTriagem);
+
+// Página "Mudar Horário"
+window.salvarPreferenciasHorario = salvarPreferenciasHorario;
+window.limparPreferenciasHorario = limparPreferenciasHorario;
 
 // Página "Minhas Consultas"
 window.atualizarListaConsultas = atualizarListaConsultas;
 window.mostrarDetalhesConsulta = viewAppointmentDetails;
-window.mostrarPaginaNaoPosso = showCannotAttendPage;
-window.enviarNaoPosso = sendCannotAttendReasonAndCancel;
-window.fecharNaoPosso = closeCannotAttendPage;
-
 window.fecharModalDetalhes = () => closeModal(elements.modalDetalhesConsulta);
 window.cancelarConsulta = () => openCancelAppointmentModal(appState.consultaEmContexto);
 window.abrirModalConfirmarCancelamento = openCancelAppointmentModal;
 window.fecharModalConfirmarCancelamento = () => closeModal(elements.modalConfirmarCancelamento);
 window.executarCancelamentoFinal = cancelAppointment;
 
-window.fecharModalTriagem = () => closeModal(elements.modalTriagem);
-
+// Página "Consulta Confirmada"
 window.gerarQRCode = generateQRCode;
 window.baixarQRCode = downloadQRCode;
 
-// Funcionalidade "Mudar Horário"
-window.salvarPreferenciasHorario = salvarPreferenciasHorario;
-window.limparPreferenciasHorario = limparPreferenciasHorario;
+// Página "Não Posso Comparecer"
+window.mostrarPaginaNaoPosso = showCannotAttendPage;
+window.enviarNaoPosso = sendCannotAttendReasonAndCancel;
+window.fecharNaoPosso = closeCannotAttendPage;
