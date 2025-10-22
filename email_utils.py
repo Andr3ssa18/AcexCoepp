@@ -300,6 +300,7 @@ def enviar_email_confirmacao_consulta(paciente_email, nome_paciente, data_consul
             <div class="contact-info">
                 <p><strong>📞 Precisa de ajuda?</strong></p>
                 <p>Entre em contato conosco em caso de dúvidas</p>
+                <p>☎ (11) 4979-3458</p>
             </div>
             
             <p style="text-align: center; color: #666; font-style: italic; margin-top: 25px;">
@@ -687,7 +688,8 @@ def enviar_email_redefinicao_senha(email, reset_url):
             </div>
             
             <p style="color: #666; text-align: center; font-style: italic;">
-                Se você tiver alguma dúvida ou precisar de ajuda, entre em contato conosco.
+                Se você tiver alguma dúvida ou precisar de ajuda, entre em contato conosco.<br>
+                ☎ (11) 4979-3458
             </p>
         </div>
         
