@@ -230,7 +230,7 @@
             </div>
         </div>
 
-        <div id="sub-aba-mudar-senha" class="sub-tab-content">
+                <div id="sub-aba-mudar-senha" class="sub-tab-content">
             <div class="form-container">
                 <h3>Alterar Senha</h3>
                 <p class="description">Para sua segurança, digite sua senha atual e a nova senha para prosseguir com a alteração.</p>
@@ -653,6 +653,37 @@
     <div id="toast-notification" class="toast"></div>
 
     <div id="loading-spinner" class="spinner"></div>
+
+    <!-- Adicionando função formatarTelefone que estava faltando -->
+    <script>
+        function formatarTelefone(input) {
+            // Remove tudo que não é número
+            let valor = input.value.replace(/\D/g, '');
+            
+            // Formata o telefone: (11) 99999-9999
+            if (valor.length <= 10) {
+                valor = valor.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else {
+                valor = valor.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            }
+            
+            input.value = valor;
+        }
+
+        // Função auxiliar para confirmar presença (se necessário)
+        function confirmarPresencaConsulta() {
+            alert('Funcionalidade de confirmar presença será implementada em breve.');
+        }
+
+        // Função auxiliar para fechar modal de presença
+        function fecharModalConfirmarPresenca() {
+            const modal = document.getElementById('modal-confirmar-presenca');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.classList.remove('modal-active');
+            }
+        }
+    </script>
 
     <script src="{{ url_for('static', filename='js/aba_paciente.js') }}"></script>
 </body>
