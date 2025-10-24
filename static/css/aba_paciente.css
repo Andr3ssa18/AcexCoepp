@@ -280,8 +280,46 @@ header {
     background: linear-gradient(135deg, #003366 0%, #004a91 100%);
 }
 
-/* Estados de erro melhorados */
+/* =============================================================================
+   CORREÇÃO DOS CAMPOS DE MUDANÇA DE SENHA - SEM ESTILOS VERMELHOS
+   ============================================================================= */
+
+/* REMOVER ESTILOS VERMELHOS DOS CAMPOS DE SENHA */
+#sub-aba-mudar-senha .form-group input {
+    border: 1px solid #a7d9f7 !important;
+    background-color: white !important;
+}
+
+#sub-aba-mudar-senha .form-group input:focus {
+    border-color: #004a91 !important;
+    box-shadow: 0 0 0 3px rgba(0, 74, 145, 0.2) !important;
+}
+
+/* Estilos para campos com erro - mais sutis */
+#sub-aba-mudar-senha .form-group input.error {
+    border-color: #dc3545 !important;
+    background-color: #fff5f5 !important;
+}
+
+/* Estilos para mensagens de erro */
 .error-message {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: none;
+    text-align: left;
+    font-weight: 500;
+    background: transparent;
+    padding: 0;
+    border: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+/* Estados de erro melhorados - versão geral */
+.error-message:not(#sub-aba-mudar-senha .error-message) {
     color: #dc3545;
     font-size: 0.9em;
     margin-top: 8px;
@@ -1616,15 +1654,6 @@ header {
     display: block;
     margin-left: auto;
     margin-right: auto;
-}
-
-.error-message {
-    color: #dc3545;
-    font-size: 0.85em;
-    margin-top: 5px;
-    display: block;
-    text-align: left;
-    font-weight: 500;
 }
 
 /* ********** ESTILOS PARA SUB-ABAS EM MINHA CONTA ********** */
