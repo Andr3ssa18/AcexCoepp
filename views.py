@@ -1128,27 +1128,54 @@ def esqueci_senha():
         if not email:
             return jsonify({'success': False, 'error': 'Email é obrigatório.'}), 400
 
+        print(f"DEBUG: Solicitando redefinição de senha para: {email}")
+
         # Verificar se o email existe no sistema (paciente ou estagiário)
-        if not verificar_email_existe(email):
+        paciente = Paciente.query.filter_by(email=email).first()
+        estagiario = Estagiario.query.filter_by(emailfsa=email).first()
+        
+        if not paciente and not estagiario:
+            print(f"DEBUG: Email não encontrado: {email}")
             return jsonify({'success': False, 'error': 'Email não cadastrado no sistema.'}), 404
+
+        print(f"DEBUG: Email encontrado - Paciente: {paciente is not None}, Estagiário: {estagiario is not None}")
 
         # Gerar token de redefinição
         token = gerar_token_redefinicao(email)
         
         if not token:
+            print("DEBUG: Erro ao gerar token")
             return jsonify({'success': False, 'error': 'Erro ao gerar token de redefinição. Tente novamente.'}), 500
+
+        print(f"DEBUG: Token gerado com sucesso: {token}")
 
         # Enviar email com link de redefinição
         reset_url = url_for('login', token=token, _external=True)
+        print(f"DEBUG: URL de redefinição: {reset_url}")
         
-        if enviar_email_redefinicao_senha(email, reset_url):
-            return jsonify({'success': True, 'message': 'Email enviado com sucesso!'})
+        email_enviado = enviar_email_redefinicao_senha(email, reset_url)
+        
+        if email_enviado:
+            print("DEBUG: Email de redefinição enviado com sucesso")
+            return jsonify({
+                'success': True, 
+                'message': 'Email enviado com sucesso! Verifique sua caixa de entrada.'
+            })
         else:
-            return jsonify({'success': False, 'error': 'Erro ao enviar email. Tente novamente.'}), 500
+            print("DEBUG: Falha ao enviar email")
+            return jsonify({
+                'success': False, 
+                'error': 'Erro ao enviar email. Tente novamente mais tarde.'
+            }), 500
             
     except Exception as e:
-        print(f"Erro em esqueci_senha: {str(e)}")
-        return jsonify({'success': False, 'error': 'Erro interno do servidor.'}), 500
+        print(f"ERRO em esqueci-senha: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False, 
+            'error': 'Erro interno do servidor. Tente novamente.'
+        }), 500
 
 @app.route('/redefinir-senha', methods=['POST'])
 def redefinir_senha():
@@ -1157,41 +1184,160 @@ def redefinir_senha():
         nova_senha = request.form.get('nova_senha')
         confirmar_senha = request.form.get('confirmar_senha')
         
+        print(f"DEBUG: Tentativa de redefinição - Token: {token}, Nova senha: {nova_senha is not None}")
+        
         if not token or not nova_senha or not confirmar_senha:
-            return jsonify({'success': False, 'error': 'Todos os campos são obrigatórios.'}), 400
+            return jsonify({
+                'success': False, 
+                'error': 'Todos os campos são obrigatórios.'
+            }), 400
 
         # Validar token
         email = validar_token_redefinicao(token)
         
         if not email:
-            return jsonify({'success': False, 'error': 'Link inválido ou expirado. Solicite um novo link.'}), 400
+            print(f"DEBUG: Token inválido ou expirado: {token}")
+            return jsonify({
+                'success': False, 
+                'error': 'Link inválido ou expirado. Solicite um novo link.'
+            }), 400
+        
+        print(f"DEBUG: Token válido para email: {email}")
         
         if nova_senha != confirmar_senha:
-            return jsonify({'success': False, 'error': 'As senhas não coincidem.'}), 400
+            return jsonify({
+                'success': False, 
+                'error': 'As senhas não coincidem.'
+            }), 400
         
         if len(nova_senha) < 8:
-            return jsonify({'success': False, 'error': 'A senha deve ter no mínimo 8 caracteres.'}), 400
+            return jsonify({
+                'success': False, 
+                'error': 'A senha deve ter no mínimo 8 caracteres.'
+            }), 400
         
-        # Atualizar senha no banco de dados
+        # Buscar usuário no banco de dados
         paciente = Paciente.query.filter_by(email=email).first()
         estagiario = Estagiario.query.filter_by(emailfsa=email).first()
         
+        if not paciente and not estagiario:
+            print(f"DEBUG: Usuário não encontrado para email: {email}")
+            return jsonify({
+                'success': False, 
+                'error': 'Usuário não encontrado.'
+            }), 404
+        
+        # Hash da nova senha
         hashed_senha = generate_password_hash(nova_senha, method='pbkdf2:sha256')
         
+        # Atualizar senha
         if paciente:
             paciente.senha = hashed_senha
+            print(f"DEBUG: Senha atualizada para paciente: {paciente.nome}")
         elif estagiario:
             estagiario.senha = hashed_senha
-        else:
-            return jsonify({'success': False, 'error': 'Usuário não encontrado.'}), 404
+            print(f"DEBUG: Senha atualizada para estagiário: {estagiario.nome}")
         
         # Marcar token como usado
         marcar_token_como_usado(token)
         
+        # Commit das alterações
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Senha redefinida com sucesso!'}), 200
+        
+        print("DEBUG: Senha redefinida com sucesso!")
+        return jsonify({
+            'success': True, 
+            'message': 'Senha redefinida com sucesso!'
+        }), 200
         
     except Exception as e:
         db.session.rollback()
-        print(f"Erro ao redefinir senha: {str(e)}")
-        return jsonify({'success': False, 'error': 'Erro ao redefinir senha. Tente novamente.'}), 500
+        print(f"ERRO ao redefinir senha: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False, 
+            'error': 'Erro ao redefinir senha. Tente novamente.'
+        }), 500
+
+# =============================================================================
+# ROTA PARA VERIFICAÇÃO DE TOKEN (para o frontend)
+# =============================================================================
+
+@app.route('/api/verificar-token/<token>', methods=['GET'])
+def verificar_token(token):
+    """Verifica se um token de redefinição é válido"""
+    try:
+        email = validar_token_redefinicao(token)
+        if email:
+            return jsonify({'valid': True, 'email': email})
+        else:
+            return jsonify({'valid': False, 'error': 'Token inválido ou expirado'}), 400
+    except Exception as e:
+        print(f"Erro ao verificar token: {e}")
+        return jsonify({'valid': False, 'error': 'Erro ao verificar token'}), 500
+
+# =============================================================================
+# ROTAS DE HEALTH CHECK E ERROS
+# =============================================================================
+
+@app.route('/health')
+def health_check():
+    return jsonify({
+        'status': 'healthy', 
+        'timestamp': datetime.datetime.now().isoformat(),
+        'database': 'connected' if db.session.execute('SELECT 1').first() else 'disconnected'
+    })
+
+@app.errorhandler(404)
+def pagina_nao_encontrada(e):
+    """Redireciona para login se tentar acessar página protegida sem autenticação"""
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Endpoint não encontrado'}), 404
+    return redirect(url_for('login'))
+
+@app.errorhandler(500)
+def erro_servidor(e):
+    """Tratamento de erros do servidor"""
+    print(f"Erro 500: {e}")
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+    flash('Erro interno do servidor. Tente novamente.', 'error')
+    return redirect(url_for('login'))
+@app.route('/api/paciente/alterar-senha', methods=['POST'])
+def alterar_senha_paciente():
+    if 'logged_in' not in session or session.get('user_type') != 'paciente':
+        return jsonify({'error': 'Acesso negado.'}), 403
+
+    paciente_id = session.get('user_id')
+    data = request.get_json()
+
+    senha_atual = data.get('senha_atual')
+    nova_senha = data.get('nova_senha')
+    confirmar_senha = data.get('confirmar_senha')
+
+    if not all([senha_atual, nova_senha, confirmar_senha]):
+        return jsonify({'error': 'Todos os campos são obrigatórios.'}), 400
+
+    if nova_senha != confirmar_senha:
+        return jsonify({'error': 'As senhas não coincidem.'}), 400
+
+    if len(nova_senha) < 6:
+        return jsonify({'error': 'A nova senha deve ter no mínimo 6 caracteres.'}), 400
+
+    paciente = Paciente.query.get(paciente_id)
+    if not paciente:
+        return jsonify({'error': 'Paciente não encontrado.'}), 404
+
+    # Verificar senha atual
+    if not check_password_hash(paciente.senha, senha_atual):
+        return jsonify({'error': 'Senha atual incorreta.'}), 400
+
+    try:
+        # Atualizar senha
+        paciente.senha = generate_password_hash(nova_senha, method='pbkdf2:sha256')
+        db.session.commit()
+        return jsonify({'message': 'Senha alterada com sucesso!'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Erro ao alterar senha.'}), 500
