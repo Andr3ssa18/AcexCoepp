@@ -1,4 +1,4 @@
-// aba_paciente.js - VERSÃO FINAL CONSOLIDADA E 100% FUNCIONAL
+// aba_paciente.js - VERSÃO FINAL CONSOLIDADA E CORRIGIDA
 console.log("DEBUG: aba_paciente.js CARREGADO E SENDO INTERPRETADO");
 
 // =============================================================================
@@ -48,12 +48,10 @@ const elements = {
     consultaConfirmadaLocal: document.getElementById('consulta-confirmada-local'),
     consultaConfirmadaQrcode: document.getElementById('consulta-confirmada-qrcode'),
 
-    // Campos Minha Conta
+    // Campos Minha Conta - CORRIGIDO: Removidos elementos que não existem no HTML
     inputsMeusDados: document.querySelectorAll('#sub-aba-meus-dados input, #sub-aba-meus-dados select'),
     notifEmail: document.getElementById('notif-email'),
-    notifSms: document.getElementById('notif-sms'),
     notifApp: document.getElementById('notif-app'),
-    notifOfertas: document.getElementById('notif-ofertas'),
     senhaAtualInput: document.getElementById('senha-atual'),
     novaSenhaInput: document.getElementById('nova-senha'),
     confirmarNovaSenhaInput: document.getElementById('confirmar-nova-senha'),
@@ -80,11 +78,10 @@ const appState = {
     },
     consultaEmContexto: null,
     
+    // CORRIGIDO: Removidas preferências que não existem no HTML
     preferenciasNotificacao: {
         email: true,
-        sms: false,
-        app: true,
-        ofertas: false
+        app: true
     },
 
     // Horários disponíveis por período (CORRIGIDO - usando formato 24h)
@@ -104,6 +101,10 @@ const appState = {
 
 function showToast(message, type = 'success') {
     const toast = elements.toastNotification;
+    if (!toast) {
+        console.warn('Elemento toast não encontrado');
+        return;
+    }
     toast.textContent = message;
     toast.className = 'toast';
     toast.classList.add('show', type);
@@ -114,11 +115,15 @@ function showToast(message, type = 'success') {
 }
 
 function showSpinner() {
-    elements.loadingSpinner.classList.add('active');
+    if (elements.loadingSpinner) {
+        elements.loadingSpinner.classList.add('active');
+    }
 }
 
 function hideSpinner() {
-    elements.loadingSpinner.classList.remove('active');
+    if (elements.loadingSpinner) {
+        elements.loadingSpinner.classList.remove('active');
+    }
 }
 
 function formatarDataParaExibicao(dataString) {
@@ -143,26 +148,39 @@ function calcularHoraFim(horaInicio) {
 // NAVEGAÇÃO E MODAIS
 // =============================================================================
 
-function goToPage(pageId) {
+function mostrarPagina(pageId) {
+    console.log(`[mostrarPagina] Tentando mostrar página: ${pageId}`);
+    
+    if (!elements.pages || elements.pages.length === 0) {
+        console.error('Nenhuma página encontrada no DOM');
+        return;
+    }
+    
     elements.pages.forEach(p => p.classList.remove('active'));
     const paginaAtiva = document.getElementById(pageId);
+    
     if (paginaAtiva) {
         paginaAtiva.classList.add('active');
         appState.currentActivePage = pageId;
+        console.log(`[mostrarPagina] Página ${pageId} ativada com sucesso`);
+    } else {
+        console.error(`[mostrarPagina] Página não encontrada: ${pageId}`);
     }
 
+    // Fechar todos os modais
     document.querySelectorAll('.modal-overlay').forEach(modal => {
         modal.classList.remove('active');
     });
     document.body.classList.remove('modal-active');
 
+    // Ações específicas por página
     if (pageId === 'pagina-consultas') {
         atualizarListaConsultas();
     } else if (pageId === 'pagina-meus-dados') {
         setTimeout(() => {
             const primeiraAba = document.querySelector('.tab-button');
             if (primeiraAba) {
-                showSubTab('sub-aba-meus-dados', primeiraAba);
+                mostrarSubAba('sub-aba-meus-dados', primeiraAba);
             }
         }, 50);
         carregarPreferenciasNotificacao();
@@ -172,10 +190,12 @@ function goToPage(pageId) {
 }
 
 function toggleDropdown() {
-    elements.dropdownMenu.classList.toggle("show");
+    if (elements.dropdownMenu) {
+        elements.dropdownMenu.classList.toggle("show");
+    }
 }
 
-function showSubTab(subTabId, buttonElement) {
+function mostrarSubAba(subTabId, buttonElement) {
     console.log("Mostrando sub-aba:", subTabId);
     
     document.querySelectorAll('.sub-tab-content').forEach(tab => {
@@ -202,8 +222,10 @@ function showSubTab(subTabId, buttonElement) {
 }
 
 function openModal(modalElement) {
-    modalElement.classList.add('active');
-    document.body.classList.add('modal-active');
+    if (modalElement) {
+        modalElement.classList.add('active');
+        document.body.classList.add('modal-active');
+    }
 }
 
 function closeModal(modalElement) {
@@ -237,11 +259,20 @@ function inicializarSelecaoHorarios() {
     criarBotoesSelecao(elements.periodosContainer, appState.periodosDisponiveis, 'periodos');
     
     // Inicialmente esconder horários específicos
-    elements.horariosEspecificosContainer.style.display = 'none';
-    elements.scheduleSummary.style.display = 'none';
+    if (elements.horariosEspecificosContainer) {
+        elements.horariosEspecificosContainer.style.display = 'none';
+    }
+    if (elements.scheduleSummary) {
+        elements.scheduleSummary.style.display = 'none';
+    }
 }
 
 function criarBotoesSelecao(container, opcoes, tipo) {
+    if (!container) {
+        console.error('Container não encontrado para criar botões');
+        return;
+    }
+    
     container.innerHTML = '';
     
     opcoes.forEach(opcao => {
@@ -281,10 +312,16 @@ function atualizarInterfaceAposSelecao() {
     // Mostrar/ocultar horários específicos baseado nas seleções
     if (appState.selectedTriagem.diasSemana.length > 0 && appState.selectedTriagem.periodos.length > 0) {
         mostrarHorariosEspecificos();
-        elements.horariosEspecificosContainer.style.display = 'block';
+        if (elements.horariosEspecificosContainer) {
+            elements.horariosEspecificosContainer.style.display = 'block';
+        }
     } else {
-        elements.horariosEspecificosContainer.style.display = 'none';
-        elements.scheduleSummary.style.display = 'none';
+        if (elements.horariosEspecificosContainer) {
+            elements.horariosEspecificosContainer.style.display = 'none';
+        }
+        if (elements.scheduleSummary) {
+            elements.scheduleSummary.style.display = 'none';
+        }
     }
     
     // Atualizar resumo
@@ -293,6 +330,8 @@ function atualizarInterfaceAposSelecao() {
 
 function mostrarHorariosEspecificos() {
     const container = elements.horariosEspecificosContainer;
+    if (!container) return;
+    
     container.innerHTML = '<h3>Horários Específicos</h3>';
     
     // Para cada período selecionado, mostrar os horários disponíveis
@@ -359,6 +398,8 @@ function toggleHorarioEspecifico(botao, periodo, horario) {
 function atualizarResumoSelecao() {
     const resumo = elements.selectedPreferencesDisplay;
     const summaryContainer = elements.scheduleSummary;
+    
+    if (!resumo || !summaryContainer) return;
     
     if (appState.selectedTriagem.diasSemana.length === 0 && 
         appState.selectedTriagem.periodos.length === 0 && 
@@ -437,7 +478,9 @@ function validarEabrirModalTriagem() {
         infoText += `• ${periodo}: ${horariosPorPeriodo[periodo].join(', ')}<br>`;
     });
     
-    elements.triagemInfoConfirmacao.innerHTML = infoText;
+    if (elements.triagemInfoConfirmacao) {
+        elements.triagemInfoConfirmacao.innerHTML = infoText;
+    }
     openModal(elements.modalTriagem);
 }
 
@@ -502,7 +545,7 @@ async function enviarSolicitacaoTriagem() {
 
         showToast('Solicitação de triagem enviada com sucesso!', 'success');
         resetTriagemSelection();
-        goToPage('pagina-triagem-sucesso');
+        mostrarPagina('pagina-triagem-sucesso');
         
     } catch (error) {
         console.error('Erro ao solicitar triagem:', error);
@@ -575,9 +618,13 @@ function resetTriagemSelection() {
         btn.classList.remove('selected');
     });
     
-    elements.horariosEspecificosContainer.innerHTML = '';
-    elements.horariosEspecificosContainer.style.display = 'none';
-    elements.scheduleSummary.style.display = 'none';
+    if (elements.horariosEspecificosContainer) {
+        elements.horariosEspecificosContainer.innerHTML = '';
+        elements.horariosEspecificosContainer.style.display = 'none';
+    }
+    if (elements.scheduleSummary) {
+        elements.scheduleSummary.style.display = 'none';
+    }
 }
 
 // =============================================================================
@@ -601,14 +648,20 @@ function inicializarMudarHorario() {
     criarBotoesSelecaoMudarHorario(elements.mudarPeriodosContainer, appState.periodosDisponiveis, 'periodos');
     
     // Inicialmente esconder horários específicos
-    elements.mudarHorariosEspecificosContainer.style.display = 'none';
-    elements.mudarScheduleSummary.style.display = 'none';
+    if (elements.mudarHorariosEspecificosContainer) {
+        elements.mudarHorariosEspecificosContainer.style.display = 'none';
+    }
+    if (elements.mudarScheduleSummary) {
+        elements.mudarScheduleSummary.style.display = 'none';
+    }
     
     // Carregar preferências salvas se existirem
     carregarPreferenciasSalvas();
 }
 
 function criarBotoesSelecaoMudarHorario(container, opcoes, tipo) {
+    if (!container) return;
+    
     container.innerHTML = '';
     
     opcoes.forEach(opcao => {
@@ -648,10 +701,16 @@ function atualizarInterfaceAposSelecaoMudarHorario() {
     // Mostrar/ocultar horários específicos baseado nas seleções
     if (appState.selectedPreferenciasHorario.diasSemana.length > 0 && appState.selectedPreferenciasHorario.periodos.length > 0) {
         mostrarHorariosEspecificosMudarHorario();
-        elements.mudarHorariosEspecificosContainer.style.display = 'block';
+        if (elements.mudarHorariosEspecificosContainer) {
+            elements.mudarHorariosEspecificosContainer.style.display = 'block';
+        }
     } else {
-        elements.mudarHorariosEspecificosContainer.style.display = 'none';
-        elements.mudarScheduleSummary.style.display = 'none';
+        if (elements.mudarHorariosEspecificosContainer) {
+            elements.mudarHorariosEspecificosContainer.style.display = 'none';
+        }
+        if (elements.mudarScheduleSummary) {
+            elements.mudarScheduleSummary.style.display = 'none';
+        }
     }
     
     // Atualizar resumo
@@ -660,6 +719,8 @@ function atualizarInterfaceAposSelecaoMudarHorario() {
 
 function mostrarHorariosEspecificosMudarHorario() {
     const container = elements.mudarHorariosEspecificosContainer;
+    if (!container) return;
+    
     container.innerHTML = '<h3>Horários Específicos Preferidos</h3>';
     
     // Para cada período selecionado, mostrar os horários disponíveis
@@ -726,6 +787,8 @@ function toggleHorarioEspecificoMudarHorario(botao, periodo, horario) {
 function atualizarResumoSelecaoMudarHorario() {
     const resumo = elements.mudarSelectedPreferencesDisplay;
     const summaryContainer = elements.mudarScheduleSummary;
+    
+    if (!resumo || !summaryContainer) return;
     
     if (appState.selectedPreferenciasHorario.diasSemana.length === 0 && 
         appState.selectedPreferenciasHorario.periodos.length === 0 && 
@@ -858,9 +921,13 @@ function limparPreferenciasHorario() {
         botao.classList.remove('selected');
     });
     
-    elements.mudarHorariosEspecificosContainer.innerHTML = '';
-    elements.mudarHorariosEspecificosContainer.style.display = 'none';
-    elements.mudarScheduleSummary.style.display = 'none';
+    if (elements.mudarHorariosEspecificosContainer) {
+        elements.mudarHorariosEspecificosContainer.innerHTML = '';
+        elements.mudarHorariosEspecificosContainer.style.display = 'none';
+    }
+    if (elements.mudarScheduleSummary) {
+        elements.mudarScheduleSummary.style.display = 'none';
+    }
     
     // Limpar do localStorage
     localStorage.removeItem('preferenciasHorarioPaciente');
@@ -872,7 +939,12 @@ function limparPreferenciasHorario() {
 // MINHA CONTA - FUNCIONALIDADES COMPLETAS
 // =============================================================================
 
-function enableEditMode() {
+function habilitarEdicao() {
+    if (!elements.inputsMeusDados || elements.inputsMeusDados.length === 0) {
+        console.error('Elementos de inputs não encontrados');
+        return;
+    }
+    
     elements.inputsMeusDados.forEach(input => {
         if (input.id !== 'nome-completo' && input.id !== 'data-nascimento' && input.id !== 'cpf') {
             input.disabled = false;
@@ -881,7 +953,7 @@ function enableEditMode() {
     showToast("Campos habilitados para edição.", "info");
 }
 
-function saveAccountData() {
+function salvarDados() {
     showSpinner();
 
     const formData = new FormData();
@@ -898,11 +970,13 @@ function saveAccountData() {
     .then(data => {
         if (data.status === 'success') {
             showToast(data.message, 'success');
-            elements.inputsMeusDados.forEach(input => {
-                if (input.id !== 'nome-completo' && input.id !== 'data-nascimento' && input.id !== 'cpf') {
-                    input.disabled = true;
-                }
-            });
+            if (elements.inputsMeusDados) {
+                elements.inputsMeusDados.forEach(input => {
+                    if (input.id !== 'nome-completo' && input.id !== 'data-nascimento' && input.id !== 'cpf') {
+                        input.disabled = true;
+                    }
+                });
+            }
         } else {
             showToast(data.message, 'error');
         }
@@ -917,48 +991,70 @@ function saveAccountData() {
 }
 
 function carregarPreferenciasNotificacao() {
-    elements.notifEmail.checked = appState.preferenciasNotificacao.email;
-    elements.notifSms.checked = appState.preferenciasNotificacao.sms;
-    elements.notifApp.checked = appState.preferenciasNotificacao.app;
-    elements.notifOfertas.checked = appState.preferenciasNotificacao.ofertas;
+    if (elements.notifEmail) {
+        elements.notifEmail.checked = appState.preferenciasNotificacao.email;
+    }
+    if (elements.notifApp) {
+        elements.notifApp.checked = appState.preferenciasNotificacao.app;
+    }
 }
 
-function saveNotificationPreferences() {
+function salvarNotificacoes() {
     showSpinner();
     setTimeout(() => {
         hideSpinner();
-        appState.preferenciasNotificacao.email = elements.notifEmail.checked;
-        appState.preferenciasNotificacao.sms = elements.notifSms.checked;
-        appState.preferenciasNotificacao.app = elements.notifApp.checked;
-        appState.preferenciasNotificacao.ofertas = elements.notifOfertas.checked;
+        if (elements.notifEmail) {
+            appState.preferenciasNotificacao.email = elements.notifEmail.checked;
+        }
+        if (elements.notifApp) {
+            appState.preferenciasNotificacao.app = elements.notifApp.checked;
+        }
         showToast("Preferências de notificação salvas (simulado)!", "success");
     }, 800);
 }
 
-function changePassword() {
+async function mudarSenha() {
+    console.log("DEBUG: Função mudarSenha() chamada");
+    
+    if (!elements.senhaAtualInput || !elements.novaSenhaInput || !elements.confirmarNovaSenhaInput) {
+        console.error("Elementos de senha não encontrados");
+        showToast("Erro: Campos de senha não carregados corretamente.", "error");
+        return;
+    }
+
     const senhaAtual = elements.senhaAtualInput.value;
     const novaSenha = elements.novaSenhaInput.value;
     const confirmarNovaSenha = elements.confirmarNovaSenhaInput.value;
 
-    elements.errorSenhaAtual.textContent = '';
-    elements.errorNovaSenha.textContent = '';
-    elements.errorConfirmarNovaSenha.textContent = '';
+    // Limpar mensagens de erro anteriores e estilos
+    limparErrosSenha();
 
     let hasError = false;
 
+    // Validações básicas
     if (!senhaAtual) {
-        elements.errorSenhaAtual.textContent = 'Digite sua senha atual.';
+        mostrarErro('error-senha-atual', 'Digite sua senha atual.');
+        elements.senhaAtualInput.classList.add('error');
         hasError = true;
     }
+
     if (!novaSenha) {
-        elements.errorNovaSenha.textContent = 'Digite sua nova senha.';
+        mostrarErro('error-nova-senha', 'Digite sua nova senha.');
+        elements.novaSenhaInput.classList.add('error');
         hasError = true;
     } else if (novaSenha.length < 6) {
-        elements.errorNovaSenha.textContent = 'A nova senha deve ter no mínimo 6 caracteres.';
+        mostrarErro('error-nova-senha', 'A nova senha deve ter no mínimo 6 caracteres.');
+        elements.novaSenhaInput.classList.add('error');
         hasError = true;
     }
-    if (novaSenha !== confirmarNovaSenha) {
-        elements.errorConfirmarNovaSenha.textContent = 'As senhas não coincidem.';
+
+    if (!confirmarNovaSenha) {
+        mostrarErro('error-confirmar-nova-senha', 'Confirme sua nova senha.');
+        elements.confirmarNovaSenhaInput.classList.add('error');
+        hasError = true;
+    } else if (novaSenha !== confirmarNovaSenha) {
+        mostrarErro('error-confirmar-nova-senha', 'As senhas não coincidem.');
+        elements.confirmarNovaSenhaInput.classList.add('error');
         hasError = true;
     }
 
@@ -968,14 +1064,113 @@ function changePassword() {
     }
 
     showSpinner();
-    setTimeout(() => {
+
+    try {
+        // Chamada API real para alterar senha
+        const response = await fetch('/api/paciente/alterar-senha', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                senha_atual: senhaAtual,
+                nova_senha: novaSenha,
+                confirmar_senha: confirmarNovaSenha
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast("Senha alterada com sucesso!", "success");
+            // Limpar campos
+            limparFormularioSenha();
+        } else {
+            // Tratar erros específicos do servidor
+            if (data.error && data.error.includes('senha atual')) {
+                mostrarErro('error-senha-atual', 'Senha atual incorreta.');
+                elements.senhaAtualInput.classList.add('error');
+                showToast("Senha atual incorreta. Tente novamente.", "error");
+            } else {
+                showToast(data.error || "Erro ao alterar senha. Tente novamente.", "error");
+            }
+        }
+
+    } catch (error) {
+        console.error('Erro ao alterar senha:', error);
+        showToast("Erro de conexão. Tente novamente.", "error");
+    } finally {
         hideSpinner();
-        showToast("Senha alterada (simulado)!", "success");
-        elements.senhaAtualInput.value = '';
-        elements.novaSenhaInput.value = '';
-        elements.confirmarNovaSenhaInput.value = '';
-    }, 800);
+    }
 }
+
+// Funções auxiliares para manipulação de erros
+function limparErrosSenha() {
+    // Limpar mensagens de erro
+    const errorElements = [
+        'error-senha-atual',
+        'error-nova-senha', 
+        'error-confirmar-nova-senha'
+    ];
+    
+    errorElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.classList.remove('show');
+            element.textContent = '';
+        }
+    });
+    
+    // Limpar classes de erro dos inputs
+    if (elements.senhaAtualInput) elements.senhaAtualInput.classList.remove('error');
+    if (elements.novaSenhaInput) elements.novaSenhaInput.classList.remove('error');
+    if (elements.confirmarNovaSenhaInput) elements.confirmarNovaSenhaInput.classList.remove('error');
+}
+
+function mostrarErro(elementId, mensagem) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = mensagem;
+        element.classList.add('show');
+    }
+}
+
+function limparFormularioSenha() {
+    if (elements.senhaAtualInput) elements.senhaAtualInput.value = '';
+    if (elements.novaSenhaInput) elements.novaSenhaInput.value = '';
+    if (elements.confirmarNovaSenhaInput) elements.confirmarNovaSenhaInput.value = '';
+    limparErrosSenha();
+}
+
+// Adicionar event listeners para limpar erros quando o usuário digitar
+document.addEventListener('DOMContentLoaded', function() {
+    // Limpar erro da senha atual ao digitar
+    if (elements.senhaAtualInput) {
+        elements.senhaAtualInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            const errorElement = document.getElementById('error-senha-atual');
+            if (errorElement) errorElement.classList.remove('show');
+        });
+    }
+    
+    // Limpar erro da nova senha ao digitar
+    if (elements.novaSenhaInput) {
+        elements.novaSenhaInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            const errorElement = document.getElementById('error-nova-senha');
+            if (errorElement) errorElement.classList.remove('show');
+        });
+    }
+    
+    // Limpar erro da confirmação ao digitar
+    if (elements.confirmarNovaSenhaInput) {
+        elements.confirmarNovaSenhaInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            const errorElement = document.getElementById('error-confirmar-nova-senha');
+            if (errorElement) errorElement.classList.remove('show');
+        });
+    }
+});
 
 // =============================================================================
 // MINHAS CONSULTAS - FUNCIONALIDADES COMPLETAS
@@ -1000,6 +1195,11 @@ function compareAppointments(a, b) {
 
 // Função melhorada para carregar consultas do paciente
 async function atualizarListaConsultas() {
+    if (!elements.containerMeusAgendamentos || !elements.noAppointmentsMessage) {
+        console.error('Elementos de consultas não encontrados');
+        return;
+    }
+    
     elements.containerMeusAgendamentos.innerHTML = '';
     elements.noAppointmentsMessage.style.display = 'none';
     showSpinner();
@@ -1101,7 +1301,7 @@ async function atualizarListaConsultas() {
             const botaoDetalhes = document.createElement('button');
             botaoDetalhes.className = 'btn btn-outline';
             botaoDetalhes.textContent = 'Ver Detalhes';
-            botaoDetalhes.onclick = () => viewAppointmentDetails(agendamento);
+            botaoDetalhes.onclick = () => mostrarDetalhesConsulta(agendamento);
             cardActions.appendChild(botaoDetalhes);
 
             card.appendChild(cardInfo);
@@ -1117,10 +1317,16 @@ async function atualizarListaConsultas() {
     }
 }
 
-// Função melhorada para mostrar detalhes da consulta
-function viewAppointmentDetails(consulta) {
-    console.log("[viewAppointmentDetails] Iniciada com consulta:", consulta);
+// Função melhorada para mostrar detalhes da consulta - VERSÃO ÚNICA CORRIGIDA
+function mostrarDetalhesConsulta(consulta) {
+    console.log("[mostrarDetalhesConsulta] Iniciada com consulta:", consulta);
     appState.consultaEmContexto = consulta;
+    
+    if (!elements.detalhesConsultaConteudo || !elements.modalDetalhesConsulta) {
+        console.error('Elementos do modal de detalhes não encontrados');
+        return;
+    }
+    
     const conteudo = elements.detalhesConsultaConteudo;
 
     let dataExibicao = "A definir";
@@ -1171,80 +1377,20 @@ function viewAppointmentDetails(consulta) {
         setTimeout(() => {
             const cancelButton = document.getElementById(`btn-detalhes-cancelar-${consulta.id}`);
             if (cancelButton) {
-                cancelButton.onclick = () => openCancelAppointmentModal(consulta);
-            }
-        }, 0);
-    }
-    openModal(elements.modalDetalhesConsulta);
-}
-
-function viewAppointmentDetails(consulta) {
-    console.log("[viewAppointmentDetails] Iniciada com consulta:", consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
-    appState.consultaEmContexto = consulta;
-    const conteudo = elements.detalhesConsultaConteudo;
-
-    // CORREÇÃO: Validar e formatar datas corretamente
-    let dataExibicao = "A definir";
-    let horarioExibicao = "A definir";
-
-    if (consulta.data_agendamento) {
-        try {
-            const dataAg = new Date(consulta.data_agendamento);
-            if (!isNaN(dataAg.getTime())) {
-                dataExibicao = dataAg.toLocaleDateString('pt-BR');
-                horarioExibicao = dataAg.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            }
-        } catch (e) {
-            console.error('Erro ao formatar data de agendamento:', e);
-        }
-    } else if (consulta.tipo_atendimento === 'Solicitação de Triagem' && consulta.data_solicitacao) {
-        try {
-            const dataSol = new Date(consulta.data_solicitacao);
-            if (!isNaN(dataSol.getTime())) {
-                dataExibicao = `Solicitado em ${dataSol.toLocaleDateString('pt-BR')}`;
-                horarioExibicao = dataSol.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            }
-        } catch (e) {
-            console.error('Erro ao formatar data de solicitação:', e);
-        }
-    }
-
-    const tipoAtendimento = consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Solicitação de Triagem' : consulta.tipo_atendimento;
-
-    conteudo.innerHTML = `
-        <p><strong>Tipo:</strong> ${tipoAtendimento}</p>
-        <p><strong>Estagiário/a:</strong> ${consulta.estagiario_nome || (consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Aguardando atribuição' : 'Não definido')}</p>
-        <p><strong>Data:</strong> ${dataExibicao}</p>
-        <p><strong>Horário:</strong> ${horarioExibicao}</p>
-        <p><strong>Local:</strong> COEPP - Fundação Santo André (Sala a ser definida)</p>
-        <p><strong>Status:</strong> <span class="status-text ${consulta.status.replace('_', '-')}">${consulta.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></p>
-    `;
-
-    if (consulta.status !== 'cancelado_paciente' && consulta.status !== 'cancelado_estagiario' && consulta.status !== 'finalizado') {
-        conteudo.innerHTML += `
-                <h3 style="margin-top: 20px;">Ações</h3>
-                <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: center;">
-                    <button class="action-button danger" id="btn-detalhes-cancelar-${consulta.id}">Cancelar Agendamento</button>
-                    ${consulta.data_agendamento ? '<button class="action-button warning" disabled>Reagendar (Em breve)</button>' : ''}
-                </div>`;
-        
-        setTimeout(() => {
-            const cancelButton = document.getElementById(`btn-detalhes-cancelar-${consulta.id}`);
-            if (cancelButton) {
-                console.log(`[viewAppointmentDetails] Botão #btn-detalhes-cancelar-${consulta.id} ENCONTRADO. Adicionando onclick.`);
+                console.log(`[mostrarDetalhesConsulta] Botão #btn-detalhes-cancelar-${consulta.id} ENCONTRADO. Adicionando onclick.`);
                 cancelButton.onclick = () => {
-                    console.log(`[viewAppointmentDetails] Botão #btn-detalhes-cancelar-${consulta.id} CLICADO. Chamando openCancelAppointmentModal com:`, consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
-                    openCancelAppointmentModal(consulta); 
+                    console.log(`[mostrarDetalhesConsulta] Botão #btn-detalhes-cancelar-${consulta.id} CLICADO. Chamando abrirModalConfirmarCancelamento com:`, consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
+                    abrirModalConfirmarCancelamento(consulta); 
                 };
             } else {
-                console.error(`[viewAppointmentDetails] ERRO: Botão #btn-detalhes-cancelar-${consulta.id} NÃO encontrado no DOM.`);
+                console.error(`[mostrarDetalhesConsulta] ERRO: Botão #btn-detalhes-cancelar-${consulta.id} NÃO encontrado no DOM.`);
             }
         }, 0);
     }
     openModal(elements.modalDetalhesConsulta);
 }
 
-async function cancelAppointment() {
+async function executarCancelamentoFinal() {
     if (!appState.consultaEmContexto) {
         showToast('Erro: Nenhuma consulta selecionada.', 'error');
         return;
@@ -1263,9 +1409,9 @@ async function cancelAppointment() {
 
         if (response.ok) {
             showToast(data.message, 'success');
-            closeModal(elements.modalConfirmarCancelamento);
+            fecharModalConfirmarCancelamento();
             await atualizarListaConsultas();
-            goToPage('pagina-consultas');
+            mostrarPagina('pagina-consultas');
         } else {
             showToast(data.error || 'Erro ao cancelar a consulta.', 'error');
         }
@@ -1277,7 +1423,7 @@ async function cancelAppointment() {
     }
 }
 
-function openCancelAppointmentModal(consulta) {
+function abrirModalConfirmarCancelamento(consulta) {
     if (!consulta) {
         showToast('Erro: Nenhuma consulta selecionada.', 'error');
         return;
@@ -1286,12 +1432,22 @@ function openCancelAppointmentModal(consulta) {
     openModal(elements.modalConfirmarCancelamento);
 }
 
+function fecharModalConfirmarCancelamento() {
+    closeModal(elements.modalConfirmarCancelamento);
+}
+
+function fecharModalDetalhes() {
+    closeModal(elements.modalDetalhesConsulta);
+}
+
 // =============================================================================
 // CONSULTA CONFIRMADA - FUNCIONALIDADES
 // =============================================================================
 
-function generateQRCode() {
+function gerarQRCode() {
     const qrCodeContainer = elements.consultaConfirmadaQrcode;
+    if (!qrCodeContainer) return;
+    
     qrCodeContainer.innerHTML = '';
     
     const qrCodeImg = document.createElement('img');
@@ -1325,8 +1481,8 @@ function generateQRCode() {
     qrCodeContainer.appendChild(qrCodeImg);
 }
 
-function downloadQRCode() {
-    const qrCodeImg = elements.consultaConfirmadaQrcode.querySelector('img');
+function baixarQRCode() {
+    const qrCodeImg = elements.consultaConfirmadaQrcode ? elements.consultaConfirmadaQrcode.querySelector('img') : null;
     
     if (!qrCodeImg) {
         showToast('Erro: QR Code não encontrado.', "error");
@@ -1335,8 +1491,8 @@ function downloadQRCode() {
     
     const downloadLink = document.createElement('a');
     
-    const dataFormatada = elements.consultaConfirmadaData.textContent.replace(/\//g, '-');
-    const horario = elements.consultaConfirmadaHorario.textContent.replace('h', '-');
+    const dataFormatada = elements.consultaConfirmadaData ? elements.consultaConfirmadaData.textContent.replace(/\//g, '-') : 'data';
+    const horario = elements.consultaConfirmadaHorario ? elements.consultaConfirmadaHorario.textContent.replace('h', '-') : 'hora';
     const fileName = `consulta_${dataFormatada}_${horario}.png`;
     
     downloadLink.href = qrCodeImg.src;
@@ -1353,24 +1509,26 @@ function downloadQRCode() {
 // NÃO POSSO COMPARECER - FUNCIONALIDADES
 // =============================================================================
 
-function showCannotAttendPage(consulta) {
+function mostrarPaginaNaoPosso(consulta) {
     appState.consultaEmContexto = consulta;
-    goToPage('pagina-nao-posso-comparecer');
+    mostrarPagina('pagina-nao-posso-comparecer');
 }
 
-function closeCannotAttendPage() {
-    goToPage('pagina-consultas');
-    elements.motivoNaoPosso.value = '';
+function fecharNaoPosso() {
+    mostrarPagina('pagina-consultas');
+    if (elements.motivoNaoPosso) {
+        elements.motivoNaoPosso.value = '';
+    }
     appState.consultaEmContexto = null;
 }
 
-function sendCannotAttendReasonAndCancel() {
+function enviarNaoPosso() {
     if (!appState.consultaEmContexto) {
         showToast('Erro: Nenhuma consulta selecionada.');
         return;
     }
     
-    const motivo = elements.motivoNaoPosso.value;
+    const motivo = elements.motivoNaoPosso ? elements.motivoNaoPosso.value : '';
     if (!motivo.trim()) {
         showToast('Por favor, informe o motivo da sua ausência.', "error");
         return;
@@ -1380,9 +1538,11 @@ function sendCannotAttendReasonAndCancel() {
     setTimeout(() => {
         hideSpinner();
         if (appState.consultaEmContexto) {
-            cancelAppointment();
-            goToPage('pagina-consultas');
-            elements.motivoNaoPosso.value = '';
+            executarCancelamentoFinal();
+            mostrarPagina('pagina-consultas');
+            if (elements.motivoNaoPosso) {
+                elements.motivoNaoPosso.value = '';
+            }
             appState.consultaEmContexto = null;
             showToast('Solicitação de cancelamento enviada.', "success");
         } else {
@@ -1397,7 +1557,7 @@ function sendCannotAttendReasonAndCancel() {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DEBUG: DOMContentLoaded disparado!");
-    goToPage('pagina-principal');
+    mostrarPagina('pagina-principal');
 
     // Eventos do Header
     const profileElement = document.querySelector('.profile');
@@ -1413,7 +1573,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const link = event.target.closest('a');
             if (link && link.dataset.page) {
                 event.preventDefault();
-                goToPage(link.dataset.page);
+                mostrarPagina(link.dataset.page);
                 toggleDropdown();
             }
         });
@@ -1429,16 +1589,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Eventos da página "Minha Conta"
     const editButton = document.querySelector('#sub-aba-meus-dados .form-group-actions .action-button.secondary');
-    if (editButton) editButton.addEventListener('click', enableEditMode);
+    if (editButton) editButton.addEventListener('click', habilitarEdicao);
     
     const saveAccountButton = document.querySelector('#sub-aba-meus-dados .action-buttons .action-button.primary');
-    if (saveAccountButton) saveAccountButton.addEventListener('click', saveAccountData);
+    if (saveAccountButton) saveAccountButton.addEventListener('click', salvarDados);
     
     const saveNotifButton = document.querySelector('#sub-aba-notificacoes .action-button.primary');
-    if (saveNotifButton) saveNotifButton.addEventListener('click', saveNotificationPreferences);
+    if (saveNotifButton) saveNotifButton.addEventListener('click', salvarNotificacoes);
     
     const changePassButton = document.querySelector('#sub-aba-mudar-senha .action-button.primary');
-    if (changePassButton) changePassButton.addEventListener('click', changePassword);
+    if (changePassButton) changePassButton.addEventListener('click', mudarSenha);
 
     // Eventos da página "Horários de Triagem"
     if (elements.confirmSelectionButton) {
@@ -1451,42 +1611,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Eventos dos Modais
-    document.querySelector('#modal-detalhes-consulta .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalDetalhesConsulta));
+    document.querySelector('#modal-detalhes-consulta .modal-action-buttons .action-button.secondary')?.addEventListener('click', fecharModalDetalhes);
     document.querySelector('#modal-triagem .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalTriagem));
     document.querySelector('#modal-triagem .modal-action-buttons .action-button.primary')?.addEventListener('click', enviarSolicitacaoTriagem);
-    document.querySelector('#modal-confirmar-cancelamento .modal-action-buttons .action-button.secondary')?.addEventListener('click', () => closeModal(elements.modalConfirmarCancelamento));
+    document.querySelector('#modal-confirmar-cancelamento .modal-action-buttons .action-button.secondary')?.addEventListener('click', fecharModalConfirmarCancelamento);
     
     if (elements.btnConfirmarCancelamentoFinal) {
         console.log("[DOMContentLoaded] Botão #btn-confirmar-cancelamento-final ENCONTRADO. Adicionando listener.");
-        elements.btnConfirmarCancelamentoFinal.addEventListener('click', () => {
-            console.log("[DOMContentLoaded] Botão #btn-confirmar-cancelamento-final CLICADO. Chamando cancelAppointment().");
-            cancelAppointment();
-        });
+        elements.btnConfirmarCancelamentoFinal.addEventListener('click', executarCancelamentoFinal);
     } else {
         console.error("[DOMContentLoaded] ERRO: Botão #btn-confirmar-cancelamento-final NÃO encontrado no DOM.");
     }
 
     // Eventos da Página "Consulta Confirmada"
-    document.querySelector('.consulta-confirmada-download')?.addEventListener('click', downloadQRCode);
-    document.querySelector('.consulta-confirmada-voltar')?.addEventListener('click', () => goToPage('pagina-consultas'));
+    document.querySelector('.consulta-confirmada-download')?.addEventListener('click', baixarQRCode);
+    document.querySelector('.consulta-confirmada-voltar')?.addEventListener('click', () => mostrarPagina('pagina-consultas'));
 
     // Eventos da Página "Não Posso Comparecer"
-    document.querySelector('#pagina-nao-posso-comparecer .action-button.secondary')?.addEventListener('click', closeCannotAttendPage);
-    document.querySelector('#pagina-nao-posso-comparecer .action-button.primary')?.addEventListener('click', sendCannotAttendReasonAndCancel);
+    document.querySelector('#pagina-nao-posso-comparecer .action-button.secondary')?.addEventListener('click', fecharNaoPosso);
+    document.querySelector('#pagina-nao-posso-comparecer .action-button.primary')?.addEventListener('click', enviarNaoPosso);
 });
 
 // =============================================================================
 // MAPEAMENTO PARA FUNÇÕES GLOBAIS (compatibilidade com onclick no HTML)
 // =============================================================================
 
-window.mostrarPagina = goToPage;
-window.mostrarSubAba = showSubTab;
+window.mostrarPagina = mostrarPagina;
+window.mostrarSubAba = mostrarSubAba;
 
 // Página "Minha Conta"
-window.habilitarEdicao = enableEditMode;
-window.salvarDados = saveAccountData;
-window.salvarNotificacoes = saveNotificationPreferences;
-window.mudarSenha = changePassword;
+window.habilitarEdicao = habilitarEdicao;
+window.salvarDados = salvarDados;
+window.salvarNotificacoes = salvarNotificacoes;
+window.mudarSenha = mudarSenha;
 
 // Página "Horários de Triagem"
 window.validarEabrirModalTriagem = validarEabrirModalTriagem;
@@ -1499,18 +1656,20 @@ window.limparPreferenciasHorario = limparPreferenciasHorario;
 
 // Página "Minhas Consultas"
 window.atualizarListaConsultas = atualizarListaConsultas;
-window.mostrarDetalhesConsulta = viewAppointmentDetails;
-window.fecharModalDetalhes = () => closeModal(elements.modalDetalhesConsulta);
-window.cancelarConsulta = () => openCancelAppointmentModal(appState.consultaEmContexto);
-window.abrirModalConfirmarCancelamento = openCancelAppointmentModal;
-window.fecharModalConfirmarCancelamento = () => closeModal(elements.modalConfirmarCancelamento);
-window.executarCancelamentoFinal = cancelAppointment;
+window.mostrarDetalhesConsulta = mostrarDetalhesConsulta;
+window.fecharModalDetalhes = fecharModalDetalhes;
+window.cancelarConsulta = () => abrirModalConfirmarCancelamento(appState.consultaEmContexto);
+window.abrirModalConfirmarCancelamento = abrirModalConfirmarCancelamento;
+window.fecharModalConfirmarCancelamento = fecharModalConfirmarCancelamento;
+window.executarCancelamentoFinal = executarCancelamentoFinal;
 
 // Página "Consulta Confirmada"
-window.gerarQRCode = generateQRCode;
-window.baixarQRCode = downloadQRCode;
+window.gerarQRCode = gerarQRCode;
+window.baixarQRCode = baixarQRCode;
 
 // Página "Não Posso Comparecer"
-window.mostrarPaginaNaoPosso = showCannotAttendPage;
-window.enviarNaoPosso = sendCannotAttendReasonAndCancel;
-window.fecharNaoPosso = closeCannotAttendPage;
+window.mostrarPaginaNaoPosso = mostrarPaginaNaoPosso;
+window.enviarNaoPosso = enviarNaoPosso;
+window.fecharNaoPosso = fecharNaoPosso;
+
+console.log("DEBUG: aba_paciente.js completamente carregado e inicializado");
