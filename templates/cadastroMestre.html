@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro do Professor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -37,9 +38,8 @@
             margin: 0 0 20px 0;
         }
 
-        .cartao input[type="text"],
-        .cartao input[type="email"],
-        .cartao input[type="date"] {
+        .cartao input,
+        .cartao select {
             width: 100%;
             padding: 12px;
             margin-bottom: 12px;
@@ -54,7 +54,8 @@
             gap: 10px;
         }
 
-        .linha-inputs input[type="text"] {
+        .linha-inputs input,
+        .linha-inputs select {
             flex: 1;
         }
 
@@ -76,14 +77,6 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-        }
-
-        .indicador-etapa {
-            position: absolute;
-            bottom: 15px;
-            left: 20px;
-            font-size: 14px;
-            color: #666;
         }
 
         .logo-img {
@@ -287,7 +280,7 @@
 
         <form id="cadastroProfessorForm" method="POST" action="{{ url_for('cadastrar_mestre') }}">
             <!-- Nome -->
-            <input type="text" id="nome" name="nome" placeholder="Nome Completo" maxlength="100" required>
+            <input type="text" id="nome" name="nome" placeholder="Nome completo" maxlength="100" required>
             <span id="erroNome" class="mensagem-erro"></span>
 
             <!-- Data de Nascimento -->
@@ -307,7 +300,7 @@
             </div>
 
             <!-- E-mail Institucional -->
-            <input type="email" id="email" name="email" placeholder="E-mail institucional" maxlength="100" required>
+            <input type="email" id="email" name="email" placeholder="E-mail Institucional" maxlength="100" required>
             <span id="erroEmail" class="mensagem-erro"></span>
 
             <!-- Registro Profissional -->
@@ -319,8 +312,6 @@
                 <button type="button" class="botao-navegacao" onclick="validarFormulario()">&#8594;</button>
             </div>
         </form>
-
-        <div class="indicador-etapa">Etapa 1 de 2</div>
     </div>
 
     <script>
@@ -399,7 +390,14 @@
         }
 
         function validarEmail(email) {
-            return email.endsWith("@graduacao.fsa.br");
+            // Regex para validar o formato específico: nome.759324@graduacao.fsa.br
+            const regex = /^[a-z]+\.[0-9]{6}@graduacao\.fsa\.br$/;
+            
+            if (!regex.test(email)) {
+                return false;
+            }
+            
+            return true;
         }
 
         function validarTelefone(telefone) {
@@ -437,6 +435,34 @@
             if (elementoInput) {
                 elementoInput.classList.add('erro');
             }
+        }
+
+        function obterMensagemErroEmail(email) {
+            if (!email) {
+                return 'E-mail institucional é obrigatório';
+            }
+            
+            if (!email.endsWith("@graduacao.fsa.br")) {
+                return 'E-mail deve ser institucional';
+            }
+            
+            // Validação específica do formato
+            const partes = email.split('@')[0].split('.');
+            if (partes.length !== 2) {
+                return 'Formato de e-mail inválido. Use: nome.123456@graduacao.fsa.br';
+            }
+            
+            const [nomePart, numeroPart] = partes;
+            
+            if (!/^[a-z]+$/.test(nomePart)) {
+                return 'Nome deve conter apenas letras minúsculas antes do ponto';
+            }
+            
+            if (!/^[0-9]{6}$/.test(numeroPart)) {
+                return 'Número deve ter exatamente 6 dígitos';
+            }
+            
+            return 'E-mail inválido';
         }
 
         function validarFormulario() {
@@ -493,7 +519,8 @@
                 exibirErro('Email', 'E-mail institucional é obrigatório');
                 valido = false;
             } else if (!validarEmail(email)) {
-                exibirErro('Email', 'E-mail deve ser institucional (@graduacao.fsa.br)');
+                const mensagemErro = obterMensagemErroEmail(email);
+                exibirErro('Email', mensagemErro);
                 valido = false;
             }
             
@@ -559,4 +586,3 @@
     </script>
 </body>
 </html>
-
