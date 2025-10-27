@@ -1,8 +1,8 @@
 # views.py
 from main import app, mail # Importa o aplicativo Flask principal e o objeto mail
 from db import db
-from models import Paciente,Estagiario,Agendamento
-from flask import render_template, request, redirect, url_for, flash, session,jsonify
+from models import Paciente, Estagiario, Agendamento, Mestre  # ADICIONAR Mestre aqui
+from flask import render_template, request, redirect, url_for, flash, session, jsonify
 import datetime # Adicionado para conversão de data
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate 
@@ -23,64 +23,78 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        print("DEBUG: Requisição POST para /login recebida.") # DEBUG
+        print("DEBUG: Requisição POST para /login recebida.")
         identificador = request.form.get('identificador')
         senha_digitada = request.form.get('password')
 
-        print(f"DEBUG: Identificador recebido: {identificador}") # DEBUG
+        print(f"DEBUG: Identificador recebido: {identificador}")
 
-        # Verificação para Paciente (usa email)
+        # PRIMEIRO: Verificação para Mestre (usa email)
+        mestre = Mestre.query.filter_by(email=identificador).first()
+        if mestre:
+            print(f"DEBUG: Mestre encontrado: {mestre.email}")
+            if check_password_hash(mestre.senha, senha_digitada):
+                print("DEBUG: Senha do mestre CORRETA.")
+                session['logged_in'] = True
+                session['user_id'] = mestre.id
+                session['user_type'] = 'mestre'
+                session['nome_usuario'] = mestre.nome
+                flash('Login de mestre realizado com sucesso!', 'success')
+                print("DEBUG: Redirecionando para aba_admin...")
+                return redirect(url_for('aba_admin'))
+            else:
+                print("DEBUG: Senha do mestre INCORRETA.")
+                flash('Senha incorreta. Por favor, tente novamente.', 'error')
+                return render_template('login.html')
+
+        # SEGUNDO: Verificação para Paciente (usa email)
         paciente = Paciente.query.filter_by(email=identificador).first()
         if paciente:
-            print(f"DEBUG: Paciente encontrado: {paciente.email}") # DEBUG
+            print(f"DEBUG: Paciente encontrado: {paciente.email}")
             if check_password_hash(paciente.senha, senha_digitada):
-                print("DEBUG: Senha do paciente CORRETA.") # DEBUG
+                print("DEBUG: Senha do paciente CORRETA.")
                 session['logged_in'] = True
                 session['user_id'] = paciente.id
                 session['user_type'] = 'paciente'
                 session['nome_usuario'] = paciente.nome
                 flash('Login de paciente realizado com sucesso!', 'success')
-                print("DEBUG: Redirecionando para aba_pacientes...") # DEBUG
+                print("DEBUG: Redirecionando para aba_pacientes...")
                 return redirect(url_for('aba_pacientes'))
             else:
-                print("DEBUG: Senha do paciente INCORRETA.") # DEBUG
+                print("DEBUG: Senha do paciente INCORRETA.")
                 flash('Senha incorreta. Por favor, tente novamente.', 'error')
                 return render_template('login.html')
         else:
-            print("DEBUG: Paciente não encontrado por email.") # DEBUG
+            print("DEBUG: Paciente não encontrado por email.")
         
-        # Verificação para Estagiário (usa email ou RA)
+        # TERCEIRO: Verificação para Estagiário (usa email ou RA)
         estagiario = Estagiario.query.filter_by(emailfsa=identificador).first()
         if not estagiario: 
             estagiario = Estagiario.query.filter_by(RA=identificador).first()
             if estagiario:
-                print(f"DEBUG: Estagiário encontrado por RA: {estagiario.RA}") # DEBUG
+                print(f"DEBUG: Estagiário encontrado por RA: {estagiario.RA}")
             else:
-                print("DEBUG: Estagiário NÃO encontrado por RA.") # DEBUG
+                print("DEBUG: Estagiário NÃO encontrado por RA.")
                 flash('E-mail/RA não encontrado. Por favor, verifique suas credenciais.', 'error')
                 return render_template('login.html')
         else:
-            print(f"DEBUG: Estagiário encontrado por emailfsa: {estagiario.emailfsa}") # DEBUG
+            print(f"DEBUG: Estagiário encontrado por emailfsa: {estagiario.emailfsa}")
 
         if estagiario and check_password_hash(estagiario.senha, senha_digitada):
-            print("DEBUG: Senha do estagiário CORRETA.") # DEBUG
+            print("DEBUG: Senha do estagiário CORRETA.")
             session['logged_in'] = True
             session['user_id'] = estagiario.id
             session['user_type'] = 'estagiario'
             session['nome_usuario'] = estagiario.nome
             flash('Login de estagiário realizado com sucesso!', 'success')
-            print("DEBUG: Redirecionando para aba_estagiario...") # DEBUG
+            print("DEBUG: Redirecionando para aba_estagiario...")
             return redirect(url_for('aba_estagiario'))
         else:
-            print("DEBUG: Senha do estagiário INCORRETA ou estagiário não encontrado.") # DEBUG
+            print("DEBUG: Senha do estagiário INCORRETA ou estagiário não encontrado.")
             flash('Senha incorreta. Por favor, tente novamente.', 'error')
             return render_template('login.html')
     
-    # Se o método for GET, apenas renderiza a página de login
-    messages = session.pop('_flashes', [])
-    print(f"DEBUG: Requisição GET para /login. Mensagens flash: {messages}") # DEBUG
-    return render_template('login.html', messages=messages)
-
+    return render_template('login.html')
 # Rota de Logout (opcional, mas recomendado)
 @app.route('/logout')
 def logout():
@@ -1341,3 +1355,137 @@ def alterar_senha_paciente():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Erro ao alterar senha.'}), 500
+# Rota para exibir o formulário de cadastro do Mestre
+# Rota para exibir o formulário de cadastro do Mestre
+@app.route('/cadastroMestre', methods=['GET'])
+def cadastro_mestre():
+    messages = session.pop('_flashes', [])
+    return render_template('cadastroMestre.html', messages=messages)
+
+# Rota para processar o cadastro do Mestre
+@app.route('/cadastrar-mestre', methods=['POST'])
+def cadastrar_mestre():
+    try:
+        print("DEBUG: Recebendo dados do cadastro do Mestre")
+        
+        dados_mestre = {
+            'nome': request.form.get('nome'),
+            'cpf': request.form.get('cpf'),
+            'telefone': request.form.get('telefone'),
+            'email': request.form.get('email'),
+            'registro_profissional': request.form.get('registro_profissional')
+        }
+        
+        print(f"DEBUG: Dados recebidos - {dados_mestre}")
+        
+        # Validar campos obrigatórios
+        campos_obrigatorios = ['nome', 'cpf', 'telefone', 'email', 'registro_profissional']
+        for campo in campos_obrigatorios:
+            if not dados_mestre[campo]:
+                flash(f'O campo {campo} é obrigatório.', 'error')
+                return redirect(url_for('cadastro_mestre'))
+        
+        # Verificar se email já existe
+        if Mestre.query.filter_by(email=dados_mestre['email']).first():
+            flash('Este email já está cadastrado.', 'error')
+            return redirect(url_for('cadastro_mestre'))
+        
+        # Verificar se CPF já existe
+        if Mestre.query.filter_by(cpf=dados_mestre['cpf']).first():
+            flash('Este CPF já está cadastrado.', 'error')
+            return redirect(url_for('cadastro_mestre'))
+        
+        # Salvar na sessão e redirecionar para criar senha
+        session['dados_mestre'] = dados_mestre
+        return redirect(url_for('criar_senha_mestre'))
+        
+    except Exception as e:
+        print(f"ERRO no cadastro do mestre: {e}")
+        flash('Erro ao processar cadastro. Tente novamente.', 'error')
+        return redirect(url_for('cadastro_mestre'))
+
+# Rota para criar senha do Mestre
+@app.route('/criar-senha-mestre', methods=['GET', 'POST'])
+def criar_senha_mestre():
+    # Verificar se há dados do mestre na sessão
+    if 'dados_mestre' not in session:
+        flash('Por favor, preencha os dados do mestre primeiro.', 'error')
+        return redirect(url_for('cadastro_mestre'))
+    
+    if request.method == 'POST':
+        try:
+            senha = request.form.get('senha')
+            confirmar_senha = request.form.get('confirmar_senha')
+            
+            # Validar senhas
+            if senha != confirmar_senha:
+                flash('As senhas não coincidem.', 'error')
+                return render_template('criarSenha_mestre.html')
+            
+            if len(senha) < 8:
+                flash('A senha deve ter no mínimo 8 caracteres.', 'error')
+                return render_template('criarSenha_mestre.html')
+            
+            # Hash da senha
+            hashed_senha = generate_password_hash(senha, method='pbkdf2:sha256')
+            
+            dados_mestre = session['dados_mestre']
+            
+            # Criar novo Mestre
+            novo_mestre = Mestre(
+                nome=dados_mestre['nome'],
+                cpf=dados_mestre['cpf'],
+                telefone=dados_mestre['telefone'],
+                email=dados_mestre['email'],
+                registro_profissional=dados_mestre['registro_profissional'],
+                senha=hashed_senha
+            )
+            
+            # Salvar no banco
+            db.session.add(novo_mestre)
+            db.session.commit()
+            
+            # Fazer login automático
+            session['logged_in'] = True
+            session['user_id'] = novo_mestre.id
+            session['user_type'] = 'mestre'
+            session['nome_usuario'] = novo_mestre.nome
+            
+            flash('Mestre cadastrado com sucesso!', 'success')
+            session.pop('dados_mestre', None)
+            
+            # Redirecionar para aba_admin
+            return redirect(url_for('aba_admin'))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"ERRO ao criar senha do mestre: {e}")
+            flash(f'Erro ao cadastrar mestre: {str(e)}', 'error')
+            return render_template('criarSenha_mestre.html')
+    
+    messages = session.pop('_flashes', [])
+    return render_template('criarSenha_mestre.html', messages=messages)
+
+# Rota para a aba do administrador (Mestre)
+@app.route('/aba_admin')
+def aba_admin():
+    print("DEBUG: Acessando a rota /aba_admin.")
+    
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Por favor, faça login como mestre.', 'error')
+        return redirect(url_for('login'))
+
+    mestre_id = session.get('user_id')
+    if not mestre_id:
+        flash('Erro na sessão. Por favor, faça login novamente.', 'error')
+        return redirect(url_for('login'))
+
+    mestre = Mestre.query.get(mestre_id)
+
+    if not mestre:
+        flash('Mestre não encontrado.', 'error')
+        session.clear()
+        return redirect(url_for('login'))
+
+    messages = session.pop('_flashes', [])
+    return render_template("aba_admin.html", mestre=mestre, messages=messages)
