@@ -1587,3 +1587,176 @@ def verificar_duplicatas(tipo_usuario, dados):
             return True, 'Este registro profissional já está cadastrado'
     
     return False, None
+
+# ========================
+# APIs para aba_admin
+# ========================
+@app.route('/api/admin/estatisticas', methods=['GET'])
+def admin_estatisticas():
+    try:
+        if 'logged_in' not in session or session.get('user_type') != 'mestre':
+            return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+        # Totais simples
+        total_pacientes = Paciente.query.count()
+
+        # Consultas hoje
+        hoje_inicio = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+        hoje_fim = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+        consultas_hoje = Agendamento.query.filter(
+            Agendamento.data_agendamento.isnot(None),
+            Agendamento.data_agendamento >= hoje_inicio,
+            Agendamento.data_agendamento <= hoje_fim
+        ).count()
+
+        # Contagens por status relevantes
+        consultas_confirmadas = Agendamento.query.filter_by(status='confirmado').count()
+        consultas_nao_confirmadas = Agendamento.query.filter(Agendamento.status.in_(['solicitado'])).count()
+
+        # Solicitações de triagem (pendentes)
+        solicitacoes_triagem = Agendamento.query.filter_by(status='solicitado').count()
+
+        # Prontuários para avaliar (use concluido como pronto e confirmado como pendente de avaliação)
+        prontuarios_avaliar = Agendamento.query.filter_by(status='concluido').count()
+
+        # Próximas consultas (próximos 7 dias)
+        agora = datetime.datetime.now()
+        ate = agora + datetime.timedelta(days=7)
+        proximas = Agendamento.query.filter(
+            Agendamento.data_agendamento.isnot(None),
+            Agendamento.data_agendamento >= agora,
+            Agendamento.data_agendamento <= ate
+        ).order_by(Agendamento.data_agendamento.asc()).limit(5).all()
+
+        proximas_consultas = []
+        for ag in proximas:
+            paciente_nome = Paciente.query.get(ag.paciente_id).nome if ag.paciente_id else None
+            estagiario_nome = Estagiario.query.get(ag.estagiario_id).nome if ag.estagiario_id else 'A definir'
+            proximas_consultas.append({
+                'paciente_nome': paciente_nome,
+                'estagiario_nome': estagiario_nome,
+                'data_agendamento': ag.data_agendamento.isoformat() if ag.data_agendamento else None
+            })
+
+        return jsonify({
+            'total_pacientes': total_pacientes,
+            'consultas_hoje': consultas_hoje,
+            'solicitacoes_triagem': solicitacoes_triagem,
+            'prontuarios_avaliar': prontuarios_avaliar,
+            'consultas_nao_confirmadas': consultas_nao_confirmadas,
+            'consultas_confirmadas': consultas_confirmadas,
+            'proximas_consultas': proximas_consultas
+        })
+    except Exception as e:
+        print(f"Erro ao montar estatísticas admin: {e}")
+        return jsonify({'error': 'Erro ao carregar estatísticas.'}), 500
+
+
+@app.route('/api/admin/pacientes', methods=['GET'])
+def admin_listar_pacientes():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+    try:
+        filtro = request.args.get('filtro', 'todos')
+        busca = (request.args.get('busca') or '').strip()
+
+        # Base: último agendamento por paciente para status atual
+        sub_max = db.session.query(
+            Agendamento.paciente_id,
+            db.func.max(Agendamento.id).label('max_id')
+        ).group_by(Agendamento.paciente_id).subquery()
+
+        query = db.session.query(Agendamento, Paciente, Estagiario).join(
+            sub_max,
+            db.and_(Agendamento.paciente_id == sub_max.c.paciente_id, Agendamento.id == sub_max.c.max_id)
+        ).join(Paciente, Paciente.id == Agendamento.paciente_id).outerjoin(Estagiario, Estagiario.id == Agendamento.estagiario_id)
+
+        # Aplicar filtro de status nas categorias da UI
+        if filtro == 'andamento':
+            query = query.filter(Agendamento.status.in_(['confirmado']))
+        elif filtro == 'aprovar':
+            query = query.filter(Agendamento.status.in_(['solicitado']))
+        elif filtro == 'finalizados':
+            query = query.filter(Agendamento.status.in_(['concluido']))
+        else:
+            # 'todos' - sem filtro extra
+            pass
+
+        # Busca por nome de paciente ou estagiário
+        if busca:
+            query = query.filter(db.or_(Paciente.nome.ilike(f'%{busca}%'), Estagiario.nome.ilike(f'%{busca}%')))
+
+        resultados = query.order_by(db.desc(Agendamento.data_solicitacao)).limit(100).all()
+
+        pacientes_resp = []
+        for ag, pac, est in resultados:
+            pacientes_resp.append({
+                'paciente_nome': pac.nome,
+                'estagiario_nome': est.nome if est else None,
+                'data_agendamento': ag.data_agendamento.strftime('%d/%m/%Y %H:%M') if ag.data_agendamento else None,
+                'tipo_consulta': 'Solicitação de Triagem' if ag.status == 'solicitado' else 'Consulta',
+                'status': ag.status
+            })
+
+        # Stats para os badges
+        stats = {
+            'todos': db.session.query(sub_max).count(),
+            'andamento': db.session.query(Agendamento).join(sub_max, db.and_(Agendamento.paciente_id == sub_max.c.paciente_id, Agendamento.id == sub_max.c.max_id)).filter(Agendamento.status.in_(['confirmado'])).count(),
+            'aprovar': db.session.query(Agendamento).join(sub_max, db.and_(Agendamento.paciente_id == sub_max.c.paciente_id, Agendamento.id == sub_max.c.max_id)).filter(Agendamento.status.in_(['solicitado'])).count(),
+            'finalizados': db.session.query(Agendamento).join(sub_max, db.and_(Agendamento.paciente_id == sub_max.c.paciente_id, Agendamento.id == sub_max.c.max_id)).filter(Agendamento.status.in_(['concluido'])).count(),
+        }
+
+        return jsonify({'pacientes': pacientes_resp, 'stats': stats})
+    except Exception as e:
+        print(f"Erro ao listar pacientes admin: {e}")
+        return jsonify({'error': 'Erro ao listar pacientes.'}), 500
+
+
+@app.route('/api/admin/prontuarios', methods=['GET'])
+def admin_listar_prontuarios():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+    try:
+        busca = (request.args.get('busca') or '').strip()
+
+        query = db.session.query(Agendamento, Paciente, Estagiario).join(
+            Paciente, Paciente.id == Agendamento.paciente_id
+        ).outerjoin(Estagiario, Estagiario.id == Agendamento.estagiario_id)
+
+        # Consideramos prontuário apenas consultas concluídas
+        query = query.filter(Agendamento.status == 'concluido')
+
+        if busca:
+            query = query.filter(db.or_(Paciente.nome.ilike(f'%{busca}%'), Estagiario.nome.ilike(f'%{busca}%')))
+
+        resultados = query.order_by(db.desc(Agendamento.data_agendamento)).limit(200).all()
+
+        prontuarios = []
+        for ag, pac, est in resultados:
+            prontuarios.append({
+                'paciente_nome': pac.nome,
+                'estagiario_nome': est.nome if est else None,
+                'data_criacao': ag.data_agendamento.strftime('%d/%m/%Y %H:%M') if ag.data_agendamento else None,
+                'status': ag.status,
+                'ultima_atualizacao': ag.data_agendamento.strftime('%d/%m/%Y %H:%M') if ag.data_agendamento else None
+            })
+
+        # Estatísticas da seção de prontuários
+        total = db.session.query(Agendamento).filter(Agendamento.status == 'concluido').count()
+        pendentes = db.session.query(Agendamento).filter(Agendamento.status == 'confirmado').count()
+        aprovados = total  # não há campo específico, considerar concluído como aprovado
+        revisao = 0
+
+        stats = {
+            'total': total,
+            'pendentes': pendentes,
+            'aprovados': aprovados,
+            'revisao': revisao
+        }
+
+        return jsonify({'prontuarios': prontuarios, 'stats': stats})
+    except Exception as e:
+        print(f"Erro ao listar prontuários admin: {e}")
+        return jsonify({'error': 'Erro ao listar prontuários.'}), 500

@@ -891,19 +891,19 @@
                     <!-- Cards de Estatísticas -->
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-number">120</div>
+                            <div class="stat-number">0</div>
                             <div class="stat-label">Pacientes cadastrados</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">30</div>
+                            <div class="stat-number">0</div>
                             <div class="stat-label">Consultas Hoje</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">80</div>
+                            <div class="stat-number">0</div>
                             <div class="stat-label">Solicitações de Triagem</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">12</div>
+                            <div class="stat-number">0</div>
                             <div class="stat-label">Prontuários para Avaliar</div>
                         </div>
                     </div>
@@ -918,11 +918,11 @@
                             <div class="card-content">
                                 <div class="consultas-stats">
                                     <div class="consulta-stat">
-                                        <div class="consulta-number">40</div>
+                                        <div class="consulta-number">0</div>
                                         <div class="consulta-label">Não confirmadas</div>
                                     </div>
                                     <div class="consulta-stat">
-                                        <div class="consulta-number">80</div>
+                                        <div class="consulta-number">0</div>
                                         <div class="consulta-label">Consultas confirmadas</div>
                                     </div>
                                 </div>
@@ -935,36 +935,7 @@
                                 <h2>Próximas Consultas</h2>
                             </div>
                             <div class="card-content">
-                                <div class="consultas-list">
-                                    <div class="consulta-item">
-                                        <div class="consulta-info">
-                                            <div class="paciente-name">Caio Silveira - 756790</div>
-                                            <div class="estagiario-name">Leandro Silva</div>
-                                        </div>
-                                        <div class="consulta-horario">QUA-10:00</div>
-                                    </div>
-                                    <div class="consulta-item">
-                                        <div class="consulta-info">
-                                            <div class="paciente-name">Maria Santos - 756791</div>
-                                            <div class="estagiario-name">Leandro Silva</div>
-                                        </div>
-                                        <div class="consulta-horario">QUA-10:00</div>
-                                    </div>
-                                    <div class="consulta-item">
-                                        <div class="consulta-info">
-                                            <div class="paciente-name">Felipe Costa - 796875</div>
-                                            <div class="estagiario-name">Letícia Almeida</div>
-                                        </div>
-                                        <div class="consulta-horario">QUA-16:00</div>
-                                    </div>
-                                    <div class="consulta-item">
-                                        <div class="consulta-info">
-                                            <div class="paciente-name">Ana Anjos - 796877</div>
-                                            <div class="estagiario-name">Alan Cabral</div>
-                                        </div>
-                                        <div class="consulta-horario">QUI-08:00</div>
-                                    </div>
-                                </div>
+                                <div class="consultas-list"></div>
                             </div>
                         </div>
 
@@ -1214,13 +1185,7 @@
                                     <th>Última Atualização</th>
                                 </tr>
                             </thead>
-                            <tbody id="corpo-tabela-prontuarios">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
-                                        Carregando dados...
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="corpo-tabela-prontuarios"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1679,11 +1644,51 @@
             alert('Configuração de exportação em desenvolvimento!');
         }
 
-        // Função para buscar prontuários
-        function buscarProntuarios() {
-            const termo = document.getElementById('buscarProntuarios').value;
-            alert(`Buscando prontuários: ${termo}`);
+        // Função para carregar prontuários da API
+        function carregarProntuarios() {
+            const termo = (document.getElementById('buscarProntuarios') || {}).value || '';
+            fetch(`/api/admin/prontuarios?busca=${encodeURIComponent(termo)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao carregar prontuários:', data.error);
+                        return;
+                    }
+
+                    // Atualizar estatísticas
+                    if (data.stats) {
+                        document.getElementById('stat-prontuarios-total').textContent = data.stats.total || 0;
+                        document.getElementById('stat-prontuarios-pendentes').textContent = data.stats.pendentes || 0;
+                        document.getElementById('stat-prontuarios-aprovados').textContent = data.stats.aprovados || 0;
+                        document.getElementById('stat-prontuarios-revisao').textContent = data.stats.revisao || 0;
+                    }
+
+                    const corpo = document.getElementById('corpo-tabela-prontuarios');
+                    corpo.innerHTML = '';
+
+                    const lista = data.prontuarios || [];
+                    if (!lista.length) {
+                        corpo.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">Nenhum prontuário encontrado.</td></tr>';
+                        return;
+                    }
+
+                    lista.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="checkbox-cell"><div class="checkbox-container"><input type="checkbox"></div></td>
+                            <td>${item.paciente_nome || '-'}</td>
+                            <td>${item.estagiario_nome || '-'}</td>
+                            <td>${item.data_criacao || '-'}</td>
+                            <td>${item.status || '-'}</td>
+                            <td>${item.ultima_atualizacao || '-'}</td>
+                        `;
+                        corpo.appendChild(tr);
+                    });
+                })
+                .catch(err => console.error('Erro na requisição de prontuários:', err));
         }
+
+        function buscarProntuarios() { carregarProntuarios(); }
 
         // Função para buscar comunicados
         function buscarComunicados() {
@@ -1802,6 +1807,7 @@
             // Carregar dados iniciais
             carregarEstatisticas();
             carregarDadosPacientes('todos');
+            carregarProntuarios();
             
             // Adicionar evento de enter na busca
             const buscarPacEl = document.getElementById('buscarPacientes');
