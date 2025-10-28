@@ -128,7 +128,7 @@ def termo_responsavel():
 @app.route('/cadastroPaciente', methods=['GET', 'POST'])
 def registrar_paciente():
     if request.method == 'POST':
-        print("DEBUG: Recebido POST para /cadastroPaciente") # DEBUG
+        print("DEBUG: Recebido POST para /cadastroPaciente")
         
         dados_paciente = {
             'nome': request.form['nomeForm'],
@@ -140,15 +140,18 @@ def registrar_paciente():
             'endereco': request.form['enderecoForm'],
             'numero_casa': request.form['numeroCasaForm']
         }
-        session['dados_paciente'] = dados_paciente
         
+        # Verificar duplicatas
+        tem_duplicata, mensagem = verificar_duplicatas('paciente', dados_paciente)
+        if tem_duplicata:
+            flash(mensagem, 'error')
+            return render_template("cadastroPaciente.html")
+        
+        session['dados_paciente'] = dados_paciente
         flash('Dados do paciente salvos temporariamente. Agora crie sua senha.', 'info')
-        print("DEBUG: Redirecionando para criar_senha") # DEBUG
         return redirect(url_for('criar_senha'))
     
-    messages = session.pop('_flashes', [])
-    return render_template("cadastroPaciente.html", messages=messages)
-
+    return render_template("cadastroPaciente.html")
     
 @app.route('/criarSenha', methods=['GET', 'POST'])
 def criar_senha():
@@ -343,15 +346,41 @@ def tela_cadastro_aluno():
             'RA': request.form['raForm'],
             'curso_periodo': request.form['cursoPeriodoForm']
         }
+        
+        # VERIFICAR DUPLICATAS AQUI
+        campos_duplicados = []
+        
+        # Verificar CPF
+        if Estagiario.query.filter(Estagiario.cpf.contains(dados_Estagiario['cpf'].replace('.', '').replace('-', ''))).first():
+            campos_duplicados.append('CPF')
+            flash('CPF já cadastrado no sistema', 'error')
+        
+        # Verificar Telefone
+        if Estagiario.query.filter(Estagiario.telefone_aluno.contains(''.join(filter(str.isdigit, dados_Estagiario['telefone_aluno'])))).first():
+            campos_duplicados.append('Telefone')
+            flash('Telefone já cadastrado no sistema', 'error')
+        
+        # Verificar Email
+        if Estagiario.query.filter_by(emailfsa=dados_Estagiario['emailfsa']).first():
+            campos_duplicados.append('E-mail')
+            flash('E-mail já cadastrado no sistema', 'error')
+        
+        # Verificar RA
+        if Estagiario.query.filter_by(RA=dados_Estagiario['RA']).first():
+            campos_duplicados.append('RA')
+            flash('RA já cadastrado no sistema', 'error')
+        
+        # Se houver duplicatas, não prosseguir
+        if campos_duplicados:
+            # Manter os dados no formulário
+            return render_template("cadastroaluno.html")
+        
+        # Se não houver duplicatas, continuar normalmente
         session['dados_Estagiario'] = dados_Estagiario
         flash('Dados do Estagiário salvos temporariamente. Agora crie sua senha.', 'info')
-        print("DEBUG: Redirecionando para criar_senha_aluno.") # Nome da rota corrigido
         return redirect(url_for('criar_senha_aluno'))
     
-    print("DEBUG: Acessando a rota /cadastroaluno (GET)")
-    messages = session.pop('_flashes', [])
-    return render_template("cadastroaluno.html", messages=messages)
-
+    return render_template("cadastroaluno.html")
 
 @app.route('/criarSenha_aluno', methods=['GET', 'POST'])
 def criar_senha_aluno():
@@ -1376,6 +1405,12 @@ def cadastrar_mestre():
             'registro_profissional': request.form.get('registro_profissional')
         }
         
+        # Verificar duplicatas
+        tem_duplicata, mensagem = verificar_duplicatas('mestre', dados_mestre)
+        if tem_duplicata:
+            flash(mensagem, 'error')
+            return redirect(url_for('cadastro_mestre'))
+        
         print(f"DEBUG: Dados recebidos - {dados_mestre}")
         
         # Validar campos obrigatórios
@@ -1489,3 +1524,66 @@ def aba_admin():
 
     messages = session.pop('_flashes', [])
     return render_template("aba_admin.html", mestre=mestre, messages=messages)
+
+def verificar_duplicatas(tipo_usuario, dados):
+    """
+    Verifica se já existem registros com os mesmos dados únicos
+    Retorna (True, mensagem_erro) se encontrar duplicata, (False, None) caso contrário
+    """
+    
+    # Verificar email único entre todos os usuários
+    if tipo_usuario in ['paciente', 'mestre']:
+        email = dados.get('email')
+        if email:
+            if Paciente.query.filter_by(email=email).first():
+                return True, 'Este email já está cadastrado no sistema'
+            if Mestre.query.filter_by(email=email).first():
+                return True, 'Este email já está cadastrado no sistema'
+            # Verificar também em estagiários se necessário
+    
+    elif tipo_usuario == 'estagiario':
+        emailfsa = dados.get('emailfsa')
+        if emailfsa:
+            if Estagiario.query.filter_by(emailfsa=emailfsa).first():
+                return True, 'Este email institucional já está cadastrado'
+            # Verificar se não existe em outras tabelas com email normal
+            if Paciente.query.filter_by(email=emailfsa).first():
+                return True, 'Este email já está cadastrado no sistema'
+            if Mestre.query.filter_by(email=emailfsa).first():
+                return True, 'Este email já está cadastrado no sistema'
+    
+    # Verificar CPF único
+    cpf = dados.get('cpf')
+    if cpf:
+        cpf_limpo = cpf.replace('.', '').replace('-', '')
+        if Paciente.query.filter(Paciente.cpf.contains(cpf_limpo)).first():
+            return True, 'Este CPF já está cadastrado no sistema'
+        if Estagiario.query.filter(Estagiario.cpf.contains(cpf_limpo)).first():
+            return True, 'Este CPF já está cadastrado no sistema'
+        if Mestre.query.filter(Mestre.cpf.contains(cpf_limpo)).first():
+            return True, 'Este CPF já está cadastrado no sistema'
+    
+    # Verificar telefone único
+    telefone = dados.get('telefone') or dados.get('telefone_aluno')
+    if telefone:
+        telefone_limpo = ''.join(filter(str.isdigit, telefone))
+        if Paciente.query.filter(Paciente.telefone.contains(telefone_limpo)).first():
+            return True, 'Este telefone já está cadastrado no sistema'
+        if Estagiario.query.filter(Estagiario.telefone_aluno.contains(telefone_limpo)).first():
+            return True, 'Este telefone já está cadastrado no sistema'
+        if Mestre.query.filter(Mestre.telefone.contains(telefone_limpo)).first():
+            return True, 'Este telefone já está cadastrado no sistema'
+    
+    # Verificar RA único (apenas para estagiários)
+    if tipo_usuario == 'estagiario':
+        ra = dados.get('RA')
+        if ra and Estagiario.query.filter_by(RA=ra).first():
+            return True, 'Este RA já está cadastrado'
+    
+    # Verificar registro profissional único (apenas para mestres)
+    if tipo_usuario == 'mestre':
+        registro = dados.get('registro_profissional')
+        if registro and Mestre.query.filter_by(registro_profissional=registro).first():
+            return True, 'Este registro profissional já está cadastrado'
+    
+    return False, None
