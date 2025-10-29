@@ -428,9 +428,13 @@
                 </td>
                 <td data-label="RA">{{ estagiario.ra }}</td>
                 <td data-label="Grupo">
-                  <span class="grupo-badge grupo-{{ estagiario.grupo.lower() }}">{{ estagiario.grupo }}</span>
+                  {% if estagiario.grupo %}
+                  <span class="grupo-badge grupo-{{ estagiario.grupo|lower }}">{{ estagiario.grupo }}</span>
+                  {% else %}
+                  <span class="grupo-badge">-</span>
+                  {% endif %}
                 </td>
-                <td data-label="Semestre">{{ estagiario.semestre }}</td>
+                <td data-label="Semestre">{{ estagiario.semestre if estagiario.semestre else '-' }}</td>
                 <td data-label="Total Consultas" class="consultations">{{ estagiario.consultas_count }}</td>
                 <td data-label="Consultas Hoje" class="consultations-today">{{ estagiario.consultas_hoje }}</td>
                 <td data-label="Ações">

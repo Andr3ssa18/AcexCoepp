@@ -1525,6 +1525,236 @@ def aba_admin():
     messages = session.pop('_flashes', [])
     return render_template("aba_admin.html", mestre=mestre, messages=messages)
 
+@app.route('/admin/consultas', methods=['GET'])
+def admin_consultas_estagiarios():
+    print("DEBUG: Acessando a rota /admin/consultas.")
+
+    # Restrito ao perfil mestre (administrador)
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Por favor, faça login como mestre.', 'error')
+        return redirect(url_for('login'))
+
+    # Filtros opcionais via query string
+    termo_busca = request.args.get('busca', '').strip()
+    filtro_grupo = request.args.get('grupo', '').strip()
+    filtro_semestre = request.args.get('semestre', '').strip()
+
+    # Buscar estagiários
+    query = Estagiario.query
+    if termo_busca:
+        # Busca simples por nome, RA ou email institucional
+        query = query.filter(
+            (Estagiario.nome.ilike(f"%{termo_busca}%")) |
+            (Estagiario.RA.ilike(f"%{termo_busca}%")) |
+            (Estagiario.emailfsa.ilike(f"%{termo_busca}%"))
+        )
+
+    estagiarios_db = query.all()
+
+    # Montar lista no formato esperado pelo template
+    hoje_inicio = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+    hoje_fim = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+
+    estagiarios_view = []
+    for e in estagiarios_db:
+        total_consultas = Agendamento.query.filter_by(estagiario_id=e.id).count()
+        consultas_hoje = Agendamento.query.filter(
+            Agendamento.estagiario_id == e.id,
+            Agendamento.data_agendamento.isnot(None),
+            Agendamento.data_agendamento >= hoje_inicio,
+            Agendamento.data_agendamento <= hoje_fim
+        ).count()
+
+        # Tentar derivar semestre a partir de curso_periodo (quando existir)
+        semestre = ''
+        if getattr(e, 'curso_periodo', None):
+            try:
+                # Extrai primeiro número encontrado no texto, ex: "5º semestre" -> 5
+                import re
+                match = re.search(r"(\d+)", str(e.curso_periodo))
+                semestre = match.group(1) if match else ''
+            except Exception:
+                semestre = ''
+
+        # Não existe campo de grupo no modelo atual
+        grupo = ''
+
+        # Aplicar filtros de grupo/semestre, se fornecidos
+        if filtro_grupo and grupo != filtro_grupo:
+            continue
+        if filtro_semestre and str(semestre) != str(filtro_semestre):
+            continue
+
+        estagiarios_view.append({
+            'id': e.id,
+            'nome': e.nome,
+            'email': getattr(e, 'emailfsa', None),
+            'ra': getattr(e, 'RA', None),
+            'grupo': grupo or None,
+            'semestre': str(semestre) if semestre else None,
+            'consultas_count': total_consultas,
+            'consultas_hoje': consultas_hoje,
+        })
+
+    # Dados de cabeçalho/sumário
+    total_estagiarios = len(estagiarios_view)
+    consultas_hoje_total = sum(e['consultas_hoje'] for e in estagiarios_view)
+    prontuarios_aguardando = Agendamento.query.filter_by(status='confirmado').count()
+    prontuarios_avaliar = Agendamento.query.filter_by(status='concluido').count()
+
+    # Opções de filtros
+    grupos_disponiveis = ['A', 'B', 'C']
+    semestres_disponiveis = [str(i) for i in range(1, 9)]
+
+    context = {
+        'estagiarios': estagiarios_view,
+        'total_estagiarios': total_estagiarios,
+        'consultas_hoje': consultas_hoje_total,
+        'prontuarios_aguardando': prontuarios_aguardando,
+        'prontuarios_avaliar': prontuarios_avaliar,
+        'grupos_disponiveis': grupos_disponiveis,
+        'semestres_disponiveis': semestres_disponiveis,
+        'filtros_ativos': {
+            'busca': termo_busca,
+            'grupo': filtro_grupo,
+            'semestre': filtro_semestre,
+        }
+    }
+
+    return render_template('consultas_estagiarios.html', **context)
+
+@app.route('/api/admin/estagiarios', methods=['GET'])
+def api_admin_estagiarios():
+    """Lista estagiários com estatísticas, para alimentar aba_admin.
+    Retorna: {
+        estagiarios: [{id, nome, email, ra, grupo, semestre, consultas_count, consultas_hoje}],
+        stats: { total_estagiarios, consultas_hoje, prontuarios_aguardando, prontuarios_avaliar }
+    }
+    """
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+    termo_busca = request.args.get('busca', '').strip()
+
+    query = Estagiario.query
+    if termo_busca:
+        query = query.filter(
+            (Estagiario.nome.ilike(f"%{termo_busca}%")) |
+            (Estagiario.RA.ilike(f"%{termo_busca}%")) |
+            (Estagiario.emailfsa.ilike(f"%{termo_busca}%"))
+        )
+
+    estagiarios_db = query.all()
+
+    hoje_inicio = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+    hoje_fim = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+
+    estagiarios_view = []
+    total_consultas_hoje = 0
+
+    for e in estagiarios_db:
+        total_consultas = Agendamento.query.filter_by(estagiario_id=e.id).count()
+        consultas_hoje = Agendamento.query.filter(
+            Agendamento.estagiario_id == e.id,
+            Agendamento.data_agendamento.isnot(None),
+            Agendamento.data_agendamento >= hoje_inicio,
+            Agendamento.data_agendamento <= hoje_fim
+        ).count()
+        total_consultas_hoje += consultas_hoje
+
+        # Derivar semestre do curso_periodo se houver
+        semestre = ''
+        if getattr(e, 'curso_periodo', None):
+            try:
+                import re
+                match = re.search(r"(\d+)", str(e.curso_periodo))
+                semestre = match.group(1) if match else ''
+            except Exception:
+                semestre = ''
+
+        estagiarios_view.append({
+            'id': e.id,
+            'nome': e.nome,
+            'email': getattr(e, 'emailfsa', None),
+            'ra': getattr(e, 'RA', None),
+            'grupo': None,
+            'semestre': str(semestre) if semestre else None,
+            'consultas_count': total_consultas,
+            'consultas_hoje': consultas_hoje,
+        })
+
+    stats = {
+        'total_estagiarios': len(estagiarios_view),
+        'consultas_hoje': total_consultas_hoje,
+        'prontuarios_aguardando': Agendamento.query.filter_by(status='confirmado').count(),
+        'prontuarios_avaliar': Agendamento.query.filter_by(status='concluido').count(),
+    }
+
+    return jsonify({'estagiarios': estagiarios_view, 'stats': stats})
+
+@app.route('/api/admin/estagiarios', methods=['POST'])
+def api_admin_criar_estagiario():
+    """Cria um novo estagiário a partir de dados enviados pelo admin (mestre)."""
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+    try:
+        data = request.get_json(silent=True) or {}
+
+        nome = (data.get('nome') or '').strip()
+        emailfsa = (data.get('emailfsa') or '').strip()
+        ra = (data.get('RA') or '').strip()
+        cpf = (data.get('cpf') or '').strip()
+        telefone_aluno = (data.get('telefone_aluno') or '').strip()
+        curso_periodo = (data.get('curso_periodo') or '').strip()
+        data_nascimento_str = (data.get('data_nascimento') or '').strip()
+
+        # Validação simples
+        campos_obrigatorios = [nome, emailfsa, ra, cpf, telefone_aluno, curso_periodo, data_nascimento_str]
+        if not all(campos_obrigatorios):
+            return jsonify({'error': 'Preencha todos os campos obrigatórios.'}), 400
+
+        # Duplicidades básicas
+        if Estagiario.query.filter_by(emailfsa=emailfsa).first():
+            return jsonify({'error': 'Email institucional já cadastrado.'}), 400
+        if Estagiario.query.filter_by(RA=ra).first():
+            return jsonify({'error': 'RA já cadastrado.'}), 400
+        if Estagiario.query.filter_by(cpf=cpf).first():
+            return jsonify({'error': 'CPF já cadastrado.'}), 400
+        if Estagiario.query.filter_by(telefone_aluno=telefone_aluno).first():
+            return jsonify({'error': 'Telefone já cadastrado.'}), 400
+
+        # Converter data de nascimento
+        try:
+            data_nascimento = datetime.datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()
+        except Exception:
+            return jsonify({'error': 'Data de nascimento inválida. Use YYYY-MM-DD.'}), 400
+
+        # Senha temporária segura
+        temp_password = data.get('senha') or 'Temp@12345'
+        hashed_senha = generate_password_hash(temp_password, method='pbkdf2:sha256')
+
+        novo = Estagiario(
+            nome=nome,
+            data_nascimento=data_nascimento,
+            RA=ra,
+            cpf=cpf,
+            telefone_aluno=telefone_aluno,
+            emailfsa=emailfsa,
+            curso_periodo=curso_periodo,
+            senha=hashed_senha,
+        )
+
+        db.session.add(novo)
+        db.session.commit()
+
+        return jsonify({'success': True, 'id': novo.id}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao criar estagiário: {e}")
+        return jsonify({'error': f'Erro ao criar estagiário: {str(e)}'}), 500
+
 def verificar_duplicatas(tipo_usuario, dados):
     """
     Verifica se já existem registros com os mesmos dados únicos

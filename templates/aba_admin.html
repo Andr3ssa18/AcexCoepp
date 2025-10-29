@@ -705,6 +705,239 @@
             width: 100%;
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .perfil-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .perfil-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .perfil-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .perfil-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 16px;
+        }
+        .form-grid .full { grid-column: 1 / -1; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #555; }
+        .form-group input { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+
+        .agenda-section {
+            margin-bottom: 24px;
+        }
+
+        .agenda-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .horarios-disponiveis {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .horario-badge {
+            padding: 8px 16px;
+            background: #e3f2fd;
+            color: #007bff;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .consultas-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .consulta-card {
+            padding: 12px;
+            background: #f8f9fa;
+            border-left: 3px solid #007bff;
+            border-radius: 4px;
+        }
+
+        .consulta-card.finalizada {
+            border-left-color: #28a745;
+            background: #f1f8f4;
+        }
+
+        .consulta-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .consulta-tipo {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .consulta-data {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .consulta-paciente {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .ver-mais-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .ver-mais-link:hover {
+            text-decoration: underline;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #e3f2fd;
+            color: #007bff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .action-icon-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
         /* Responsividade */
         @media (max-width: 1024px) {
             .content-grid {
@@ -1091,6 +1324,103 @@
                 </div>
             </div>
 
+            <!-- ===== PÁGINA CONSULTAS ESTAGIÁRIOS ===== -->
+            <div id="pagina-consultas-estagiarios" class="page">
+                <div class="page-header">
+                    <h1>Estagiários</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Gerenciamento de estagiários e suas consultas</p>
+                    </div>
+                    
+                    <!-- Cards de Estatísticas -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">56</div>
+                            <div class="stat-label">Estagiários cadastrados</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #28a745;">
+                            <div class="stat-number" style="color: #28a745;">30</div>
+                            <div class="stat-label">Consultas Hoje</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #ffc107;">
+                            <div class="stat-number" style="color: #ffc107;">6</div>
+                            <div class="stat-label">Prontuários aguardando envio</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #dc3545;">
+                            <div class="stat-number" style="color: #dc3545;">12</div>
+                            <div class="stat-label">Prontuários para Avaliar</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de Busca -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Buscar Estagiários, RA, Grupos, Semestre..." class="search-input" id="buscarEstagiarios">
+                            <button class="btn btn-primary search-btn" onclick="buscarEstagiarios()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Estagiários -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h2>Listagem - Estagiários</h2>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportarDados()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                                    </svg>
+                                    Exportar
+                                </button>
+                        <button class="btn btn-primary" onclick="abrirModal('modal-adicionar-estagiario')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Adicionar
+                                </button>
+                            </div>
+                        </div>
+                        <table id="tabela-estagiarios">
+                            <thead>
+                                <tr>
+                                    <th>Estagiário</th>
+                                    <th>Grupo</th>
+                                    <th>Semestre</th>
+                                    <th>Qtd. Consultas</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-estagiarios"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination">
+                        <div class="pagination-info">
+                            Mostrando <span id="items-per-page-select">
+                                <select onchange="mudarItensPorPagina(this.value)" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </span> itens - Página <span id="pagina-atual-estagiarios">1</span> de <span id="total-paginas-estagiarios">6</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" onclick="irParaPagina(1)">1</button>
+                            <button class="pagination-btn" onclick="irParaPagina(2)">2</button>
+                            <button class="pagination-btn" onclick="irParaPagina(3)">3</button>
+                            <button class="pagination-btn" onclick="irParaPagina(4)">4</button>
+                            <span>...</span>
+                            <button class="pagination-btn" onclick="irParaPaginaSeguinte()">›</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div id="pagina-configuracoes" class="page">
                 <div class="page-header">
@@ -1374,9 +1704,99 @@
         </div>
     </div>
 
+    <!-- Modais -->
+    <!-- Modal Visualizar Perfil -->
+    <div class="modal-overlay" id="modal-perfil">
+        <div class="modal">
+            <div class="modal-header">
+                <span style="font-size: 24px;">👁️</span>
+                <h2>Perfil</h2>
+                <button class="modal-close" onclick="fecharModal('modal-perfil')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="perfil-info" id="perfil-info-content">
+                    <!-- Conteúdo será preenchido dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="fecharModal('modal-perfil')">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agenda Geral -->
+    <div class="modal-overlay" id="modal-agenda">
+        <div class="modal">
+            <div class="modal-header">
+                <span style="font-size: 24px;">📋</span>
+                <h2>Agenda Geral</h2>
+                <button class="modal-close" onclick="fecharModal('modal-agenda')">&times;</button>
+            </div>
+            <div class="modal-body" id="agenda-content">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModal('modal-agenda')">Voltar</button>
+                <button class="btn btn-primary" onclick="visualizarProntuarios()">Visualizar prontuários</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Estagiário -->
+    <div class="modal-overlay" id="modal-adicionar-estagiario">
+        <div class="modal">
+            <div class="modal-header">
+                <span style="font-size: 24px;">➕</span>
+                <h2>Novo Estagiário</h2>
+                <button class="modal-close" onclick="fecharModal('modal-adicionar-estagiario')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Nome completo</label>
+                        <input id="novo_nome" type="text" placeholder="Nome do estagiário">
+                    </div>
+                    <div class="form-group">
+                        <label>Email institucional</label>
+                        <input id="novo_emailfsa" type="email" placeholder="ex: nome.sobrenome@fsa.br">
+                    </div>
+                    <div class="form-group">
+                        <label>RA</label>
+                        <input id="novo_ra" type="text" placeholder="RA">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input id="novo_cpf" type="text" placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input id="novo_telefone" type="text" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de nascimento</label>
+                        <input id="novo_nascimento" type="date">
+                    </div>
+                    <div class="form-group full">
+                        <label>Curso/Período (ex: Psicologia - 7º)</label>
+                        <input id="novo_curso_periodo" type="text" placeholder="Curso - período">
+                    </div>
+                    <div class="form-group full">
+                        <label>Senha temporária (opcional)</label>
+                        <input id="novo_senha" type="text" placeholder="Se vazio, usamos uma senha segura padrão">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModal('modal-adicionar-estagiario')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarNovoEstagiario()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Variáveis globais
         let dadosPacientes = {};
+        let dadosEstagiarios = [];
         let dadosEstatisticas = {};
         let filtroAtual = 'todos';
 
@@ -1443,6 +1863,11 @@
                 carregarDadosPacientes('todos');
             }
             
+            // Se for a página de consultas estagiários, carregar os dados
+            if (paginaId === 'pagina-consultas-estagiarios') {
+                carregarDadosEstagiarios();
+            }
+            
         }
 
         // Função de logout
@@ -1454,8 +1879,16 @@
 
         // Função para abrir consultas de estagiários na mesma página
         function abrirConsultasEstagiarios() {
-            window.location.href = '/admin/consultas';
+            mostrarPagina('pagina-consultas-estagiarios');
         }
+        
+        // Carregar ao abrir a página se houver hash na URL
+        window.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash;
+            if (hash === '#consultas-estagiarios') {
+                abrirConsultasEstagiarios();
+            }
+        });
 
         // Função para filtrar pacientes
         function filtrarPacientes(tipo, el) {
@@ -1694,6 +2127,293 @@
         function buscarComunicados() {
             const termo = document.getElementById('buscarComunicados').value;
             alert(`Buscando comunicados: ${termo}`);
+        }
+
+        // ===== FUNÇÕES PARA CONSULTAS ESTAGIÁRIOS =====
+        
+        // Carregar dados reais dos estagiários
+        function carregarDadosEstagiarios(busca = '') {
+            const url = '/api/admin/estagiarios' + (busca ? `?busca=${encodeURIComponent(busca)}` : '');
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Erro ao carregar estagiários:', data.error);
+                        return;
+                    }
+                    // Mapear para o formato usado na tabela
+                    dadosEstagiarios = (data.estagiarios || []).map(e => ({
+                        id: e.id,
+                        nome: e.nome,
+                        ra: e.ra || '-',
+                        grupo: e.grupo || '-',
+                        semestre: e.semestre ? `${e.semestre}°` : '-',
+                        consultas: e.consultas_count || 0,
+                        consultasHoje: e.consultas_hoje || 0,
+                    }));
+
+                    // Atualizar cards de estatísticas da página de estagiários
+                    try {
+                        const cards = document.querySelectorAll('#pagina-consultas-estagiarios .stat-card .stat-number');
+                        if (cards && cards.length >= 4 && data.stats) {
+                            cards[0].textContent = data.stats.total_estagiarios || 0;
+                            cards[1].textContent = data.stats.consultas_hoje || 0;
+                            cards[2].textContent = data.stats.prontuarios_aguardando || 0;
+                            cards[3].textContent = data.stats.prontuarios_avaliar || 0;
+                        }
+                    } catch (e) { /* ignore */ }
+
+                    renderizarTabelaEstagiarios();
+                })
+                .catch(err => console.error('Erro na API de estagiários:', err));
+        }
+
+        // Renderizar tabela de estagiários
+        function renderizarTabelaEstagiarios() {
+            const tbody = document.getElementById('corpo-tabela-estagiarios');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            dadosEstagiarios.forEach(est => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${est.nome}</strong></td>
+                    <td>${est.grupo}</td>
+                    <td>${est.semestre}</td>
+                    <td><strong style="color: #007bff;">${est.consultas} consultas</strong></td>
+                    <td>
+                        <div class="action-icons">
+                            <button class="action-icon-btn" onclick="visualizarPerfil(${est.id})" title="Visualizar Perfil">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                            </button>
+                            <button class="action-icon-btn" onclick="visualizarAgenda(${est.id})" title="Agenda">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                                </svg>
+                            </button>
+                            <button class="action-icon-btn" onclick="editarEstagiario(${est.id})" title="Editar">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                            <button class="action-icon-btn" style="background: #ffe3e3; color: #dc3545;" onclick="excluirEstagiario(${est.id})" title="Excluir">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Buscar estagiários
+        function buscarEstagiarios() {
+            const termo = (document.getElementById('buscarEstagiarios') || {}).value || '';
+            carregarDadosEstagiarios(termo);
+        }
+
+        // Visualizar perfil do estagiário
+        function visualizarPerfil(id) {
+            const estagiario = dadosEstagiarios.find(e => e.id === id);
+            if (!estagiario) return;
+            
+            const conteudo = document.getElementById('perfil-info-content');
+            conteudo.innerHTML = `
+                <div class="perfil-item">
+                    <div class="perfil-label">👤 Nome</div>
+                    <div class="perfil-value">${estagiario.nome.split(' - ')[0] || estagiario.nome}</div>
+                </div>
+                <div class="perfil-item">
+                    <div class="perfil-label">🎓 RA</div>
+                    <div class="perfil-value">${estagiario.ra}</div>
+                </div>
+                <div class="perfil-item">
+                    <div class="perfil-label">📚 Semestre</div>
+                    <div class="perfil-value">${estagiario.semestre} Semestre</div>
+                </div>
+                <div class="perfil-item">
+                    <div class="perfil-label">👥 Grupo(s)</div>
+                    <div class="perfil-value">Grupo ${estagiario.grupo}</div>
+                </div>
+                <div class="perfil-item">
+                    <div class="perfil-label">📊 Qtd de Consultas Realizadas</div>
+                    <div class="perfil-value" style="color: #007bff; font-size: 20px; font-weight: 700;">${estagiario.consultas} consultas</div>
+                </div>
+            `;
+            
+            abrirModal('modal-perfil');
+        }
+
+        // Visualizar agenda do estagiário
+        function visualizarAgenda(id) {
+            const estagiario = dadosEstagiarios.find(e => e.id === id);
+            if (!estagiario) return;
+            
+            const conteudo = document.getElementById('agenda-content');
+            
+            // Dados específicos para Caio Silveira
+            let horarios, proximasConsultas, consultasFinalizadas;
+            
+            if (estagiario.ra === '756790') {
+                horarios = [
+                    { dia: 'Terça', horario: '08:00h - 09:00h' },
+                    { dia: 'Quinta', horario: '08:00h - 15:00h' },
+                    { dia: 'Sábado', horario: '10:00h - 16:00h' }
+                ];
+                proximasConsultas = [
+                    { tipo: 'Triagem', paciente: 'Leandro Silva', data: '08/10/2025 - 10:00hr' },
+                    { tipo: 'Triagem', paciente: 'Antônio Oliveira', data: '16/10/2025 - 11:00hr' }
+                ];
+                consultasFinalizadas = [
+                    { tipo: 'Triagem', paciente: 'Gabriel Felipe', data: '02/10/2025 - 10:00hr' },
+                    { tipo: 'Triagem', paciente: 'Laura da silva', data: '31/09/2025 - 12:00hr' },
+                    { tipo: 'Triagem', paciente: 'Laura da silva', data: '31/09/2025 - 13:00hr' }
+                ];
+            } else {
+                // Dados genéricos para outros estagiários
+                horarios = [
+                    { dia: 'Segunda', horario: '09:00h - 12:00h' },
+                    { dia: 'Quarta', horario: '14:00h - 17:00h' }
+                ];
+                proximasConsultas = [
+                    { tipo: 'Triagem', paciente: 'Paciente Exemplo', data: '15/11/2025 - 10:00hr' }
+                ];
+                consultasFinalizadas = [
+                    { tipo: 'Triagem', paciente: 'Paciente Anterior', data: '01/10/2025 - 11:00hr' }
+                ];
+            }
+            
+            conteudo.innerHTML = `
+                <h3 style="font-size: 18px; font-weight: 600; color: #007bff; margin-bottom: 16px;">
+                    ${estagiario.nome.split(' - ')[0] || estagiario.nome} - ${estagiario.ra}
+                </h3>
+                
+                <div class="agenda-section">
+                    <h3>Dias e Horários Disponíveis:</h3>
+                    <div class="horarios-disponiveis">
+                        ${horarios.map(h => `
+                            <div class="horario-badge">
+                                <strong>${h.dia}</strong>  ${h.horario}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="agenda-section">
+                    <h3>Próximas consultas:</h3>
+                    <div class="consultas-lista">
+                        ${proximasConsultas.map(c => `
+                            <div class="consulta-card">
+                                <div class="consulta-card-header">
+                                    <span class="consulta-tipo">${c.tipo}</span>
+                                    <span class="consulta-data">${c.data}</span>
+                                </div>
+                                <div class="consulta-paciente">${c.paciente}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="agenda-section">
+                    <h3>Consultas Finalizadas:</h3>
+                    <div class="consultas-lista">
+                        ${consultasFinalizadas.map(c => `
+                            <div class="consulta-card finalizada">
+                                <div class="consulta-card-header">
+                                    <span class="consulta-tipo">${c.tipo}</span>
+                                    <span class="consulta-data">${c.data}</span>
+                                </div>
+                                <div class="consulta-paciente">${c.paciente}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <a href="#" class="ver-mais-link" onclick="event.preventDefault(); alert('Ver mais consultas');">
+                        Ver mais ➜
+                    </a>
+                </div>
+            `;
+            
+            abrirModal('modal-agenda');
+        }
+
+        // Funções dos modais
+        function abrirModal(idModal) {
+            document.getElementById(idModal).classList.add('show');
+        }
+
+        function fecharModal(idModal) {
+            document.getElementById(idModal).classList.remove('show');
+        }
+
+        // Outras funções placeholder
+        async function salvarNovoEstagiario() {
+            const payload = {
+                nome: document.getElementById('novo_nome').value.trim(),
+                emailfsa: document.getElementById('novo_emailfsa').value.trim(),
+                RA: document.getElementById('novo_ra').value.trim(),
+                cpf: document.getElementById('novo_cpf').value.trim(),
+                telefone_aluno: document.getElementById('novo_telefone').value.trim(),
+                data_nascimento: document.getElementById('novo_nascimento').value,
+                curso_periodo: document.getElementById('novo_curso_periodo').value.trim(),
+                senha: document.getElementById('novo_senha').value.trim()
+            };
+
+            try {
+                const resp = await fetch('/api/admin/estagiarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await resp.json();
+                if (!resp.ok) {
+                    alert(data.error || 'Erro ao salvar estagiário');
+                    return;
+                }
+                fecharModal('modal-adicionar-estagiario');
+                // Recarregar a listagem com busca atual (se houver)
+                const termo = (document.getElementById('buscarEstagiarios') || {}).value || '';
+                carregarDadosEstagiarios(termo);
+                alert('Estagiário adicionado com sucesso!');
+            } catch (e) {
+                console.error(e);
+                alert('Erro inesperado ao salvar estagiário');
+            }
+        }
+
+        function editarEstagiario(id) {
+            alert(`Editar estagiário ID: ${id}`);
+        }
+
+        function excluirEstagiario(id) {
+            if (confirm('Tem certeza que deseja excluir este estagiário?')) {
+                alert(`Estagiário ${id} excluído`);
+            }
+        }
+
+        function visualizarProntuarios() {
+            fecharModal('modal-agenda');
+            mostrarPagina('pagina-prontuarios');
+        }
+
+        function mudarItensPorPagina(valor) {
+            alert(`Alterando para ${valor} itens por página`);
+        }
+
+        function irParaPagina(num) {
+            document.getElementById('pagina-atual-estagiarios').textContent = num;
+        }
+
+        function irParaPaginaSeguinte() {
+            const atual = parseInt(document.getElementById('pagina-atual-estagiarios').textContent);
+            const total = parseInt(document.getElementById('total-paginas-estagiarios').textContent);
+            if (atual < total) {
+                irParaPagina(atual + 1);
+            }
         }
 
 

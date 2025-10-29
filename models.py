@@ -5,16 +5,15 @@ import datetime # Importar datetime para tipos de data
 class Paciente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    data_nascimento = db.Column(db.Date, nullable=False) # Use db.Date para datas
+    data_nascimento = db.Column(db.Date, nullable=False)
     genero = db.Column(db.String(20), nullable=False)
-    cpf = db.Column(db.String(14), unique=True, nullable=False)
-    telefone = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+    cpf = db.Column(db.String(14), unique=True, nullable=False)  # Único
+    telefone = db.Column(db.String(20), unique=True, nullable=False)  # Único
+    email = db.Column(db.String(100), unique=True, nullable=False)  # Único entre todos
     endereco = db.Column(db.String(200), nullable=False)
     numero_casa = db.Column(db.String(10), nullable=False)
-    senha = db.Column(db.String(200), nullable=False) # Armazena hashes de senhas, não senhas em texto puro!
-    agendamentos = db.relationship('Agendamento', backref='paciente', lazy=True) # Relacionamento com Agendamento
-
+    senha = db.Column(db.String(200), nullable=False)
+    agendamentos = db.relationship('Agendamento', backref='paciente', lazy=True)
     def __repr__(self):
         return f"Paciente ('{self.nome}')"
 
@@ -22,14 +21,13 @@ class Estagiario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     data_nascimento = db.Column(db.Date, nullable=False)
-    RA = db.Column(db.String(10), unique=True, nullable=False) # RA geralmente é string
-    cpf = db.Column(db.String(14), unique=True, nullable=False)
-    # AQUI ESTÁ A CHAVE! Certifique-se de que esta linha existe e o nome é "telefone"
-    telefone_aluno = db.Column(db.String(20), nullable=False)
-    emailfsa = db.Column(db.String(100), unique=True, nullable=False)
+    RA = db.Column(db.String(10), unique=True, nullable=False)  # Único
+    cpf = db.Column(db.String(14), unique=True, nullable=False)  # Único
+    telefone_aluno = db.Column(db.String(20), unique=True, nullable=False)  # Único
+    emailfsa = db.Column(db.String(100), unique=True, nullable=False)  # Único entre todos
     curso_periodo = db.Column(db.String(50), nullable=False)
-    senha = db.Column(db.String(200), nullable=False) # Armazenar a senha hash
-    agendamentos = db.relationship('Agendamento', backref='estagiario', lazy=True) # Relacionamento com Agendamento
+    senha = db.Column(db.String(200), nullable=False)
+    agendamentos = db.relationship('Agendamento', backref='estagiario', lazy=True)
     disponibilidades = db.relationship('Disponibilidade', backref='estagiario', lazy=True)
 
     def __repr__(self):
@@ -61,11 +59,12 @@ class Disponibilidade(db.Model):
 class Mestre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    cpf = db.Column(db.String(14), unique=True, nullable=False)
-    telefone = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    registro_profissional = db.Column(db.String(50), nullable=False)
+    cpf = db.Column(db.String(14), unique=True, nullable=False)  # Único
+    telefone = db.Column(db.String(20), unique=True, nullable=False)  # Único
+    email = db.Column(db.String(100), unique=True, nullable=False)  # Único entre todos
+    registro_profissional = db.Column(db.String(50), unique=True, nullable=False)  # Único
     senha = db.Column(db.String(200), nullable=False)
-
+    
     def __repr__(self):
         return f"Mestre ('{self.nome}', CPF: '{self.cpf}')"
+
