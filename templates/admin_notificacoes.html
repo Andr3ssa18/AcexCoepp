@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Comunicados - Administração</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body{font-family:'Poppins',sans-serif;background:#f7f9fb;color:#222;margin:0;}
+        .admin-bar{background:#0C3C7D;padding:18px 0;text-align:center;color:#fff;}
+        .container{max-width:700px;margin:40px auto;background:#fff;box-shadow:0 2px 8px #eee;border-radius:8px;padding:32px;}
+        .btn{background:#0C3C7D;color:#fff;padding:10px 26px;border-radius:4px;border:none;cursor:pointer;font-weight:600;transition:background .2s;}
+        .btn:hover{background:#003b80;}
+        h1,h3{text-align:center;color:#0C3C7D;}
+        table{width:100%;border-collapse:collapse;margin-top:24px;}
+        th,td{padding:10px;border-bottom:1px solid #eaeaea;text-align:left;}
+        th{background:#0C3C7D;color:#fff;}
+        .form-group{margin-bottom:16px;}
+        label{font-weight:500;}
+        .voltar{display:block;padding:10px 0 14px 0;text-align:center;}
+        .alert{margin:12px 0;padding:12px;border-radius:4px;text-align:center;font-weight:500;}
+        .alert-success{background:#eafbe8;color:#226a21;}
+        .alert-error{background:#ffeaea;color:#d34b1c;}
+    </style>
+</head>
+<body>
+    <div class="admin-bar">
+        <span style="font-size:18px;font-weight:700">COEPP - Portal Admin</span>
+    </div>
+    <div class="voltar">
+        <a href="{{ url_for('aba_admin') }}" style="color:#0C3C7D;font-weight:600;text-decoration:none;">← Voltar ao Painel</a> |
+        <a href="{{ url_for('admin_notificacoes') }}" style="color:#0C3C7D;text-decoration:underline;">Comunicados</a>
+    </div>
+    <div class="container admin-comunicados">
+        <h1>Comunicados</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category if category in ['success','error'] else 'success' }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_notificacoes') }}" style="margin-bottom:32px">
+            <div class="form-group">
+                <label for="titulo">Título:</label>
+                <input id="titulo" name="titulo" class="form-control" required style="width:100%">
+            </div>
+            <div class="form-group">
+                <label for="mensagem">Mensagem:</label>
+                <textarea id="mensagem" name="mensagem" class="form-control" required rows="3" style="width:100%"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="destinatario_id">Enviar para:</label>
+                <select id="destinatario_id" name="destinatario_id" class="form-control" style="width:100%">
+                    <option value="">Todos os Estagiários</option>
+                    {% for est in estagiarios %}
+                    <option value="{{ est.id }}">{{ est.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn">Enviar Comunicado</button>
+        </form>
+        <hr/>
+        <h3>Histórico de Comunicados</h3>
+        <table>
+            <tr>
+                <th>Título</th>
+                <th>Data</th>
+                <th>Mensagem</th>
+                <th>Enviado para</th>
+            </tr>
+            {% for notif in notificacoes %}
+            <tr>
+                <td>{{ notif.titulo }}</td>
+                <td>{{ notif.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ notif.mensagem }}</td>
+                <td>{% if notif.destinatario_id %}Estagiário ID {{ notif.destinatario_id }}{% else %}Todos{% endif %}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" style="color:#999; text-align:center;">Nenhum comunicado enviado ainda.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

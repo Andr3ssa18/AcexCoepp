@@ -420,8 +420,27 @@ async function finalizarConsulta(consultaId) {
 
             if (response.ok) {
                 mostrarToast('Consulta finalizada com sucesso!', 'success');
-                // Recarrega a lista de consultas
-                await carregarConsultas();
+
+                // Propaga o ID da consulta concluída para o modal de prontuário e abre-o imediatamente
+                try {
+                    // Tenta definir uma variável global de fallback, caso exista script que a utilize
+                    window.consultaAtual = data.consulta_id || consultaId;
+                } catch (e) {
+                    // ignore
+                }
+
+                const hiddenInput = document.getElementById('prontuario-consulta-id');
+                if (hiddenInput) {
+                    hiddenInput.value = (data && data.consulta_id) ? data.consulta_id : consultaId;
+                }
+
+                const prontuarioModal = document.getElementById('modal-prontuario');
+                if (prontuarioModal) {
+                    prontuarioModal.classList.add('show');
+                }
+
+                // Opcionalmente, atualiza a lista de consultas em background
+                try { await carregarConsultas(); } catch (e) {}
             } else {
                 throw new Error(data.error || 'Erro ao finalizar consulta');
             }

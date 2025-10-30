@@ -5,7 +5,773 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Estagiário - Psicologia</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/aba_estagiario.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            gap: 8px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            background: white;
+            color: #667eea;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .profile {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile > div:first-child {
+            font-size: 0.9rem;
+        }
+
+        .profile > span {
+            width: 35px;
+            height: 35px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .dropdown a:hover {
+            background: #f8f9fa;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: #f7fafc;
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102,126,234,0.1) 0%, transparent 100%);
+            color: #667eea;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #667eea;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .nav-item.logout {
+            color: #e53e3e;
+            margin-top: 2rem;
+            border-top: 1px solid #e9ecef;
+            padding-top: 1.5rem;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .radio-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .radio-container input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .info-message {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .info-message p {
+            margin: 0;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Modal de confirmação de triagem (estilo mais atraente) */
+        .modal-confirmar-triagem .modal-content {
+            max-width: 520px;
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+        }
+        .triagem-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 1.25rem 1.5rem;
+        }
+        .triagem-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .triagem-body {
+            padding: 1.5rem;
+            display: grid;
+            gap: 1rem;
+        }
+        .triagem-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .triagem-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 0.25rem;
+            display: block;
+            font-weight: 500;
+        }
+        .triagem-input, .triagem-textarea {
+            width: 100%;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            transition: box-shadow .2s, border-color .2s;
+        }
+        .triagem-input:focus, .triagem-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+        .triagem-footer {
+            padding: 1rem 1.5rem 1.25rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #2d3748;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .comunicado-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+
+        .comunicado-item.read {
+            opacity: 0.7;
+            border-left-color: #cbd5e0;
+        }
+
+        .comunicado-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .comunicado-icon {
+            width: 40px;
+            height: 40px;
+            background: #f7fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+        }
+
+        .comunicado-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .comunicado-date {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .comunicado-content p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .modal-prontuario-completo .modal-content {
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .prontuario-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-prontuario-completo .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-prontuario-completo label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .modal-prontuario-completo textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .modal-prontuario-completo textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .btn-secondary {
+            background: #f5c842;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e6b732;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245,200,66,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-prontuario-completo .modal-content {
+                margin: 1rem;
+                width: calc(100% - 2rem);
+            }
+        }
+
+        /* Estilos para checkboxes personalizados */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        /* Melhorias no modal de reajustes */
+        #modal-reajustes .modal-content {
+            max-width: 600px;
+        }
+
+        #modal-reajustes .form-group textarea {
+            min-height: 120px;
+        }
+
+        /* Animações suaves para modais */
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+        }
+
+        .modal-content {
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Estilo para campos select */
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            appearance: none;
+        }
+
+        select.form-control:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content {
+                order: 1;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+                width: calc(100% - 2rem);
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -17,7 +783,7 @@
         <div class="title" id="page-title">Portal do Estagiário</div>
         <div class="profile" onclick="toggleDropdown()">
             <div>Olá, {{ estagiario.nome }}</div>
-            <span>E</span>
+            <span>{{ estagiario.nome[:1] if estagiario and estagiario.nome else 'E' }}</span>
             <div class="dropdown" id="dropdownMenu">
                 <a href="#" onclick="mostrarPagina('pagina-meus-dados')"><span>👤</span>Minha Conta</a>
                 <a href="#" onclick="mostrarPagina('pagina-ajuda')"><span>❓</span>Ajuda</a>
@@ -30,10 +796,10 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-user">
-                    <div class="user-avatar">E</div>
+                    <div class="user-avatar">{{ estagiario.nome[:1] if estagiario and estagiario.nome else 'E' }}</div>
                     <div class="user-info">
                         <div class="user-name">{{ estagiario.nome }}</div>
-                        <div class="user-role">Estagiário de Psicologia</div>
+                        <div class="user-role">RA: {{ estagiario.RA }}</div>
                     </div>
                 </div>
             </div>
@@ -79,6 +845,23 @@
         </div>
 
         <div class="content">
+            <!-- Página de Minhas Consultas -->
+            <div id="pagina-minhas-consultas" class="page active">
+                <div class="page-header">
+                    <h1>Minhas Consultas</h1>
+                </div>
+                <div class="page-content">
+                    <div class="info-box">
+                        <p>Visualize e gerencie suas consultas do dia.</p>
+                    </div>
+                    
+                    <div class="consultas-dia">
+                        <h3>Consultas do dia</h3>
+                        <div class="info-message"><p>Carregando suas consultas...</p></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Página de Meus Horários -->
             <div id="pagina-meus-horarios" class="page">
                 <div class="page-header">
@@ -193,54 +976,6 @@
                 </div>
             </div>
 
-            <!-- Página de Minhas Consultas -->
-            <div id="pagina-minhas-consultas" class="page active">
-                <div class="page-header">
-                    <h1>Minhas Consultas</h1>
-                </div>
-                <div class="page-content">
-                    <div class="info-box">
-                        <p>Visualize e gerencie suas consultas do dia.</p>
-                    </div>
-                    
-                    <div class="consultas-dia">
-                        <h3>Consultas do dia</h3>
-                        <!-- As consultas serão carregadas dinamicamente -->
-                    </div>
-
-                    <!-- Modal de Finalização de Consulta -->
-                    <div id="modal-finalizar-consulta" class="modal">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2>Finalizar Consulta</h2>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label>Observações da Consulta:</label>
-                                    <textarea class="form-control" rows="4" placeholder="Adicione observações sobre a consulta..."></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Próxima Consulta Recomendada:</label>
-                                    <select class="form-control">
-                                        <option value="">Selecione o intervalo</option>
-                                        <option value="7">1 semana</option>
-                                        <option value="14">2 semanas</option>
-                                        <option value="21">3 semanas</option>
-                                        <option value="30">1 mês</option>
-                                        <option value="60">2 meses</option>
-                                        <option value="90">3 meses</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-outline" onclick="fecharModalFinalizarConsulta()">Cancelar</button>
-                                <button class="btn btn-primary" onclick="confirmarFinalizacaoConsulta()">Finalizar Consulta</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Página de Minha Conta -->
             <div id="pagina-meus-dados" class="page">
                 <div class="page-header">
@@ -259,7 +994,7 @@
                             <form id="form-dados-pessoais">
                                 <div class="form-group">
                                     <label>Nome Completo</label>
-                                    <input type="text" class="form-control" value="{{ estagiario.nome }}" readonly>
+                                    <input type="text" class="form-control" value="Estagiário" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label>E-mail FSA</label>
@@ -289,7 +1024,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>E-mail Pessoal</label>
-                                    <input type="email" class="form-control" value="{{ estagiario.email }}" id="email" maxlength="100">
+                                    <input type="email" class="form-control" value="" id="email" maxlength="100">
                                 </div>
                                 <div class="action-buttons">
                                     <button type="button" class="btn btn-primary" onclick="atualizarDadosContato()">Salvar Alterações</button>
@@ -334,7 +1069,7 @@
                     <div class="search-box">
                         <input type="text" placeholder="Buscar paciente..." class="search-input">
                         <button class="btn btn-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
                                 <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                             </svg>
                         </button>
@@ -353,231 +1088,695 @@
                 </div>
                 <div class="page-content">
                     <div class="comunicados-list">
-                        <div class="comunicado-item">
-                            <div class="comunicado-header">
-                                <div class="comunicado-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
-                                    </svg>
+                        {% if notificacoes and notificacoes|length > 0 %}
+                            {% for n in notificacoes %}
+                            <div class="comunicado-item">
+                                <div class="comunicado-header">
+                                    <div class="comunicado-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="comunicado-info">
+                                        <h3>{{ n.titulo }}</h3>
+                                        <p class="comunicado-date">{{ n.data_criacao.strftime('%d/%m/%Y %H:%M') }}</p>
+                                    </div>
                                 </div>
-                                <div class="comunicado-info">
-                                    <h3>Reunião de Supervisão</h3>
-                                    <p class="comunicado-date">15/05/2025</p>
-                                </div>
-                            </div>
-                            <div class="comunicado-content">
-                                <p>Prezados estagiários, informamos que haverá reunião de supervisão na próxima sexta-feira, às 14h, na sala 12 do COEPP. A presença de todos é obrigatória.</p>
-                            </div>
-                            <div class="comunicado-actions">
-                                <button class="btn btn-outline">Marcar como lido</button>
-                            </div>
-                        </div>
-                        
-                        <div class="comunicado-item read">
-                            <div class="comunicado-header">
-                                <div class="comunicado-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
-                                    </svg>
-                                </div>
-                                <div class="comunicado-info">
-                                    <h3>Atualização do Sistema</h3>
-                                    <p class="comunicado-date">10/05/2025</p>
+                                <div class="comunicado-content">
+                                    <p>{{ n.mensagem }}</p>
                                 </div>
                             </div>
-                            <div class="comunicado-content">
-                                <p>Informamos que o sistema de agendamentos foi atualizado com novas funcionalidades. Agora é possível visualizar o histórico completo de consultas dos pacientes e exportar relatórios em PDF.</p>
-                            </div>
-                            <div class="comunicado-actions">
-                                <button class="btn btn-outline">Arquivar</button>
-                            </div>
-                        </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="info-message"><p>Não há comunicados no momento.</p></div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <!-- Página de Agendar Consulta -->
-            <div id="pagina-agendar-consulta" class="page">
+            <!-- Página de Ajuda -->
+            <div id="pagina-ajuda" class="page">
                 <div class="page-header">
-                    <h1>Agendar Consulta</h1>
+                    <h1>Ajuda</h1>
                 </div>
-                <div class="page-content">
+                <div class="page-content ajuda-content">
                     <div class="info-box">
-                        <p>Informe abaixo a data e horário disponível para realizar o atendimento.</p>
+                        <p>Confira abaixo as perguntas mais comuns e suas respostas.</p>
                     </div>
                     
                     <div class="card">
                         <div class="card-header">
-                            <h2>Data do Atendimento</h2>
+                            <h2>📝 Acesso e Cadastro</h2>
                         </div>
                         <div class="card-content">
-                            <div class="form-group">
-                                <input type="date" class="form-control">
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="margin-bottom: 1rem;">
+                                    <strong>Como faço meu primeiro acesso?</strong><br>
+                                    <span>O coordenador do COEPP enviará suas credenciais por e-mail. Use seu e-mail FSA e a senha fornecida para fazer login.</span>
+                                </li>
+                                <li style="margin-bottom: 1rem;">
+                                    <strong>Esqueci minha senha. O que devo fazer?</strong><br>
+                                    <span>Entre em contato com o coordenador do COEPP para redefinição de senha.</span>
+                                </li>
+                                <li>
+                                    <strong>Posso alterar meus dados de cadastro?</strong><br>
+                                    <span>Sim, acesse "Minha Conta" no menu do perfil para atualizar suas informações de contato.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Horário Disponível</h2>
+    <!-- Modal de Finalização de Consulta -->
+    <div id="modal-finalizar-consulta" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Finalizar Consulta</h2>
                         </div>
-                        <div class="card-content">
+            <div class="modal-body">
                             <div class="form-group">
+                    <label>Observações da Consulta:</label>
+                    <textarea class="form-control" rows="4" placeholder="Adicione observações sobre a consulta..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Próxima Consulta Recomendada:</label>
                                 <select class="form-control">
-                                    <option value="">Selecione um horário</option>
-                                    <option value="08:00">08:00 - 09:00</option>
-                                    <option value="09:00">09:00 - 10:00</option>
-                                    <option value="10:00">10:00 - 11:00</option>
-                                    <option value="11:00">11:00 - 12:00</option>
-                                    <option value="13:00">13:00 - 14:00</option>
-                                    <option value="14:00">14:00 - 15:00</option>
-                                    <option value="15:00">15:00 - 16:00</option>
-                                    <option value="16:00">16:00 - 17:00</option>
+                        <option value="">Selecione o intervalo</option>
+                        <option value="7">1 semana</option>
+                        <option value="14">2 semanas</option>
+                        <option value="21">3 semanas</option>
+                        <option value="30">1 mês</option>
+                        <option value="60">2 meses</option>
+                        <option value="90">3 meses</option>
                                 </select>
                             </div>
                         </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModalFinalizarConsulta()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarFinalizacaoConsulta()">Finalizar Consulta</button>
                     </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Tipo de Consulta</h2>
-                        </div>
-                        <div class="card-content">
-                            <div class="radio-group">
-                                <label class="radio-container">
-                                    <input type="radio" name="tipo-consulta" value="presencial" checked>
-                                    <span class="radio-mark"></span>
-                                    Presencial
-                                </label>
-                                <label class="radio-container">
-                                    <input type="radio" name="tipo-consulta" value="online">
-                                    <span class="radio-mark"></span>
-                                    Online
-                                </label>
-                            </div>
                         </div>
                     </div>
                     
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Observações</h2>
+    <!-- Modal de Prontuário Completo -->
+    <div id="modal-prontuario" class="modal">
+        <div class="modal-content modal-prontuario-completo">
+            <div class="modal-header">
+                <h2>Prontuário da Consulta</h2>
                         </div>
-                        <div class="card-content">
+            <div class="modal-body">
+                <input type="hidden" id="prontuario-consulta-id" value="">
+                <!-- Informações Gerais -->
+                <div class="prontuario-section">
+                    <h3 class="section-title">Informações Gerais</h3>
+                    <div class="info-row">
                             <div class="form-group">
-                                <textarea class="form-control" rows="4" placeholder="Adicione informações relevantes sobre o atendimento..."></textarea>
+                            <label for="tipo-triagem">Tipo de Triagem:</label>
+                            <select id="tipo-triagem" class="form-control">
+                                <option value="primeira-vez">Primeira Vez</option>
+                                <option value="retorno">Retorno</option>
+                                <option value="urgencia">Urgência</option>
+                                <option value="acompanhamento">Acompanhamento</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sala-atendimento">Sala de Atendimento:</label>
+                            <select id="sala-atendimento" class="form-control">
+                                <option value="sala-01">Sala 01 - COEPP</option>
+                                <option value="sala-02">Sala 02 - COEPP</option>
+                                <option value="sala-03">Sala 03 - COEPP</option>
+                                <option value="sala-04">Sala 04 - COEPP</option>
+                                <option value="sala-05">Sala 05 - COEPP</option>
+                            </select>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="action-buttons">
-                        <button class="btn btn-outline btn-lg" onclick="mostrarPagina('pagina-solicitacoes')">Cancelar</button>
-                        <button class="btn btn-primary btn-lg" id="btn-confirmar-agendamento">Avançar</button>
+                <!-- Queixa Principal -->
+                <div class="prontuario-section">
+                    <h3 class="section-title">Queixa Principal</h3>
+                    <div class="form-group">
+                        <textarea id="prontuario-queixa" class="form-control" rows="4" placeholder="Descreva detalhadamente a queixa principal apresentada pelo paciente..." required></textarea>
+                </div>
+            </div>
+
+                <!-- Histórico do Paciente -->
+                <div class="prontuario-section">
+                    <h3 class="section-title">Histórico do Paciente</h3>
+                    <div class="form-group">
+                        <textarea id="prontuario-historico" class="form-control" rows="5" placeholder="Descreva o histórico clínico do paciente, tratamentos anteriores, medicações, etc..." required></textarea>
+        </div>
+    </div>
+
+                <!-- Avaliação Inicial -->
+                <div class="prontuario-section">
+                    <h3 class="section-title">Avaliação Inicial</h3>
+                <div class="form-group">
+                        <textarea id="prontuario-avaliacao" class="form-control" rows="4" placeholder="Descreva suas observações e avaliação inicial do paciente durante a consulta..." required></textarea>
                     </div>
                 </div>
-            </div>
-
-            <!-- Modal de Confirmação de Exclusão -->
-            <div id="modalConfirmacao" class="modal">
-                <div class="modal-content">
-                    <h2>Confirmar Exclusão</h2>
-                    <p>Tem certeza que deseja excluir este item?</p>
-                    <div class="modal-buttons">
-                        <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-                        <button class="btn btn-danger" onclick="confirmarExclusao()">Excluir</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação de Triagem -->
-    <div id="modal-confirmacao-triagem" class="modal">
-        <div class="modal-content modal-confirmacao">
-            <div class="modal-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-            </div>
-            <h2 class="modal-title">Confirmar triagem</h2>
-            <div class="modal-body">
-                <p id="modal-confirmacao-texto"></p>
                 
+                <!-- Encaminhamentos -->
+                <div class="prontuario-section">
+                    <h3 class="section-title">Encaminhamentos</h3>
                 <div class="form-group">
-                    <label for="data-consulta">Data da Consulta:</label>
-                    <input type="date" id="data-consulta" class="form-control" required>
+                        <label for="tipo-encaminhamento">Tipo de Encaminhamento:</label>
+                        <select id="tipo-encaminhamento" class="form-control">
+                            <option value="sem-encaminhamento">Sem Encaminhamento</option>
+                            <option value="psicodiagnostico">Psicodiagnóstico</option>
+                            <option value="psicoterapia">Psicoterapia</option>
+                            <option value="avaliacao-psiquiatrica">Avaliação Psiquiátrica</option>
+                            <option value="medico-clinico">Médico Clínico</option>
+                            <option value="servico-social">Serviço Social</option>
+                            <option value="outro">Outro</option>
+                        </select>
                 </div>
-                
                 <div class="form-group">
-                    <label for="hora-consulta">Horário da Consulta:</label>
-                    <input type="time" id="hora-consulta" class="form-control" required>
+                        <textarea id="prontuario-encaminhamento" class="form-control" rows="3" placeholder="Descreva detalhes do encaminhamento, se necessário..."></textarea>
                 </div>
-                
-                <div class="form-group">
-                    <label for="observacoes-consulta">Observações (opcional):</label>
-                    <textarea id="observacoes-consulta" class="form-control" rows="3" placeholder="Adicione observações sobre a consulta..."></textarea>
-                </div>
+            </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger btn-lg" onclick="fecharModalConfirmacaoTriagem()">Cancelar</button>
-                <button class="btn btn-primary btn-lg" onclick="confirmarTriagem()">Confirmar</button>
+                <button class="btn btn-secondary" onclick="solicitarReajustes()">Solicitar Reajustes</button>
+                <button class="btn btn-primary" onclick="aprovarProntuario()">Aprovar Prontuário para Enviar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Sucesso de Disponibilidade -->
-    <div id="modal-sucesso-disponibilidade" class="modal">
-        <div class="modal-content modal-sucesso">
-            <div class="modal-icon success">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-            </div>
-            <h2 class="modal-title">Sua disponibilidade foi enviada com sucesso!</h2>
-            <div class="modal-body">
-                <p>O paciente confirmará a consulta em breve.</p>
-                <p>Acesse o menu <a href="#" onclick="fecharModalSucessoDisponibilidade(); mostrarPagina('pagina-minhas-consultas');">Minhas Consultas</a> para visualizar os agendamentos.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary btn-lg" onclick="fecharModalSucessoDisponibilidade()">Voltar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Agendamento com Sucesso -->
-    <div id="modal-agendamento-sucesso" class="modal">
+    <!-- Modal de Solicitação de Reajustes -->
+    <div id="modal-reajustes" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="success-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                    </svg>
-                </div>
-                <h2>Agendamento Realizado!</h2>
+                <h2>Solicitar Reajustes do Prontuário</h2>
             </div>
             <div class="modal-body">
-                <p>O agendamento foi realizado com sucesso. O paciente receberá uma notificação com os detalhes da consulta.</p>
-                <div class="agendamento-details">
-                    <p><strong>Paciente:</strong> <span id="modal-paciente">Nome do Paciente</span></p>
-                    <p><strong>Data:</strong> <span id="modal-data">26/05/2025</span></p>
-                    <p><strong>Horário:</strong> <span id="modal-horario">08:00 - 09:00</span></p>
-                    <p><strong>Tipo:</strong> <span id="modal-tipo">Presencial</span></p>
+                <div class="form-group">
+                    <label for="feedback-reajustes">Feedback/Comentários:</label>
+                    <textarea id="feedback-reajustes" class="form-control" rows="4" placeholder="Detalhar melhor o histórico do paciente ou Corrigir a descrição da queixa principal..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notificar-email"> Notificar o estagiário por e-mail sobre o reajuste.
+                    </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="fecharModal()">Entendi</button>
+                <button class="btn btn-outline" onclick="fecharModalReajustes()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarReajustes()">Confirmar Solicitação</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Confirmar Triagem (novo) -->
+    <div id="modal-confirmar-triagem" class="modal modal-confirmar-triagem">
+        <div class="modal-content">
+            <div class="triagem-header">
+                <h2 id="triagem-titulo">Confirmar Triagem</h2>
+            </div>
+            <div class="triagem-body">
+                <div>
+                    <span class="triagem-label">Paciente</span>
+                    <div id="triagem-paciente" style="font-weight:600; color:#2d3748;">—</div>
+                </div>
+                <div class="triagem-row">
+                    <div>
+                        <label class="triagem-label" for="triagem-data">Data</label>
+                        <input id="triagem-data" type="date" class="triagem-input">
+                    </div>
+                    <div>
+                        <label class="triagem-label" for="triagem-hora">Hora</label>
+                        <input id="triagem-hora" type="time" class="triagem-input">
+                    </div>
+                </div>
+                <div>
+                    <label class="triagem-label" for="triagem-observacoes">Observações (opcional)</label>
+                    <textarea id="triagem-observacoes" class="triagem-textarea" rows="3" placeholder="Ex.: Triagem confirmada, trazer exames..."></textarea>
+                </div>
+                <div class="info-message"><p>Defina a data e horário para confirmar esta triagem. Um email de confirmação é enviado ao paciente.</p></div>
+            </div>
+            <div class="triagem-footer">
+                <button class="btn btn-outline" onclick="fecharModalConfirmacaoTriagem()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarTriagemSubmit()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
     <div id="toast" class="toast"></div>
-    <script src="{{ url_for('static', filename='js/aba_estagiario.js') }}"></script>
+
     <script>
+        // Variável global para armazenar o ID da consulta atual
+        let consultaAtual = null;
+
+        // Função para alternar o menu dropdown
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('show');
+        }
+
+        // Estado do modal de confirmação de triagem
+        let solicitacaoTriagemAtual = null;
+
+        function abrirModalConfirmacaoTriagem(solicitacaoId, pacienteNome) {
+            solicitacaoTriagemAtual = solicitacaoId;
+            document.getElementById('triagem-paciente').textContent = pacienteNome || 'Paciente';
+            const dataEl = document.getElementById('triagem-data');
+            const horaEl = document.getElementById('triagem-hora');
+            const obsEl = document.getElementById('triagem-observacoes');
+            // Limpa valores anteriores
+            dataEl.value = '';
+            horaEl.value = '';
+            obsEl.value = '';
+            // Define a data mínima como hoje
+            const hoje = new Date();
+            const yyyy = hoje.getFullYear();
+            const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoje.getDate()).padStart(2, '0');
+            dataEl.min = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('modal-confirmar-triagem').classList.add('show');
+        }
+
+        function fecharModalConfirmacaoTriagem() {
+            document.getElementById('modal-confirmar-triagem').classList.remove('show');
+            solicitacaoTriagemAtual = null;
+        }
+
+        async function confirmarTriagemSubmit() {
+            const data = document.getElementById('triagem-data').value;
+            const hora = document.getElementById('triagem-hora').value;
+            const observacoes = document.getElementById('triagem-observacoes').value || '';
+            if (!data) { mostrarToast('Selecione a data da consulta'); return; }
+            if (!hora) { mostrarToast('Selecione o horário da consulta'); return; }
+            if (!solicitacaoTriagemAtual) { mostrarToast('Solicitação inválida'); return; }
+            try {
+                const dataAgendamento = `${data}T${hora}`;
+                const resp = await fetch(`/api/estagiario/agendamentos/confirmar/${solicitacaoTriagemAtual}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data_agendamento: dataAgendamento, observacoes })
+                });
+                const json = await resp.json();
+                if (!resp.ok) throw new Error(json.error || 'Erro ao confirmar triagem');
+                fecharModalConfirmacaoTriagem();
+                mostrarToast('Triagem confirmada com sucesso!');
+                try { carregarSolicitacoes(); } catch (e) {}
+                try { carregarConsultas(); } catch (e) {}
+            } catch (e) {
+                mostrarToast(e.message || 'Erro ao confirmar triagem');
+            }
+        }
+
+        // Função para mostrar uma página específica
+        function mostrarPagina(paginaId) {
+            // Esconder todas as páginas
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Remover classe active de todos os itens de navegação
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar a página selecionada
+            document.getElementById(paginaId).classList.add('active');
+            
+            // Adicionar classe active ao item de navegação correspondente
+            const navItem = document.querySelector(`[onclick="mostrarPagina('${paginaId}')"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+            
+            // Fechar dropdown
+            document.getElementById('dropdownMenu').classList.remove('show');
+            
+            // Atualizar título da página
+            const titulos = {
+                'pagina-minhas-consultas': 'Minhas Consultas',
+                'pagina-meus-horarios': 'Meus Horários',
+                'pagina-solicitacoes': 'Solicitações',
+                'pagina-meus-dados': 'Minha Conta',
+                'pagina-prontuarios': 'Prontuários',
+                'pagina-comunicados': 'Comunicados',
+                'pagina-ajuda': 'Ajuda'
+            };
+            
+            document.getElementById('page-title').textContent = titulos[paginaId] || 'Portal do Estagiário';
+
+            // Carregar dados específicos da página
+            if (paginaId === 'pagina-solicitacoes') {
+                try { if (typeof carregarSolicitacoes === 'function') carregarSolicitacoes(); } catch(e) {}
+            }
+            if (paginaId === 'pagina-prontuarios') {
+                try { if (typeof carregarProntuariosEstagiario === 'function') carregarProntuariosEstagiario(); } catch(e) {}
+            }
+        }
 
         // Função para abrir o modal de finalização de consulta
         function abrirModalFinalizarConsulta(consultaId) {
-            document.getElementById('modal-finalizar-consulta').style.display = 'flex';
+            consultaAtual = consultaId;
+            document.getElementById('modal-finalizar-consulta').classList.add('show');
         }
 
+        // Função para fechar o modal de finalização de consulta
+        function fecharModalFinalizarConsulta() {
+            document.getElementById('modal-finalizar-consulta').classList.remove('show');
+            // Não resetar consultaAtual aqui para permitir propagação ao prontuário
+        }
+
+        // Função para confirmar a finalização da consulta
+        function confirmarFinalizacaoConsulta() {
+            const consultaIdSelecionada = consultaAtual; // preservar antes de fechar
+            const observacoes = document.querySelector('#modal-finalizar-consulta textarea').value;
+            const proximaConsulta = document.querySelector('#modal-finalizar-consulta select').value;
+
+            // Fechar modal de finalização
+            fecharModalFinalizarConsulta();
+            
+            // Abrir imediatamente o modal de prontuário completo
+            document.getElementById('modal-prontuario').classList.add('show');
+            // Propagar o ID da consulta para o modal de prontuário (fallback)
+            const hiddenInput = document.getElementById('prontuario-consulta-id');
+            if (hiddenInput) { hiddenInput.value = consultaIdSelecionada || consultaAtual || ''; }
+
+            // Aqui você pode adicionar a lógica para enviar os dados para o backend
+            // Por exemplo:
+            // fetch('/api/finalizar-consulta', {
+            //     method: 'POST',
+            //     body: JSON.stringify({
+            //         consultaId: consultaAtual,
+            //         observacoes,
+            //         proximaConsulta
+            //     })
+            // });
+        }
+
+        // Função para fechar o modal de prontuário
+        function fecharModalProntuario() {
+            document.getElementById('modal-prontuario').classList.remove('show');
+            // Limpar campos
+            document.getElementById('prontuario-queixa').value = '';
+            document.getElementById('prontuario-intervencao').value = '';
+            document.getElementById('prontuario-recomendacoes').value = '';
+        }
+
+        // Função para salvar o prontuário completo
+        async function salvarProntuarioCompleto() {
+            const tipoTriagem = document.getElementById('tipo-triagem').value;
+            const sala = document.getElementById('sala-atendimento').value;
+            const queixa = document.getElementById('prontuario-queixa').value;
+            const historico = document.getElementById('prontuario-historico').value;
+            const avaliacao = document.getElementById('prontuario-avaliacao').value;
+            const tipoEncaminhamento = document.getElementById('tipo-encaminhamento').value;
+            const encaminhamento = document.getElementById('prontuario-encaminhamento').value;
+            const hiddenId = document.getElementById('prontuario-consulta-id') ? document.getElementById('prontuario-consulta-id').value : '';
+            const consultaIdEfetivo = consultaAtual || hiddenId;
+
+            // Validação
+            if (!queixa.trim() || !historico.trim() || !avaliacao.trim()) {
+                mostrarToast('Por favor, preencha todos os campos obrigatórios do prontuário.');
+                return;
+            }
+            if (!consultaIdEfetivo) {
+                mostrarToast('ID da consulta não encontrado. Abra o prontuário a partir da consulta.');
+                return;
+            }
+
+            // Dados completos do prontuário
+            const dadosProntuario = {
+                consultaId: consultaIdEfetivo,
+                informacoesGerais: {
+                    tipoTriagem,
+                    sala
+                },
+                queixaPrincipal: queixa,
+                historicoPaciente: historico,
+                avaliacaoInicial: avaliacao,
+                encaminhamentos: {
+                    tipo: tipoEncaminhamento,
+                    descricao: encaminhamento
+                },
+                dataCriacao: new Date().toISOString(),
+                estagiario: 'Estagiário',
+                status: 'pendente' // pendente, aprovado, reajustes
+            };
+
+            try {
+                const resp = await fetch('/api/estagiario/prontuarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosProntuario)
+                });
+                const json = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(json.error || 'Erro ao salvar prontuário');
+                }
+                // Fechar modal e mostrar sucesso
+                fecharModalProntuario();
+                mostrarToast('Prontuário salvo com sucesso!');
+                // Atualizar a lista de consultas (se houver função global disponível)
+                try { if (typeof carregarConsultas === 'function') { carregarConsultas(); } } catch(e) {}
+            } catch (e) {
+                mostrarToast(e.message || 'Erro ao salvar prontuário');
+            }
+        }
+
+        // Função para aprovar prontuário
+        async function aprovarProntuario() {
+            // Seta status como aprovado e salva
+            await salvarProntuarioCompleto();
+        }
+
+        // Função para solicitar reajustes
+        function solicitarReajustes() {
+            // Primeiro salvar o prontuário
+            salvarProntuarioCompleto();
+            
+            // Abrir modal de reajustes
+            document.getElementById('modal-reajustes').classList.add('show');
+        }
+
+        // Função para fechar modal de reajustes
+        function fecharModalReajustes() {
+            document.getElementById('modal-reajustes').classList.remove('show');
+            document.getElementById('feedback-reajustes').value = '';
+            document.getElementById('notificar-email').checked = false;
+        }
+
+        // Função para confirmar solicitação de reajustes
+        function confirmarReajustes() {
+            const feedback = document.getElementById('feedback-reajustes').value;
+            const notificarEmail = document.getElementById('notificar-email').checked;
+
+            if (!feedback.trim()) {
+                mostrarToast('Por favor, adicione um comentário sobre os reajustes necessários.');
+                return;
+            }
+
+            // Marcar prontuário como com reajustes
+            let prontuarios = JSON.parse(localStorage.getItem('prontuarios') || '[]');
+            if (prontuarios.length > 0) {
+                prontuarios[prontuarios.length - 1].status = 'reajustes';
+                prontuarios[prontuarios.length - 1].reajustes = {
+                    feedback,
+                    notificarEmail,
+                    dataSolicitacao: new Date().toISOString()
+                };
+                localStorage.setItem('prontuarios', JSON.stringify(prontuarios));
+            }
+
+            // Enviar para backend (comentado)
+            // fetch('/api/solicitar-reajustes', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         prontuarioId: prontuarios[prontuarios.length - 1].id,
+            //         feedback,
+            //         notificarEmail
+            //     })
+            // });
+
+            fecharModalReajustes();
+            mostrarToast('Solicitação de reajustes enviada com sucesso!');
+        }
+
+        // Função para fechar o modal de prontuário
+        function fecharModalProntuario() {
+            document.getElementById('modal-prontuario').classList.remove('show');
+            // Limpar campos
+            document.getElementById('prontuario-queixa').value = '';
+            document.getElementById('prontuario-historico').value = '';
+            document.getElementById('prontuario-avaliacao').value = '';
+            document.getElementById('prontuario-encaminhamento').value = '';
+            document.getElementById('tipo-triagem').value = 'primeira-vez';
+            document.getElementById('sala-atendimento').value = 'sala-01';
+            document.getElementById('tipo-encaminhamento').value = 'sem-encaminhamento';
+        }
+
+        // Função para mostrar mensagens toast
+        function mostrarToast(mensagem) {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Função para atualizar a lista de consultas (simulação)
+        async function carregarConsultas() {
+            try {
+                const resp = await fetch('/api/estagiario/consultas');
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error || 'Erro ao carregar consultas');
+                atualizarListaConsultasUI(data || []);
+            } catch (e) {
+                const c = document.querySelector('.consultas-dia');
+                if (c) c.innerHTML = `<h3>Consultas do dia</h3><div class="info-message"><p>${e.message}</p></div>`;
+            }
+        }
+
+        // ===== PRONTUÁRIOS DO ESTAGIÁRIO =====
+        async function carregarProntuariosEstagiario() {
+            const lista = document.querySelector('.prontuarios-list');
+            if (!lista) return;
+            lista.innerHTML = '<div class="info-message"><p>Carregando prontuários...</p></div>';
+            try {
+                const resp = await fetch('/api/estagiario/prontuarios');
+                const dados = await resp.json();
+                if (!resp.ok) throw new Error(dados.error || 'Erro ao carregar prontuários');
+                if (!dados || dados.length === 0) {
+                    lista.innerHTML = '<div class="info-message"><p>Nenhum prontuário encontrado.</p></div>';
+                    return;
+                }
+                lista.innerHTML = dados.map(p => `
+                    <div class="card">
+                        <div class="card-content">
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                                <div>
+                                    <div style="font-weight:600; color:#2d3748;">${p.paciente_nome || 'Paciente'}</div>
+                                    <div style="color:#4a5568; font-size:0.9rem;">Consulta: ${p.data_consulta || '—'}</div>
+                                    ${p.observacoes_estagiario ? `<div style="margin-top:.25rem; color:#4a5568; font-size:0.9rem;"><strong>Obs.:</strong> ${p.observacoes_estagiario}</div>` : ''}
+                                </div>
+                                <button class="btn btn-outline" onclick="abrirProntuario(${p.id})">Abrir Prontuário</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                lista.innerHTML = `<div class=\"info-message\"><p>${e.message}</p></div>`;
+            }
+        }
+        
+        // Abre o modal do prontuário já preenchendo o ID oculto
+        function abrirProntuario(agendamentoId) {
+            consultaAtual = agendamentoId;
+            const hiddenInput = document.getElementById('prontuario-consulta-id');
+            if (hiddenInput) hiddenInput.value = agendamentoId;
+            document.getElementById('modal-prontuario').classList.add('show');
+        }
+
+        function atualizarListaConsultasUI(consultas) {
+            const container = document.querySelector('.consultas-dia');
+            if (!container) return;
+            if (!consultas || consultas.length === 0) {
+                container.innerHTML = `<h3>Consultas do dia</h3><div class="info-message"><p>Nenhuma consulta encontrada.</p></div>`;
+                return;
+            }
+            let html = `<h3>Consultas do dia</h3>`;
+            consultas.forEach(c => {
+                const status = c.status || '';
+                const dataAg = c.data_agendamento ? c.data_agendamento : null;
+                const dataStr = dataAg ? new Date(dataAg).toLocaleDateString('pt-BR') : '—';
+                const horaStr = dataAg ? new Date(dataAg).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '—';
+                html += `
+                <div class="card">
+                    <div class="card-content">
+                        <div style="display:flex; justify-content: space-between; align-items:center; gap:1rem;">
+                            <div>
+                                <strong>Paciente:</strong> ${c.paciente_nome || 'Paciente'}<br>
+                                <strong>Data/Hora:</strong> ${dataStr} ${horaStr}<br>
+                                <strong>Status:</strong> <span style="color:#667eea;">${status}</span>
+                            </div>
+                            ${status === 'confirmado' ? `<button class="btn btn-primary" onclick="abrirModalFinalizarConsulta(${c.id})">Finalizar Consulta</button>` : '<button class="btn btn-outline" disabled>Sem ações</button>'}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // Carregar Solicitações de Triagem para o estagiário
+        async function carregarSolicitacoes() {
+            const lista = document.querySelector('.solicitacoes-list');
+            if (!lista) return;
+            lista.innerHTML = '<div class="info-message"><p>Carregando solicitações...</p></div>';
+            try {
+                const resp = await fetch('/api/estagiario/solicitacoes');
+                const dados = await resp.json();
+                if (!resp.ok) throw new Error(dados.error || 'Erro ao carregar solicitações');
+                if (!dados || dados.length === 0) {
+                    lista.innerHTML = '<div class="info-message"><p>Nenhuma solicitação pendente.</p></div>';
+                    return;
+                }
+                lista.innerHTML = dados.map(s => `
+                    <div class="comunicado-item" style="border-left-color:#f5c842;">
+                        <div class="comunicado-header">
+                            <div class="comunicado-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                                </svg>
+                            </div>
+                            <div class="comunicado-info">
+                                <h3>${s.paciente_nome || 'Paciente'}</h3>
+                                <p class="comunicado-date">${s.data_solicitacao || ''}</p>
+                            </div>
+                        </div>
+                        <div class="comunicado-content">
+                            <p><strong>Observações:</strong> ${s.observacoes_paciente || 'Nenhuma'}</p>
+                            <div class="action-buttons" style="justify-content:flex-start; margin-top:1rem;">
+                                <button class="btn btn-primary" onclick="abrirModalConfirmacaoTriagem('${s.id}', '${s.paciente_nome || ''}')">Confirmar Triagem</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                lista.innerHTML = `<div class=\"info-message\"><p>${e.message}</p></div>`;
+            }
+        }
+
+        // Fluxo direto de confirmação (prompts simples)
+        async function confirmarTriagemDireta(solicitacaoId, pacienteNome) {
+            try {
+                const data = prompt(`Defina a DATA da consulta para ${pacienteNome} (YYYY-MM-DD):`);
+                if (!data) return;
+                const hora = prompt('Defina o HORÁRIO da consulta (HH:MM, 24h):');
+                if (!hora) return;
+                const observacoes = prompt('Observações (opcional):') || '';
+                const dataAgendamento = `${data}T${hora}`;
+
+                const resp = await fetch(`/api/estagiario/agendamentos/confirmar/${solicitacaoId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data_agendamento: dataAgendamento, observacoes })
+                });
+                const json = await resp.json();
+                if (!resp.ok) throw new Error(json.error || 'Erro ao confirmar triagem');
+
+                mostrarToast('Triagem confirmada com sucesso!');
+                try { carregarSolicitacoes(); } catch(e) {}
+                try { carregarConsultas(); } catch(e) {}
+            } catch (e) {
+                mostrarToast(e.message || 'Erro ao confirmar triagem');
+            }
+        }
+
+        // Função para formatar telefone
         function formatarTelefone(input) {
             let valor = input.value.replace(/\D/g, "");
             if (valor.length > 11) valor = valor.slice(0, 11);
@@ -591,223 +1790,65 @@
             input.value = valor;
         }
 
-        // Função para fechar o modal de finalização de consulta
-        function fecharModalFinalizarConsulta() {
-            document.getElementById('modal-finalizar-consulta').style.display = 'none';
+        // Função para logout
+        function logout() {
+            if (confirm('Tem certeza que deseja sair do sistema?')) {
+                // Aqui você pode adicionar a lógica de logout
+                window.location.href = '/login';
+            }
         }
 
-        // Função para confirmar a finalização da consulta
-        function confirmarFinalizacaoConsulta() {
-            const observacoes = document.querySelector('#modal-finalizar-consulta textarea').value;
-            const proximaConsulta = document.querySelector('#modal-finalizar-consulta select').value;
-
-            // Aqui você pode adicionar a lógica para enviar os dados para o backend
-            // Por exemplo:
-            // fetch('/api/finalizar-consulta', {
-            //     method: 'POST',
-            //     body: JSON.stringify({
-            //         observacoes,
-            //         proximaConsulta
-            //     })
-            // });
-
-            // Mostrar mensagem de sucesso
-            mostrarToast('Consulta finalizada com sucesso!');
-            
-            // Fechar o modal
-            fecharModalFinalizarConsulta();
-            
-            // Atualizar a lista de consultas
-            // atualizarListaConsultas();
+        // Função para atualizar dados de contato
+        function atualizarDadosContato() {
+            mostrarToast('Dados de contato atualizados com sucesso!');
         }
 
-        // Função para mostrar mensagens toast
-        function mostrarToast(mensagem) {
-            const toast = document.getElementById('toast');
-            toast.textContent = mensagem;
-            toast.className = 'toast show';
-            setTimeout(() => {
-                toast.className = 'toast';
-            }, 3000);
+        // Função para alterar senha
+        function alterarSenha() {
+            const senhaAtual = document.getElementById('senha-atual').value;
+            const novaSenha = document.getElementById('nova-senha').value;
+            const confirmarSenha = document.getElementById('confirmar-senha').value;
+
+            if (novaSenha !== confirmarSenha) {
+                mostrarToast('As senhas não coincidem!');
+                return;
+            }
+
+            mostrarToast('Senha alterada com sucesso!');
         }
 
-        // Variável para armazenar o tipo de exclusão
-        let tipoExclusao = '';
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fechar dropdown ao clicar fora
+            document.addEventListener('click', function(event) {
+                const dropdown = document.getElementById('dropdownMenu');
+                const profile = document.querySelector('.profile');
+                
+                if (!profile.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
 
-        // Função para confirmar exclusão de agendamentos
-        function confirmarExclusaoAgendamentos() {
-            tipoExclusao = 'agendamentos';
-            document.getElementById('modal-exclusao-texto').textContent = 
-                'Tem certeza que deseja excluir todos os agendamentos?';
-            document.getElementById('modal-confirmacao-exclusao').style.display = 'flex';
-        }
+            // Fechar modais ao clicar no background
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.classList.remove('show');
+                    }
+                });
+            });
 
-        // Função para confirmar exclusão de disponibilidade
-        function confirmarExclusaoDisponibilidade() {
-            tipoExclusao = 'disponibilidade';
-            document.getElementById('modal-exclusao-texto').textContent = 
-                'Tem certeza que deseja excluir todas as disponibilidades?';
-            document.getElementById('modal-confirmacao-exclusao').style.display = 'flex';
-        }
-
-        // Função para fechar o modal de exclusão
-        function fecharModalExclusao() {
-            document.getElementById('modal-confirmacao-exclusao').style.display = 'none';
-        }
-
-        // Função para confirmar a exclusão
-        function confirmarExclusao() {
-            // Aqui você pode adicionar a lógica para enviar a requisição ao backend
-            // Por exemplo:
-            // fetch(`/api/excluir-${tipoExclusao}`, {
-            //     method: 'DELETE'
-            // });
-
-            // Mostrar mensagem de sucesso
-            mostrarToast(`${tipoExclusao === 'agendamentos' ? 'Agendamentos' : 'Disponibilidades'} excluídos com sucesso!`);
-            
-            // Fechar o modal
-            fecharModalExclusao();
-        }
+            // Tecla ESC para fechar modais
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    document.querySelectorAll('.modal.show').forEach(modal => {
+                        modal.classList.remove('show');
+                    });
+                }
+            });
+            // Carregar consultas reais
+            carregarConsultas();
+        });
     </script>
-
-
-    <!-- Página de Ajuda -->
-    <div id="pagina-ajuda" class="page">
-        <div class="page-header">
-            <button class="action-button back-button" onclick="mostrarPagina('pagina-minhas-consultas')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21z"/>
-                </svg>
-                Voltar
-            </button>
-            <h1>Ajuda</h1>
-            <div class="header-spacer"></div>
-        </div>
-        <div class="page-content ajuda-content">
-            <div class="info-box">
-                <p>Confira abaixo as perguntas mais comuns e suas respostas.</p>
-            </div>
-            
-            <div class="ajuda-grid">
-                <div class="card ajuda-card">
-                    <div class="card-header">
-                        <h2>📝 Acesso e Cadastro</h2>
-                    </div>
-                    <div class="card-content">
-                        <ul class="faq-list">
-                            <li>
-                                <strong>Como faço meu primeiro acesso?</strong><br>
-                                <span>O coordenador do COEPP enviará suas credenciais por e-mail. Use seu e-mail FSA e a senha fornecida para fazer login.</span>
-                            </li>
-                            <li>
-                                <strong>Esqueci minha senha. O que devo fazer?</strong><br>
-                                <span>Entre em contato com o coordenador do COEPP para redefinição de senha.</span>
-                            </li>
-                            <li>
-                                <strong>Posso alterar meus dados de cadastro?</strong><br>
-                                <span>Sim, acesse "Minha Conta" no menu do perfil para atualizar suas informações de contato.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card ajuda-card">
-                    <div class="card-header">
-                        <h2>📅 Consultas e Agendamentos</h2>
-                    </div>
-                    <div class="card-content">
-                        <ul class="faq-list">
-                            <li>
-                                <strong>Como gerencio minhas consultas?</strong><br>
-                                <span>Acesse "Minhas Consultas" no menu lateral para visualizar e gerenciar seus atendimentos do dia.</span>
-                            </li>
-                            <li>
-                                <strong>Como defino minha disponibilidade?</strong><br>
-                                <span>Use a seção "Meus Horários" para definir os dias e horários em que está disponível para atendimento.</span>
-                            </li>
-                            <li>
-                                <strong>Como confirmo uma consulta?</strong><br>
-                                <span>Na página "Minhas Consultas", clique em "Confirmar" ao lado da consulta desejada.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card ajuda-card">
-                    <div class="card-header">
-                        <h2>📋 Solicitações de Triagem</h2>
-                    </div>
-                    <div class="card-content">
-                        <ul class="faq-list">
-                            <li>
-                                <strong>Como visualizo as solicitações de triagem?</strong><br>
-                                <span>Acesse "Solicitações" no menu lateral para ver todas as solicitações pendentes.</span>
-                            </li>
-                            <li>
-                                <strong>Como confirmo uma solicitação?</strong><br>
-                                <span>Na página de solicitações, clique em "Confirmar" ao lado da solicitação desejada e defina a data e horário do atendimento.</span>
-                            </li>
-                            <li>
-                                <strong>Posso recusar uma solicitação?</strong><br>
-                                <span>Sim, você pode recusar uma solicitação caso não esteja disponível ou por outros motivos justificáveis.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card ajuda-card">
-                    <div class="card-header">
-                        <h2>❓ Suporte</h2>
-                    </div>
-                    <div class="card-content">
-                        <ul class="faq-list">
-                            <li>
-                                <strong>Preciso de ajuda adicional. Com quem posso falar?</strong><br>
-                                <span>Entre em contato com o coordenador do COEPP pelo e-mail coepp@fsa.br ou procure a coordenação pessoalmente.</span>
-                            </li>
-                            <li>
-                                <strong>Encontrei um problema técnico. O que fazer?</strong><br>
-                                <span>Reporte o problema ao coordenador do COEPP, detalhando o que aconteceu e em qual página ocorreu.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        /* Estilos para o modal de confirmação de triagem */
-        .modal-confirmacao .form-group {
-            margin-bottom: 15px;
-        }
-
-        .modal-confirmacao .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .modal-confirmacao .form-control {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .modal-confirmacao .form-control:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-
-        .modal-confirmacao textarea.form-control {
-            resize: vertical;
-            min-height: 80px;
-        }
-    </style>
 </body>
 </html>

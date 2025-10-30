@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Carregar variáveis de ambiente
+# Carregar variáveis de ambienteS
 load_dotenv(override=True)
 
 app = Flask(__name__)

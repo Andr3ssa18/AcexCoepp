@@ -1,8 +1,8 @@
 # views.py
 from main import app, mail # Importa o aplicativo Flask principal e o objeto mail
 from db import db
-from models import Paciente, Estagiario, Agendamento, Mestre  # ADICIONAR Mestre aqui
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from models import Paciente, Estagiario, Agendamento, Mestre, Notificacao, Prontuario  # ADICIONAR Mestre aqui e Notificacao
+from flask import render_template, request, redirect, url_for, flash, session, jsonify, get_flashed_messages
 import datetime # Adicionado para conversão de data
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate 
@@ -483,8 +483,14 @@ def aba_estagiario():
         session.clear()
         return redirect(url_for('login'))
 
+    # Buscar notificações deste estagiário (ou para todos)
+    from models import Notificacao
+    notificacoes = Notificacao.query.filter(
+        (Notificacao.destinatario_id.is_(None)) | (Notificacao.destinatario_id == estagiario_id)
+    ).order_by(Notificacao.data_criacao.desc()).all()
+
     messages = session.pop('_flashes', [])
-    return render_template("aba_estagiario.html", estagiario=estagiario, messages=messages)
+    return render_template("aba_estagiario.html", estagiario=estagiario, messages=messages, notificacoes=notificacoes)
 
 
 
@@ -938,6 +944,72 @@ def listar_prontuarios():
     except Exception as e:
         print(f"Erro ao listar prontuários: {e}")
         return jsonify({'error': f'Erro ao listar prontuários: {str(e)}'}), 500
+
+@app.route('/api/estagiario/prontuarios', methods=['POST'])
+def criar_prontuario():
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como estagiário.'}), 403
+
+    estagiario_id = session.get('user_id')
+    if not estagiario_id:
+        return jsonify({'error': 'ID do estagiário não encontrado na sessão.'}), 400
+
+    try:
+        data = request.get_json(silent=True) or {}
+
+        agendamento_id = data.get('consultaId') or data.get('agendamento_id')
+        if not agendamento_id:
+            return jsonify({'error': 'ID da consulta é obrigatório.'}), 400
+
+        agendamento = Agendamento.query.get(agendamento_id)
+        if not agendamento:
+            return jsonify({'error': 'Consulta não encontrada.'}), 404
+
+        # O estagiário só pode criar prontuário para suas próprias consultas
+        if agendamento.estagiario_id and agendamento.estagiario_id != estagiario_id:
+            return jsonify({'error': 'Esta consulta não pertence a você.'}), 403
+
+        if not agendamento.paciente_id:
+            return jsonify({'error': 'Consulta sem paciente associado.'}), 400
+
+        # Coleta de campos do prontuário
+        info = data.get('informacoesGerais') or {}
+        encaminhamentos = data.get('encaminhamentos') or {}
+
+        prontuario = Prontuario(
+            agendamento_id=agendamento.id,
+            estagiario_id=estagiario_id,
+            paciente_id=agendamento.paciente_id,
+            tipo_triagem=info.get('tipoTriagem'),
+            sala_atendimento=info.get('sala'),
+            queixa_principal=(data.get('queixaPrincipal') or '').strip(),
+            historico_paciente=(data.get('historicoPaciente') or '').strip(),
+            avaliacao_inicial=(data.get('avaliacaoInicial') or '').strip(),
+            tipo_encaminhamento=encaminhamentos.get('tipo'),
+            encaminhamento_descricao=encaminhamentos.get('descricao'),
+            status=(data.get('status') or 'pendente')
+        )
+
+        # Validação mínima
+        if not prontuario.queixa_principal or not prontuario.historico_paciente or not prontuario.avaliacao_inicial:
+            return jsonify({'error': 'Campos obrigatórios do prontuário não preenchidos.'}), 400
+
+        # Caso a consulta ainda não esteja atribuída, atribui ao estagiário atual
+        if not agendamento.estagiario_id:
+            agendamento.estagiario_id = estagiario_id
+
+        # Marcar como concluído quando criar prontuário
+        agendamento.status = 'concluido'
+
+        db.session.add(prontuario)
+        db.session.commit()
+
+        return jsonify({'message': 'Prontuário salvo com sucesso!', 'prontuario_id': prontuario.id}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao criar prontuário: {e}")
+        return jsonify({'error': f'Erro ao salvar prontuário: {str(e)}'}), 500
 
 @app.route('/api/estagiario/senha', methods=['PUT'])
 def alterar_senha_estagiario():
@@ -1951,33 +2023,34 @@ def admin_listar_prontuarios():
     try:
         busca = (request.args.get('busca') or '').strip()
 
-        query = db.session.query(Agendamento, Paciente, Estagiario).join(
-            Paciente, Paciente.id == Agendamento.paciente_id
-        ).outerjoin(Estagiario, Estagiario.id == Agendamento.estagiario_id)
-
-        # Consideramos prontuário apenas consultas concluídas
-        query = query.filter(Agendamento.status == 'concluido')
+        # Preferir registros da tabela Prontuario (mais detalhados); fallback para agendamentos concluídos
+        query = db.session.query(Prontuario, Paciente, Estagiario).join(
+            Paciente, Paciente.id == Prontuario.paciente_id
+        ).outerjoin(Estagiario, Estagiario.id == Prontuario.estagiario_id)
 
         if busca:
             query = query.filter(db.or_(Paciente.nome.ilike(f'%{busca}%'), Estagiario.nome.ilike(f'%{busca}%')))
 
-        resultados = query.order_by(db.desc(Agendamento.data_agendamento)).limit(200).all()
+        resultados = query.order_by(db.desc(Prontuario.data_criacao)).limit(200).all()
 
         prontuarios = []
-        for ag, pac, est in resultados:
+        for pr, pac, est in resultados:
             prontuarios.append({
+                'id': pr.id,
                 'paciente_nome': pac.nome,
                 'estagiario_nome': est.nome if est else None,
-                'data_criacao': ag.data_agendamento.strftime('%d/%m/%Y %H:%M') if ag.data_agendamento else None,
-                'status': ag.status,
-                'ultima_atualizacao': ag.data_agendamento.strftime('%d/%m/%Y %H:%M') if ag.data_agendamento else None
+                'data_criacao': pr.data_criacao.strftime('%d/%m/%Y %H:%M') if pr.data_criacao else None,
+                'status': pr.status,
+                'tipo_triagem': pr.tipo_triagem,
+                'sala_atendimento': pr.sala_atendimento,
+                'ultima_atualizacao': pr.ultima_atualizacao.strftime('%d/%m/%Y %H:%M') if pr.ultima_atualizacao else None
             })
 
         # Estatísticas da seção de prontuários
-        total = db.session.query(Agendamento).filter(Agendamento.status == 'concluido').count()
-        pendentes = db.session.query(Agendamento).filter(Agendamento.status == 'confirmado').count()
-        aprovados = total  # não há campo específico, considerar concluído como aprovado
-        revisao = 0
+        total = db.session.query(Prontuario).count()
+        pendentes = db.session.query(Prontuario).filter(Prontuario.status == 'pendente').count()
+        aprovados = db.session.query(Prontuario).filter(Prontuario.status == 'aprovado').count()
+        revisao = db.session.query(Prontuario).filter(Prontuario.status == 'reajustes').count()
 
         stats = {
             'total': total,
@@ -1990,3 +2063,150 @@ def admin_listar_prontuarios():
     except Exception as e:
         print(f"Erro ao listar prontuários admin: {e}")
         return jsonify({'error': 'Erro ao listar prontuários.'}), 500
+
+@app.route('/api/admin/prontuarios/<int:prontuario_id>', methods=['GET'])
+def admin_obter_prontuario(prontuario_id):
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+    try:
+        pr = Prontuario.query.get(prontuario_id)
+        if not pr:
+            return jsonify({'error': 'Prontuário não encontrado.'}), 404
+
+        paciente = Paciente.query.get(pr.paciente_id)
+        estagiario = Estagiario.query.get(pr.estagiario_id)
+
+        return jsonify({
+            'id': pr.id,
+            'agendamento_id': pr.agendamento_id,
+            'paciente_id': pr.paciente_id,
+            'paciente_nome': paciente.nome if paciente else None,
+            'estagiario_id': pr.estagiario_id,
+            'estagiario_nome': estagiario.nome if estagiario else None,
+            'tipo_triagem': pr.tipo_triagem,
+            'sala_atendimento': pr.sala_atendimento,
+            'queixa_principal': pr.queixa_principal,
+            'historico_paciente': pr.historico_paciente,
+            'avaliacao_inicial': pr.avaliacao_inicial,
+            'tipo_encaminhamento': pr.tipo_encaminhamento,
+            'encaminhamento_descricao': pr.encaminhamento_descricao,
+            'status': pr.status,
+            'data_criacao': pr.data_criacao.strftime('%d/%m/%Y %H:%M') if pr.data_criacao else None,
+            'ultima_atualizacao': pr.ultima_atualizacao.strftime('%d/%m/%Y %H:%M') if pr.ultima_atualizacao else None
+        }), 200
+    except Exception as e:
+        print(f"Erro ao obter prontuário: {e}")
+        return jsonify({'error': 'Erro ao obter prontuário.'}), 500
+
+@app.route('/api/admin/prontuarios/<int:prontuario_id>', methods=['PUT'])
+def admin_atualizar_prontuario(prontuario_id):
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        return jsonify({'error': 'Acesso negado. Por favor, faça login como mestre.'}), 403
+
+    try:
+        pr = Prontuario.query.get(prontuario_id)
+        if not pr:
+            return jsonify({'error': 'Prontuário não encontrado.'}), 404
+
+        data = request.get_json() or {}
+
+        # Atualiza apenas campos permitidos
+        campos_texto = ['queixa_principal', 'historico_paciente', 'avaliacao_inicial', 'encaminhamento_descricao']
+        for campo in campos_texto:
+            if campo in data and isinstance(data.get(campo), str):
+                setattr(pr, campo, (data.get(campo) or '').strip())
+
+        if 'tipo_encaminhamento' in data:
+            pr.tipo_encaminhamento = data.get('tipo_encaminhamento')
+        if 'tipo_triagem' in data:
+            pr.tipo_triagem = data.get('tipo_triagem')
+        if 'sala_atendimento' in data:
+            pr.sala_atendimento = data.get('sala_atendimento')
+        if 'status' in data:
+            pr.status = data.get('status')
+
+        db.session.commit()
+        return jsonify({'message': 'Prontuário atualizado com sucesso!'}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao atualizar prontuário: {e}")
+        return jsonify({'error': 'Erro ao atualizar prontuário.'}), 500
+    except Exception as e:
+        print(f"Erro ao listar prontuários admin: {e}")
+        return jsonify({'error': 'Erro ao listar prontuários.'}), 500
+
+# --- ROTAS DE NOTIFICACAO ---
+@app.route('/admin/notificacoes', methods=['GET', 'POST'])
+def admin_notificacoes():
+    # Apenas admin pode acessar
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Faça login como mestre.', 'error')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        titulo = request.form.get('titulo')
+        mensagem = request.form.get('mensagem')
+        destinatario_id = request.form.get('destinatario_id') or None
+        enviado_por = session.get('nome_usuario')
+        notif = Notificacao(
+            titulo=titulo,
+            mensagem=mensagem,
+            destinatario_id=int(destinatario_id) if destinatario_id else None,
+            enviado_por=enviado_por
+        )
+        db.session.add(notif)
+        db.session.commit()
+        flash('Notificação enviada!', 'success')
+
+    # Buscar notificações existentes
+    notificacoes = Notificacao.query.order_by(Notificacao.data_criacao.desc()).all()
+    estagiarios = Estagiario.query.all()
+    return render_template('admin_notificacoes.html', notificacoes=notificacoes, estagiarios=estagiarios)
+
+@app.route('/comunicados')
+def comunicados():
+    # Só pode ver se for estagiário logado
+    if 'logged_in' not in session or session.get('user_type') != 'estagiario':
+        flash('Acesso negado. Faça login como estagiário.', 'error')
+        return redirect(url_for('login'))
+
+    estagiario_id = session.get('user_id')
+    notificacoes = Notificacao.query.filter(
+        (Notificacao.destinatario_id.is_(None)) | (Notificacao.destinatario_id == estagiario_id)
+    ).order_by(Notificacao.data_criacao.desc()).all()
+    return render_template('comunicados.html', notificacoes=notificacoes)
+
+# Rota para adicionar pacientes pelo admin
+@app.route('/admin/add_paciente', methods=['GET', 'POST'])
+def admin_add_paciente():
+    if 'logged_in' not in session or session.get('user_type') != 'mestre':
+        flash('Acesso negado. Faça login como mestre.', 'error')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        # Recebe dados do formulário
+        nome = request.form.get('nome')
+        data_nascimento = request.form.get('data_nascimento')
+        genero = request.form.get('genero')
+        cpf = request.form.get('cpf')
+        telefone = request.form.get('telefone')
+        email = request.form.get('email')
+        endereco = request.form.get('endereco')
+        numero_casa = request.form.get('numero_casa')
+        senha = request.form.get('senha')
+        # Cria e salva novo paciente
+        paciente = Paciente(
+            nome=nome,
+            data_nascimento=datetime.datetime.strptime(data_nascimento, '%Y-%m-%d'),
+            genero=genero,
+            cpf=cpf,
+            telefone=telefone,
+            email=email,
+            endereco=endereco,
+            numero_casa=numero_casa,
+            senha=generate_password_hash(senha)
+        )
+        db.session.add(paciente)
+        db.session.commit()
+        flash('Paciente adicionado com sucesso!', 'success')
+        return redirect(url_for('admin_add_paciente'))
+    return render_template('admin_add_paciente.html')

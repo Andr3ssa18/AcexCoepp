@@ -1072,12 +1072,7 @@
                     </svg>
                     <span>Consultas Estagiários</span>
                 </a>
-                <a href="#" class="nav-item" onclick="mostrarPagina('pagina-comunicados')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
-                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-                    </svg>
-                    <span>Comunicados</span>
-                </a>
+                <a href="{{ url_for('admin_notificacoes') }}" class="nav-item"> <span>📢</span>Comunicados</a>
                 <a href="#" class="nav-item" onclick="mostrarPagina('pagina-configuracoes')">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="nav-icon">
                         <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
@@ -1174,18 +1169,9 @@
                             </div>
                             <div class="card-content">
                                 <div class="quick-actions">
-                                    <button class="quick-action-btn" onclick="mostrarPagina('pagina-adicionar-paciente')">
-                                        <span class="action-icon">➕</span>
-                                        <span class="action-text">Adicionar pacientes</span>
-                                    </button>
-                                    <button class="quick-action-btn" onclick="mostrarPagina('pagina-prontuarios')">
-                                        <span class="action-icon">📋</span>
-                                        <span class="action-text">Acessar Prontuários</span>
-                                    </button>
-                                    <button class="quick-action-btn" onclick="mostrarPagina('pagina-criar-comunicado')">
-                                        <span class="action-icon">📢</span>
-                                        <span class="action-text">Criar comunicado</span>
-                                    </button>
+                                    <a href="{{ url_for('admin_add_paciente') }}" class="quick-action-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;"> <span class="action-icon">➕</span> <span class="action-text">Adicionar pacientes</span> </a>
+                                    <a href="/aba_admin#pagina-prontuarios" class="quick-action-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;"> <span class="action-icon">📋</span> <span class="action-text">Acessar Prontuários</span> </a>
+                                    <a href="{{ url_for('admin_notificacoes') }}" class="quick-action-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;"> <span class="action-icon">📢</span> <span class="action-text">Criar comunicado</span> </a>
                                 </div>
                             </div>
                         </div>
@@ -1699,6 +1685,62 @@
         </div>
     </div>
 
+    <!-- Modal Editar Prontuário -->
+    <div class="modal-overlay" id="modal-prontuario">
+        <div class="modal">
+            <div class="modal-header">
+                <span style="font-size: 24px;">📝</span>
+                <h2>Prontuário</h2>
+                <button class="modal-close" onclick="fecharModal('modal-prontuario')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="adm-prontuario-id">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Paciente</label>
+                        <input id="adm-paciente-nome" type="text" disabled>
+                    </div>
+                    <div class="form-group full">
+                        <label>Estagiário</label>
+                        <input id="adm-estagiario-nome" type="text" disabled>
+                    </div>
+                    <div class="form-group full">
+                        <label>Queixa Principal</label>
+                        <textarea id="adm-queixa" rows="3"></textarea>
+                    </div>
+                    <div class="form-group full">
+                        <label>Histórico do Paciente</label>
+                        <textarea id="adm-historico" rows="3"></textarea>
+                    </div>
+                    <div class="form-group full">
+                        <label>Avaliação Inicial</label>
+                        <textarea id="adm-avaliacao" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Encaminhamento</label>
+                        <input id="adm-tipo-encaminhamento" type="text">
+                    </div>
+                    <div class="form-group full">
+                        <label>Descrição do Encaminhamento</label>
+                        <textarea id="adm-encaminhamento-desc" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="adm-status">
+                            <option value="pendente">pendente</option>
+                            <option value="aprovado">aprovado</option>
+                            <option value="reajustes">reajustes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModal('modal-prontuario')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarProntuarioAdmin()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modais -->
     <!-- Modal Visualizar Perfil -->
     <div class="modal-overlay" id="modal-perfil">
@@ -1863,6 +1905,11 @@
                 carregarDadosEstagiarios();
             }
             
+            // Se for a página de prontuários, carregar a listagem
+            if (paginaId === 'pagina-prontuarios') {
+                carregarProntuarios();
+            }
+            
         }
 
         // Função de logout
@@ -1883,6 +1930,8 @@
             if (hash === '#consultas-estagiarios') {
                 abrirConsultasEstagiarios();
             }
+            // Carrega prontuários ao entrar na página inicial de prontuários
+            try { carregarProntuarios(); } catch(e) {}
         });
 
         // Função para filtrar pacientes
@@ -2103,7 +2152,11 @@
                     lista.forEach(item => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td class="checkbox-cell"><div class="checkbox-container"><input type="checkbox"></div></td>
+                            <td class="checkbox-cell">
+                                <div class="checkbox-container">
+                                    <button class="btn btn-outline" onclick="abrirProntuarioAdmin(${item.id || 0})">Ver/Editar</button>
+                                </div>
+                            </td>
                             <td>${item.paciente_nome || '-'}</td>
                             <td>${item.estagiario_nome || '-'}</td>
                             <td>${item.data_criacao || '-'}</td>
@@ -2117,6 +2170,52 @@
         }
 
         function buscarProntuarios() { carregarProntuarios(); }
+
+        // ==== Visualizar/Editar Prontuário (Admin) ====
+        function abrirProntuarioAdmin(id) {
+            if (!id) { alert('Prontuário inválido'); return; }
+            fetch(`/api/admin/prontuarios/${id}`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.error) { alert(d.error); return; }
+                    document.getElementById('adm-prontuario-id').value = d.id;
+                    document.getElementById('adm-paciente-nome').value = d.paciente_nome || '';
+                    document.getElementById('adm-estagiario-nome').value = d.estagiario_nome || '';
+                    document.getElementById('adm-queixa').value = d.queixa_principal || '';
+                    document.getElementById('adm-historico').value = d.historico_paciente || '';
+                    document.getElementById('adm-avaliacao').value = d.avaliacao_inicial || '';
+                    document.getElementById('adm-tipo-encaminhamento').value = d.tipo_encaminhamento || '';
+                    document.getElementById('adm-encaminhamento-desc').value = d.encaminhamento_descricao || '';
+                    document.getElementById('adm-status').value = d.status || 'pendente';
+                    document.getElementById('modal-prontuario').classList.add('show');
+                })
+                .catch(() => alert('Erro ao abrir prontuário'));
+        }
+
+        function salvarProntuarioAdmin() {
+            const id = document.getElementById('adm-prontuario-id').value;
+            const payload = {
+                queixa_principal: document.getElementById('adm-queixa').value,
+                historico_paciente: document.getElementById('adm-historico').value,
+                avaliacao_inicial: document.getElementById('adm-avaliacao').value,
+                tipo_encaminhamento: document.getElementById('adm-tipo-encaminhamento').value,
+                encaminhamento_descricao: document.getElementById('adm-encaminhamento-desc').value,
+                status: document.getElementById('adm-status').value
+            };
+            fetch(`/api/admin/prontuarios/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.error) { alert(d.error); return; }
+                    fecharModal('modal-prontuario');
+                    carregarProntuarios();
+                    alert('Prontuário atualizado com sucesso!');
+                })
+                .catch(() => alert('Erro ao salvar prontuário'));
+        }
 
         // Função para buscar comunicados
         function buscarComunicados() {

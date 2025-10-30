@@ -1,11 +1,15 @@
 #aqui voce pode limpar o banco de dados para testar o sistema
 
 from main import app, db
-from models import Agendamento, Disponibilidade
+from models import Agendamento, Disponibilidade, Prontuario
 
 def limpar_banco():
     with app.app_context():
         try:
+            # Deletar todos os prontuários (dependem de agendamentos)
+            num_prontuarios = Prontuario.query.delete()
+            print(f"Deletados {num_prontuarios} prontuários")
+
             # Deletar todos os agendamentos
             num_agendamentos = Agendamento.query.delete()
             print(f"Deletados {num_agendamentos} agendamentos")

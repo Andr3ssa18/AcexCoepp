@@ -1,0 +1,15 @@
+<section class="admin-add-paciente">
+  <h2>Adicionar Paciente</h2>
+  <form method="POST" action="{{ url_for('admin_add_paciente') }}">
+    <div><label>Nome:</label> <input name="nome" required></div>
+    <div><label>Data de Nascimento:</label> <input type="date" name="data_nascimento" required></div>
+    <div><label>Gênero:</label> <input name="genero" required></div>
+    <div><label>CPF:</label> <input name="cpf" required></div>
+    <div><label>Telefone:</label> <input name="telefone" required></div>
+    <div><label>Email:</label> <input name="email" required></div>
+    <div><label>Endereço:</label> <input name="endereco" required></div>
+    <div><label>Número da Casa:</label> <input name="numero_casa" required></div>
+    <div><label>Senha Inicial:</label> <input name="senha" type="password" required></div>
+    <button type="submit">Adicionar Paciente</button>
+  </form>
+</section>
