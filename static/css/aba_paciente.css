@@ -32,9 +32,272 @@ header {
 }
 
 /* =============================================================================
-   ESTILOS MELHORADOS PARA SELEÇÃO DE HORÁRIOS
+   SISTEMA DE ROLAGEM PARA DETALHES DA CONSULTA - PACIENTE (MANTENDO DESIGN ORIGINAL)
    ============================================================================= */
 
+/* Modal de Detalhes da Consulta com Scroll - Mantendo design original */
+#modal-detalhes-consulta .modal-content {
+    max-width: 500px;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0; /* Remove padding padrão para usar estrutura interna */
+}
+
+.detalhes-consulta-header {
+    background-color: #ffffff; /* Fundo branco */
+    color: #004a91; /* Texto azul */
+    padding: 1.5rem 2rem;
+    text-align: center;
+    flex-shrink: 0;
+    border-bottom: 3px solid #004a91; /* Borda inferior azul */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para destaque */
+}
+
+.detalhes-consulta-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.detalhes-consulta-body {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+    max-height: calc(85vh - 140px);
+    color: #004a91; /* Mantém a cor do texto original */
+}
+
+/* Mantendo os estilos originais da página de detalhes */
+.detalhes-consulta-container {
+    background-color: #f8faff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 0; /* Remove margem inferior original */
+}
+
+.detalhes-consulta-info {
+    margin-bottom: 25px;
+}
+
+.detalhes-consulta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0f2f7;
+}
+
+.detalhes-consulta-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detalhes-consulta-label {
+    font-weight: 600;
+    color: #004a91;
+    font-size: 1em;
+    min-width: 120px;
+}
+
+.detalhes-consulta-valor {
+    color: #333;
+    font-size: 1em;
+    text-align: right;
+    flex: 1;
+    margin-left: 15px;
+}
+
+.status-confirmado {
+    color: #28a745;
+    font-weight: 600;
+    background-color: #e6ffe6;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+/* Status badges - mantendo estilo original */
+.status-text {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.status-text.solicitado {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-text.confirmado,
+.status-text.agendado {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-text.cancelado_paciente,
+.status-text.cancelado_estagiario {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-text.finalizado {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.detalhes-consulta-acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 2px solid #e0f2f7;
+}
+
+.detalhes-consulta-acoes .action-button {
+    width: 100%;
+    justify-content: center;
+}
+
+.detalhes-consulta-acoes .action-button.danger {
+    margin-top: 10px;
+}
+
+.detalhes-consulta-acoes .action-button.warning {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.detalhes-consulta-acoes .action-button.warning:hover {
+    background-color: #6c757d;
+    transform: none;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer do modal */
+.detalhes-consulta-footer {
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Scrollbar personalizada - discreta */
+.detalhes-consulta-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.detalhes-consulta-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.detalhes-consulta-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.detalhes-consulta-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Estados de loading e erro */
+.detalhes-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.detalhes-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    color: #dc3545;
+    background: #f8d7da;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsividade - mantendo design original */
+@media (max-width: 768px) {
+    #modal-detalhes-consulta .modal-content {
+        margin: 0.5rem;
+        width: calc(100% - 1rem);
+        max-height: 95vh;
+    }
+    
+    .detalhes-consulta-header {
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .detalhes-consulta-body {
+        padding: 1.5rem;
+        max-height: calc(95vh - 120px);
+        gap: 1rem;
+    }
+    
+    .detalhes-consulta-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .detalhes-consulta-label {
+        min-width: auto;
+    }
+    
+    .detalhes-consulta-valor {
+        text-align: left;
+        margin-left: 0;
+    }
+    
+    .detalhes-consulta-footer {
+        padding: 1.25rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .detalhes-consulta-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .detalhes-consulta-body {
+        padding: 1.25rem;
+    }
+    
+    .detalhes-consulta-item {
+        margin-bottom: 0.875rem;
+        padding-bottom: 0.875rem;
+    }
+    
+    .detalhes-consulta-container {
+        padding: 15px;
+    }
+}
 .selection-container {
     margin-bottom: 30px;
     background: white;
