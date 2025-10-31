@@ -1317,17 +1317,70 @@ async function atualizarListaConsultas() {
     }
 }
 
-// Função melhorada para mostrar detalhes da consulta - VERSÃO ÚNICA CORRIGIDA
+// Função melhorada para mostrar detalhes da consulta com sistema de rolagem
 function mostrarDetalhesConsulta(consulta) {
     console.log("[mostrarDetalhesConsulta] Iniciada com consulta:", consulta);
     appState.consultaEmContexto = consulta;
     
-    if (!elements.detalhesConsultaConteudo || !elements.modalDetalhesConsulta) {
-        console.error('Elementos do modal de detalhes não encontrados');
+    if (!elements.modalDetalhesConsulta) {
+        console.error('Modal de detalhes não encontrado');
         return;
     }
     
-    const conteudo = elements.detalhesConsultaConteudo;
+    // Criar estrutura do modal com scroll mantendo design original
+    elements.modalDetalhesConsulta.innerHTML = `
+        <div class="modal-content">
+            <div class="detalhes-consulta-header">
+                <h2>Detalhes da Consulta</h2>
+            </div>
+            <div class="detalhes-consulta-body" id="detalhes-consulta-body">
+                <div class="detalhes-consulta-container">
+                    <!-- Conteúdo será preenchido aqui mantendo o design original -->
+                </div>
+            </div>
+            <div class="detalhes-consulta-footer">
+                <button class="action-button secondary" onclick="fecharModalDetalhes()">Fechar</button>
+            </div>
+        </div>
+    `;
+    
+    const container = document.querySelector('.detalhes-consulta-container');
+    
+    if (!container) {
+        console.error('Container de detalhes não encontrado');
+        return;
+    }
+    
+    // Adicionar loading state
+    container.innerHTML = `
+        <div class="detalhes-loading">
+            <div class="spinner" style="width: 40px; height: 40px; border-width: 4px;"></div>
+            <p style="margin-top: 1rem;">Carregando detalhes da consulta...</p>
+        </div>
+    `;
+    
+    // Simular carregamento (em produção, remover este timeout)
+    setTimeout(() => {
+        preencherDetalhesConsulta(container, consulta);
+    }, 500);
+    
+    openModal(elements.modalDetalhesConsulta);
+}
+
+// Função para preencher os detalhes da consulta mantendo design original
+function preencherDetalhesConsulta(container, consulta) {
+    if (!consulta) {
+        container.innerHTML = `
+            <div class="detalhes-error">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="#dc3545">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <h3 style="margin: 1rem 0 0.5rem 0;">Erro ao carregar</h3>
+                <p>Não foi possível carregar os detalhes da consulta.</p>
+            </div>
+        `;
+        return;
+    }
 
     let dataExibicao = "A definir";
     let horarioExibicao = "A definir";
@@ -1355,39 +1408,110 @@ function mostrarDetalhesConsulta(consulta) {
     }
 
     const tipoAtendimento = consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Solicitação de Triagem' : 'Consulta';
+    const statusClass = consulta.status.replace('_', '-');
 
-    conteudo.innerHTML = `
-        <p><strong>Tipo:</strong> ${tipoAtendimento}</p>
-        <p><strong>Estagiário/a:</strong> ${consulta.estagiario_nome || (consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Aguardando atribuição' : 'Não definido')}</p>
-        <p><strong>Data:</strong> ${dataExibicao}</p>
-        <p><strong>Horário:</strong> ${horarioExibicao}</p>
-        <p><strong>Local:</strong> COEPP - Fundação Santo André (Sala a ser definida)</p>
-        <p><strong>Status:</strong> <span class="status-text ${consulta.status.replace('_', '-')}">${consulta.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></p>
-        ${consulta.observacoes_estagiario ? `<p><strong>Observações do Estagiário:</strong> ${consulta.observacoes_estagiario}</p>` : ''}
+    let html = `
+        <div class="detalhes-consulta-info">
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Tipo:</span>
+                <span class="detalhes-consulta-valor">${tipoAtendimento}</span>
+            </div>
+            
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Estagiário(a):</span>
+                <span class="detalhes-consulta-valor">${consulta.estagiario_nome || (consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Aguardando atribuição' : 'Não definido')}</span>
+            </div>
+            
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Data:</span>
+                <span class="detalhes-consulta-valor">${dataExibicao}</span>
+            </div>
+            
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Horário:</span>
+                <span class="detalhes-consulta-valor">${horarioExibicao}</span>
+            </div>
+            
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Local:</span>
+                <span class="detalhes-consulta-valor">COEPP - Fundação Santo André (Sala a ser definida)</span>
+            </div>
+            
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Status:</span>
+                <span class="detalhes-consulta-valor">
+                    <span class="status-text ${statusClass}">
+                        ${consulta.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </span>
+                </span>
+            </div>
+        </div>
     `;
 
-    if (consulta.status !== 'cancelado_paciente' && consulta.status !== 'cancelado_estagiario' && consulta.status !== 'finalizado') {
-        conteudo.innerHTML += `
-                <h3 style="margin-top: 20px;">Ações</h3>
-                <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: center;">
-                    <button class="action-button danger" id="btn-detalhes-cancelar-${consulta.id}">Cancelar Agendamento</button>
-                    ${consulta.data_agendamento ? '<button class="action-button warning" disabled>Reagendar (Em breve)</button>' : ''}
-                </div>`;
-        
-        setTimeout(() => {
-            const cancelButton = document.getElementById(`btn-detalhes-cancelar-${consulta.id}`);
-            if (cancelButton) {
-                console.log(`[mostrarDetalhesConsulta] Botão #btn-detalhes-cancelar-${consulta.id} ENCONTRADO. Adicionando onclick.`);
-                cancelButton.onclick = () => {
-                    console.log(`[mostrarDetalhesConsulta] Botão #btn-detalhes-cancelar-${consulta.id} CLICADO. Chamando abrirModalConfirmarCancelamento com:`, consulta ? JSON.parse(JSON.stringify(consulta)) : consulta);
-                    abrirModalConfirmarCancelamento(consulta); 
-                };
-            } else {
-                console.error(`[mostrarDetalhesConsulta] ERRO: Botão #btn-detalhes-cancelar-${consulta.id} NÃO encontrado no DOM.`);
-            }
-        }, 0);
+    // Adicionar observações se existirem
+    if (consulta.observacoes_estagiario) {
+        html += `
+            <div class="detalhes-consulta-item">
+                <span class="detalhes-consulta-label">Observações:</span>
+                <span class="detalhes-consulta-valor">${consulta.observacoes_estagiario}</span>
+            </div>
+        `;
     }
-    openModal(elements.modalDetalhesConsulta);
+
+    // Adicionar ações se a consulta não estiver cancelada ou finalizada
+    if (consulta.status !== 'cancelado_paciente' && consulta.status !== 'cancelado_estagiario' && consulta.status !== 'finalizado') {
+        html += `
+            <div class="detalhes-consulta-acoes">
+                <button class="action-button danger" id="btn-detalhes-cancelar-${consulta.id}">
+                    Cancelar ${consulta.tipo_atendimento === 'Solicitação de Triagem' ? 'Solicitação' : 'Consulta'}
+                </button>
+                ${consulta.data_agendamento ? `
+                    <button class="action-button warning" disabled>
+                        Reagendar (Em breve)
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+
+    // Configurar evento do botão de cancelamento
+    setTimeout(() => {
+        const cancelButton = document.getElementById(`btn-detalhes-cancelar-${consulta.id}`);
+        if (cancelButton) {
+            console.log(`[preencherDetalhesConsulta] Botão #btn-detalhes-cancelar-${consulta.id} ENCONTRADO.`);
+            cancelButton.onclick = () => {
+                console.log(`[preencherDetalhesConsulta] Botão cancelar clicado para consulta:`, consulta);
+                abrirModalConfirmarCancelamento(consulta);
+            };
+        } else {
+            console.log(`[preencherDetalhesConsulta] Botão de cancelamento não encontrado (pode ser normal para consultas finalizadas/canceladas)`);
+        }
+    }, 100);
+}
+
+// Função atualizada para fechar o modal
+function fecharModalDetalhes() {
+    if (elements.modalDetalhesConsulta) {
+        // Restaurar estrutura original do modal para próxima abertura
+        elements.modalDetalhesConsulta.innerHTML = `
+            <div class="modal-content">
+                <h2>Detalhes da Consulta</h2>
+                <div id="detalhes-consulta-conteudo">
+                    <!-- Conteúdo será preenchido dinamicamente -->
+                </div>
+                <div class="modal-action-buttons">
+                    <button class="action-button secondary" onclick="fecharModalDetalhes()">Fechar</button>
+                </div>
+            </div>
+        `;
+        
+        // Atualizar referência ao conteúdo
+        elements.detalhesConsultaConteudo = document.getElementById('detalhes-consulta-conteudo');
+    }
+    
+    closeModal(elements.modalDetalhesConsulta);
 }
 
 async function executarCancelamentoFinal() {
